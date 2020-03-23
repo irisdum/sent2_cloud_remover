@@ -22,13 +22,14 @@ def define_geometry(list_coordinates):
         list_coordinates, None, False);
     return geometry
 
+
 def display_search(begin_date, ending_date, zone, collection):
     print("[INFO] searching images from collection {} \n beginning {} ending {} \n"
-          "in zone {}".format(dict_collection[collection],begin_date,ending_date,zone)
+          "in zone {}".format(dict_collection[collection], begin_date, ending_date, zone)
           )
 
 
-def get_image(begin_date, ending_date, zone, collection="sent1", opt_param={}):
+def get_filter_collection(begin_date, ending_date, zone, collection="sent1", opt_param={}):
     """:param collection sent1 or sent2 collections
     :param zone a list of list
     :return an Image collection"""
@@ -55,26 +56,24 @@ def _argparser():
     parser.add_argument('--c', type=str, help="collection")
     return parser.parse_args()
 
+
 def list_image_name(image_collection):
     """:param image_collection : an ee image collection
     :returns a list of the name of the image collection"""
-    #get the len of the image collection
-    n=image_collection.toList(1000).length().getInfo()
-    list_name=[]
-    list_image_collection=image_collection.toList(n)
+    # get the len of the image collection
+    n = image_collection.toList(1000).length().getInfo()
+    list_name = []
+    list_image_collection = image_collection.toList(n)
     for i in range(n):
-        name=ee.Image(list_image_collection.get(i)).get("system:id").getInfo()
-        list_name+=[name]
+        name = ee.Image(list_image_collection.get(i)).get("system:id").getInfo()
+        list_name += [name]
     return list_name
 
+
 def main(begin_date, ending_date, zone, collection):
-    collection = get_image(begin_date, ending_date, zone, collection)
-    #print(collection)
-    dict_collection=collection.toDictionary()
-    #print(type(dict_collection))
-    #print(dict_collection)
-    #print(collection.aggregate_array("id"))
+    collection = get_filter_collection(begin_date, ending_date, zone, collection)
     print(list_image_name(collection))
+
 
 if __name__ == '__main__':
     args = _argparser()
