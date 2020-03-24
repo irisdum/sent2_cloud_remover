@@ -1,0 +1,1 @@
+python3 run_download_images.py --bd1 "2019-12-01" --ed1 "2019-12-15" --d2 "2020-01-07" --sent2criteria "lessclouds" --zone "confs/test.geojson" --ccp 10
