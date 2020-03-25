@@ -49,7 +49,7 @@ def sub_collection_tiles(collection, sent=2):
         # collection.first().get("MGRS_TILE").getInfo()) assert collection.first().get("MGRS_TILE").getInfo() in
         # list_tiles, "{} not in {}".format(collection.first().get("MGRS_TILE").getInfo(), list_tiles) assert type(
         # tile_id)==type("55HGB"),"Wrong tile id format should be {} not {}".format(type(tile_id),type("55HGB"))
-        print(tile_id)
+        #print(tile_id)
         sub_collection = collection.filter(ee.Filter.eq(orbit_id[sent], tile_id))  # filter by the tilesid
         list_subcollection += [sub_collection]
         assert sub_collection.toList(100).length().getInfo() > 0, "Subcollection  {} is empty  ...".format(tile_id)

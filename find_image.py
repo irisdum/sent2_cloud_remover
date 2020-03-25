@@ -1,22 +1,51 @@
 import ee
 from gee_constant import dict_collection
 import argparse
+from datetime import date, timedelta
 import json
-
 ee.Initialize()
 
-def eedate_2_string(date):
-    str_day=str(date.get("day").format().getInfo())
-    str_month =str( date.get("month").format().getInfo())
-    str_year = str(date.get("year").format().getInfo())
-    return "{}-{}-{}".format(str_year,str_month,str_day)
 
-def next_day(str_date,add=1):
-    str_day=str_date.split("-")[-1]
-    str_next_day=str(int(str_day)+add)
-    str_next_date="-".join(str_date.split("-")[:-1]+[str_next_day])
-    #print(str_next_day)
+def eedate_2_string(date):
+    str_day = convert_int(str(date.get("day").format().getInfo()))
+    str_month = convert_int(str(date.get("month").format().getInfo()))
+    str_year = convert_int(str(date.get("year").format().getInfo()))
+    return "{}-{}-{}".format(str_year, str_month, str_day)
+
+
+def convert_int(str_value):
+    if type(str_value)==type(1):
+        str_value=str(str_value)
+
+    if len(str_value) == 1:
+        return "0" + str_value
+    else:
+        return str_value
+
+
+def string_2_datetime(str_date):
+    list_date = str_date.split("-")
+    new_date = date(int(list_date[0]), int(list_date[1]), int(list_date[2]))
+    return new_date
+
+
+def next_string_date(str_date, i):
+    old_date = string_2_datetime(str_date)
+    old_date = old_date + timedelta(days=i)
+    return datetime_2_string(old_date)
+
+
+def datetime_2_string(ex_date):
+    return "-".join([convert_int(ex_date.year),convert_int(ex_date.month), convert_int(ex_date.day)])
+
+
+def next_day(str_date, add=1):
+    str_day = str_date.split("-")[-1]
+    str_next_day = str(int(str_day) + add)
+    str_next_date = "-".join(str_date.split("-")[:-1] + [str_next_day])
+    # print(str_next_day)
     return str_next_date
+
 
 def gjson_2_eegeom(path_geojson):
     """Given the oath to the goejson returns an ee geometry polygon"""
@@ -46,13 +75,13 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
     """:param collection sent1 or sent2 collections
     :param zone : an ee.Geometry
     :return an Image collection"""
-    #print("begin {} ending {}".format(begin_date,ending_date))
-    if type(begin_date) !=type("u"):
+    # print("begin {} ending {}".format(begin_date,ending_date))
+    if type(begin_date) != type("u"):
         print("begin {} ending {}".format(begin_date.format().getInfo(), ending_date.format().getInfo()))
     display_search(begin_date, ending_date, zone, sent)
     collection = ee.ImageCollection(dict_collection[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
-    print("Collection sent {} filter len {}".format(sent,collection.toList(100).length().getInfo()))
+    print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
     if sent == 2:
         return collection
     else:
@@ -66,7 +95,7 @@ def opt_filter(collection, opt_param, sent):
     :param sent:
     """
     # print("sent {}".format(sent))
-    if collection.toList(100).length().getInfo()==0:
+    if collection.toList(100).length().getInfo() == 0:
         return collection
     else:
         if sent == 1:
@@ -79,7 +108,8 @@ def opt_filter(collection, opt_param, sent):
                     collection = collection.filter(ee.Filter.listContains('transmitterReceiverPolarisation', polar))
             if "orbitDirection" in opt_param:
                 # print("Filter by orbit direction {}".format(opt_param["orbitDirection"].upper()))
-                collection = collection.filter(ee.Filter.eq('orbitProperties_pass', opt_param["orbitDirection"].upper()))
+                collection = collection.filter(
+                    ee.Filter.eq('orbitProperties_pass', opt_param["orbitDirection"].upper()))
         else:  # sentinel2
             # print("Sentinel 2 default mode are MSI and Level 1C !!! To change that change the constant parameters !!")
             # print(opt_param)
@@ -126,7 +156,7 @@ def list_image_name(image_collection, sent):
 
 def main(begin_date, ending_date, path_zone, sent):
     collection = get_filter_collection(begin_date, ending_date, path_zone, sent)
-    print(list_image_name(collection, sent))
+    # print(list_image_name(collection, sent))
 
 
 if __name__ == '__main__':

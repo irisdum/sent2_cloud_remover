@@ -3,8 +3,10 @@ import json
 import ee
 import argparse
 
-from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom
+from download_images import download_all
+from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from fp_functions import sub_collection_tiles, extract_fp
+from gee_constant import sent_1_optparam
 
 
 def _argparser():
@@ -33,7 +35,7 @@ def _argparser():
 
 def default_param(collection):
     if collection == 1:
-        return {"productType": "GRD", "sensorMode": "IW", "instrument": "C-SAR", "polarisation": "VV,VH"}
+        return sent_1_optparam
     elif collection == 2:
         pass
     else:
@@ -53,15 +55,15 @@ def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
                                                        optparam1)  # get the sentinel 1 collection
     collection_sent1_t1_after = get_filter_collection(date_t, date_t.advance(i, "day"), zone, sent, optparam1)
     if opt_search == "both":
-        print("both")
+        #print("both")
         total_collection = collection_sent1_t1_after.merge(collection_sent1_t1_before)
         len_collection = collection_lenght(total_collection)
         return len_collection, total_collection
     elif opt_search == "before":
-        print(opt_search)
+        #print(opt_search)
         return collection_lenght(collection_sent1_t1_before), collection_sent1_t1_before
     else:
-        print(opt_search)
+        #print(opt_search)
         assert opt_search == "after", "Wrong parameter opt_search should be after but is {}".format(opt_search)
         return collection_lenght(collection_sent1_t1_after), collection_sent1_t1_after
 
@@ -82,20 +84,21 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
         print("Test day +- {} from {}".format(i, date_t.format().getInfo()))
         i += 1
         total_len, total_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
-    print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len,i))
+    print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len, i))
 
     final_list = list_image_name(total_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
 
     list_subcol_sent1 = sub_collection_tiles(total_collection, sent)  # Get subcollections list
     list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
-    #for subcol in list_subcol_sent1:
-        #name, date_coll, _ = extract_name_date_first(subcol, 1)
-        #print("Sentinel 1 collected at {} for sent2 collected at {}".format(date_coll.format().getInfo(),
-                                                                           # date_t.format().getInfo()))
-        #list_name_sent1 += [name]  # collect the name of the sent1 images
+    date_sent1 = list_subcol_sent1[0].first().date()
+    # for subcol in list_subcol_sent1:
+    # name, date_coll, _ = extract_name_date_first(subcol, 1)
+    # print("Sentinel 1 collected at {} for sent2 collected at {}".format(date_coll.format().getInfo(),
+    # date_t.format().getInfo()))
+    # list_name_sent1 += [name]  # collect the name of the sent1 images
 
-    return list_name_sent1
+    return list_name_sent1, date_sent1
 
 
 def sent2_filter_clouds(collection, sent2criteria, ccp):
@@ -122,9 +125,9 @@ def extract_name_date_first(collection, sent):
     if sent == 1:
         name = collection.first().get("system:id").getInfo()
     else:
-        #print("sent2")
+        # print("sent2")
         name = ee.Image(collection.first()).get("PRODUCT_ID").getInfo()
-        #print("here")
+        # print("here")
     zone = extract_fp(collection.first())
 
     return name, date_coll, zone  # TODO take care of the zone format read
@@ -136,7 +139,8 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     :param sent2criteria:
 :param zone : ee.Geometry
     """
-
+    dict_image_dwnld1 = {}
+    dict_image_dwnld2 = {}
     list_sent1_sent2_name = []
     # Extract the Image collection of sentinel 2 between the range dates
     global_collection_sent2_t1 = get_filter_collection(bd, ed, zone, 2, opt_param={
@@ -155,14 +159,14 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
         # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
         # image
-        list_name_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2, optparam1, "both")
-
+        dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
+        list_name_sent1, date_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2, optparam1, "both")
+        dict_image_dwnld1.update(dict(zip(list_name_sent1,[eedate_2_string(date_sent1) for i in range(len(list_name_sent1))])))
     list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
+    return dict_image_dwnld1,dict_image_dwnld2
 
-    return list_sent1_sent2_name
 
-
-def main(bd, ed, bd2,ed2, path_zone, sent2criteria, optparam1, ccp):
+def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp):
     """
     :param bd2:
     :param ccp: cloud pixel coverage percentage
@@ -182,12 +186,16 @@ def main(bd, ed, bd2,ed2, path_zone, sent2criteria, optparam1, ccp):
     # print("CCP val : {} type :{}".format(ccp,type(ccp)))
     # print({"ccp": ccp})
     zone_sent2_init = gjson_2_eegeom(path_zone)
-    list_name_t1 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
-    print("{} {}".format(bd2,ed2))
-    list_name_t2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1, ccp)
-    list_total=list_name_t1+list_name_t2
-    print(list_total)
-
+    dic_name_t1_sent1,dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
+    print("{} {}".format(bd2, ed2))
+    print(dic_name_t1_sent1,dic_name_t1_sent2,)
+    dic_name_t2_sent1,dic_name_t2_sent2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1, ccp)
+    print(dic_name_t2_sent1,dic_name_t2_sent2,)
+    #print(dic_total)
+    download_all(dic_name_t2_sent1, 1, "")
+    download_all(dic_name_t1_sent1, 1, "")
+    download_all(dic_name_t2_sent2, 2, "")
+    download_all(dic_name_t1_sent2, 2, "")
 
 if __name__ == '__main__':
     args = _argparser()
