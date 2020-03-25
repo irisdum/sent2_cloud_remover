@@ -12,8 +12,11 @@ def _argparser():
     parser.add_argument('--bd1', type=str, help="begin date where we are lookinf for a sentinel 2 cloud free image")
     parser.add_argument('--ed1', type=str,
                         help="ending date where we are looking for the sentinel 2  clouf free images")
-    parser.add_argument("--d2", type=str,
-                        help="t2 corresponds to the second date from which we are looking to the closer sentinel 1 "
+    parser.add_argument("--bd2", type=str,
+                        help="t2 corresponds to the second date for cloud free sent2 images"
+                             "acquisition")
+    parser.add_argument('--ed2', type=str,
+                        help="ending date t2 corresponds to the second date for cloud free sent2 images"
                              "acquisition")
     parser.add_argument('--zone', type=str, help="path where the zone coordinates are stored ")
     parser.add_argument("--sent2criteria", type=str, default="lessclouds",
@@ -74,23 +77,32 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     print("Test day +- {} from {}".format(0, date_t.format().getInfo()))
     i = 1
     total_len, total_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+    print(type(zone), zone.getInfo())
     while total_len < 1:  # iterate until a sentinel 1 image is found
-        print("Test day +- {} from {}".format(i,date_t.format().getInfo()))
+        print("Test day +- {} from {}".format(i, date_t.format().getInfo()))
         i += 1
         total_len, total_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+    print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len,i))
 
-    #print("We found a radar image Youhou ", total_collection.getInfo())
-    final_list = list_image_name(total_collection,sent)
-    date_sent1_t1 = total_collection.first().date()
-    #print("sent1 date at t1 is {}".format(date_sent1_t1))
-    #print("Final list {}".format(final_list))
+    final_list = list_image_name(total_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
-    return final_list[0], date_sent1_t1
 
-def sent2_filter_clouds(collection,sent2criteria,ccp):
+    list_subcol_sent1 = sub_collection_tiles(total_collection, sent)  # Get subcollections list
+    list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
+    #for subcol in list_subcol_sent1:
+        #name, date_coll, _ = extract_name_date_first(subcol, 1)
+        #print("Sentinel 1 collected at {} for sent2 collected at {}".format(date_coll.format().getInfo(),
+                                                                           # date_t.format().getInfo()))
+        #list_name_sent1 += [name]  # collect the name of the sent1 images
+
+    return list_name_sent1
+
+
+def sent2_filter_clouds(collection, sent2criteria, ccp):
     """ Given a ee.ImageCollection returns the name of the image with cloud pixel coverage below than ccp and that fit
      sent2criteria"""
-    collection = opt_filter(collection, {"ccp":ccp}, 2)
+    collection = opt_filter(collection, {"ccp": ccp}, 2)
+    assert collection.toList(100).length().getInfo() > 0, "No sentinel 2 image found with the ccp {}".format(ccp)
     # Sort all these images, choose the one with less clouds or the image the closer to bd1 ed1
     if sent2criteria == "begin":
         collection = collection.sort("system:time_start")
@@ -99,28 +111,65 @@ def sent2_filter_clouds(collection,sent2criteria,ccp):
     else:
         assert sent2criteria == "lessclouds", "Wrong parameter sent2criteria  {} should be in begin,end,lessclouds" \
             .format(sent2criteria)
-        collection= collection.sort('CLOUDY_PIXEL_PERCENTAGE')
+        collection = collection.sort('CLOUDY_PIXEL_PERCENTAGE')
+    # assert collection.toList(100).length().getInfo()>0, "No sentinel 2 image found with the ccp {}".format(ccp)
+    return extract_name_date_first(collection, 2)
 
-    return extract_name_date_first(collection,2)
 
-def extract_name_date_first(collection,sent):
+def extract_name_date_first(collection, sent):
     """Extract the name and the date of the first image of the collection"""
-    date_coll=collection.first().date()
-    if sent==1:
-        name=collection.first().get("system:id").getInfo()
+    date_coll = collection.first().date()
+    if sent == 1:
+        name = collection.first().get("system:id").getInfo()
     else:
-        name=collection.first().get("PRODUCT_ID").getInfo()
+        #print("sent2")
+        name = ee.Image(collection.first()).get("PRODUCT_ID").getInfo()
+        #print("here")
+    zone = extract_fp(collection.first())
 
-    zone= extract_fp(collection.first())
+    return name, date_coll, zone  # TODO take care of the zone format read
 
-    return name, date_coll,zone #TODO take care of the zone format read
 
-def main(bd, ed, d2, path_zone, sent2criteria, optparam1, ccp):
+def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
+    """    :param ccp:
+    :param optparam1:
+    :param sent2criteria:
+:param zone : ee.Geometry
     """
+
+    list_sent1_sent2_name = []
+    # Extract the Image collection of sentinel 2 between the range dates
+    global_collection_sent2_t1 = get_filter_collection(bd, ed, zone, 2, opt_param={
+        "ccp": ccp})
+    # Extract the List of subcollection with one subcollection = image between the range date
+    # at one special tile
+    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, 2)
+    list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
+    list_name_sent1 = []
+    assert len(list_subcol_sent2_t1) > 0, "No sentinel 2 list of subcollection has been created"
+    for sub_col in list_subcol_sent2_t1:  # Go over all the different subcollection
+
+        name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
+                                                                   ccp)  # filter the image with no many clouds
+        # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
+        list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
+        # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
+        # image
+        list_name_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2, optparam1, "both")
+
+    list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
+
+    return list_sent1_sent2_name
+
+
+def main(bd, ed, bd2,ed2, path_zone, sent2criteria, optparam1, ccp):
+    """
+    :param bd2:
     :param ccp: cloud pixel coverage percentage
     :param path_zone: path to the geojson which contains the zone description
-    :param d2:
-    :param sent2criteria: used to choose wether sent2 images cloud free chosern should be closer to the begin date or ending date
+    :param ed2:
+    :param sent2criteria: used to choose wether sent2 images cloud free chosern should be closer to the begin date or
+    ending date
     :param optparam1: None or a str which contains optional filter to be applied to the satellite data
     :param bd : string begin date from where we are looking for sentinel 2
     :param ed : string ending date
@@ -130,36 +179,16 @@ def main(bd, ed, d2, path_zone, sent2criteria, optparam1, ccp):
     else:
         optparam1 = json.loads(optparam1)
     # First we are looking for the first image with with less than ccp percentage of clouds
-    #print("CCP val : {} type :{}".format(ccp,type(ccp)))
-    #print({"ccp": ccp})
-    zone_sent2_init=gjson_2_eegeom(path_zone)
-    # Extract the Image collection of sentinel 2 between the range dates
-    global_collection_sent2_t1 = get_filter_collection(bd, ed, zone_sent2_init, 2, opt_param={"ccp": ccp}) #TODO adapt for having a list of sentinel 2
-    # Extract the List of subcollection with one subcollection = image between the range date
-    # at one special tile
-    #TODO : see for the special overlapping area
-    list_subcol_sent2_t1=sub_collection_tiles(global_collection_sent2_t1)
-    list_sent2_name=[] # Will contains the name of the required sentinel 2 Images
-    for sub_col in list_subcol_sent2_t1: # Go over all the different tiles
-        name,date1_sent2_subcol,zone_sent2=sent2_filter_clouds(sub_col, sent2criteria, ccp)
-        # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this image
-        #TODO sentinel 1 should be a list of names !!
-        image_sent1_t1_name, date_sent1_t1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2, optparam1, "both")
-
-    print("t1 will be {} type {}".format(date_sent2_t1.format().getInfo(), type(date_sent2_t1)))
-    list_sent2_t1 = list_image_name(collection_sent2_t1,2)
-    #print("We select the image {}", list_sent2_t1[0])
-    # Then the closest sentinel 1 closer to that date date_sent2_t1
-    image_sent1_t1_name, date_sent1_t1 = get_sentinel1_image(date_sent2_t1, zone, optparam1,"both")
-
-    # Then the sentinel 1 closer of the second date
-    image_sent1__t2_name, date_sent1_t2 = get_sentinel1_image(ee.Date(d2), zone, optparam1, "after")
-    # looks at the first radar image after d2
-
-    list_sent_t1t2_images = [list_sent2_t1[0], image_sent1_t1_name, image_sent1__t2_name]
-    print(list_sent_t1t2_images)
+    # print("CCP val : {} type :{}".format(ccp,type(ccp)))
+    # print({"ccp": ccp})
+    zone_sent2_init = gjson_2_eegeom(path_zone)
+    list_name_t1 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
+    print("{} {}".format(bd2,ed2))
+    list_name_t2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1, ccp)
+    list_total=list_name_t1+list_name_t2
+    print(list_total)
 
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.bd1, args.ed1, args.d2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp))
+    main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp))
