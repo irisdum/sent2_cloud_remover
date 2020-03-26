@@ -6,7 +6,7 @@ import argparse
 from download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from fp_functions import sub_collection_tiles, extract_fp
-from gee_constant import sent_1_optparam
+from gee_constant import S1_OPTPARAM
 
 
 def _argparser():
@@ -35,7 +35,7 @@ def _argparser():
 
 def default_param(collection):
     if collection == 1:
-        return sent_1_optparam
+        return S1_OPTPARAM
     elif collection == 2:
         pass
     else:
@@ -100,23 +100,33 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
 
     return list_name_sent1, date_sent1
 
+def clip_on_geometry(geometry):
+    def clip0(image):
+        return image.clip(geometry)
+    return clip0
 
-def sent2_filter_clouds(collection, sent2criteria, ccp):
+def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
+
     """ Given a ee.ImageCollection returns the name of the image with cloud pixel coverage below than ccp and that fit
-     sent2criteria"""
-    collection = opt_filter(collection, {"ccp": ccp}, 2)
-    assert collection.toList(100).length().getInfo() > 0, "No sentinel 2 image found with the ccp {}".format(ccp)
+     sent2criteria
+     :param zone: """
+    print("before clipping length collection = {}".format(collection.toList(100).length().getInfo()))
+    collection_zone=collection.map(clip_on_geometry(zone))
+    assert collection_zone.toList(100).length().getInfo() >0,"The clip function does not work"
+    print("after clipping length = {}".format(collection_zone.toList(100).length().getInfo()))
+    collection_zone = opt_filter(collection_zone, {"ccp": ccp}, 2)
+    assert collection_zone.toList(100).length().getInfo() > 0, "No sentinel 2 image found with the ccp {}".format(ccp)
     # Sort all these images, choose the one with less clouds or the image the closer to bd1 ed1
     if sent2criteria == "begin":
-        collection = collection.sort("system:time_start")
+        collection_zone = collection_zone.sort("system:time_start")
     elif sent2criteria == "end":
-        collection = collection.sort("system:time_start", False)
+        collection_zone = collection_zone.sort("system:time_start", False)
     else:
         assert sent2criteria == "lessclouds", "Wrong parameter sent2criteria  {} should be in begin,end,lessclouds" \
             .format(sent2criteria)
-        collection = collection.sort('CLOUDY_PIXEL_PERCENTAGE')
+        collection_zone = collection_zone.sort('CLOUDY_PIXEL_PERCENTAGE')
     # assert collection.toList(100).length().getInfo()>0, "No sentinel 2 image found with the ccp {}".format(ccp)
-    return extract_name_date_first(collection, 2)
+    return extract_name_date_first(collection_zone, 2)
 
 
 def extract_name_date_first(collection, sent):
@@ -154,7 +164,8 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     for sub_col in list_subcol_sent2_t1:  # Go over all the different subcollection
 
         name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
-                                                                   ccp)  # filter the image with no many clouds
+                                                                   ccp, zone)  # filter the image with no many clouds
+        # on the specific zone
         # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
         list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
         # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this

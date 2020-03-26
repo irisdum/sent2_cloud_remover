@@ -3,7 +3,7 @@
 import ee
 import json
 from find_image import next_day, eedate_2_string
-from gee_constant import orbit_id
+from gee_constant import ORBIT_ID
 
 
 def get_day_date(image):
@@ -14,7 +14,7 @@ def get_day_date(image):
 
 def get_property_collection(collection, sent):
     """    :param sent:
-:param collection : an ee.ImageCollection
+    :param collection : an ee.ImageCollection
     :returns a list of all the different tiles for one acquisition date, by default the first acquisition date of the zone"""
 
     small_collection=collection
@@ -33,9 +33,9 @@ def get_property_collection(collection, sent):
 
 def get_orbit_id(image,sent):
     if sent ==2:
-        return ee.String(image.get(orbit_id[sent]).getInfo())
+        return ee.String(image.get(ORBIT_ID[sent]).getInfo())
     else:
-        return image.get(orbit_id[sent]).getInfo()
+        return image.get(ORBIT_ID[sent]).getInfo()
 
 def sub_collection_tiles(collection, sent=2):
     """:param collection an ee.ImageCollection
@@ -50,7 +50,7 @@ def sub_collection_tiles(collection, sent=2):
         # list_tiles, "{} not in {}".format(collection.first().get("MGRS_TILE").getInfo(), list_tiles) assert type(
         # tile_id)==type("55HGB"),"Wrong tile id format should be {} not {}".format(type(tile_id),type("55HGB"))
         #print(tile_id)
-        sub_collection = collection.filter(ee.Filter.eq(orbit_id[sent], tile_id))  # filter by the tilesid
+        sub_collection = collection.filter(ee.Filter.eq(ORBIT_ID[sent], tile_id))  # filter by the tilesid
         list_subcollection += [sub_collection]
         assert sub_collection.toList(100).length().getInfo() > 0, "Subcollection  {} is empty  ...".format(tile_id)
     assert len(list_subcollection) > 0, "Wrong size of the list subcollection {}".format(len(list_subcollection))
@@ -68,3 +68,6 @@ def extract_fp(image):
     """:returns an ee.Geometry"""
 
     return ee.Geometry(image.get("system:footprint"))
+
+#TODO do a function which check if the initial zone is include on both fp is it is keep only the images.clip(ini_zone) où il y
+##TODO a le moins d'image. Pareil pour sentinel 1 : prendre la zone

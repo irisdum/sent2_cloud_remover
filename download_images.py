@@ -8,7 +8,7 @@ import requests
 import zipfile
 
 from find_image import next_string_date
-from gee_constant import sent_1_optparam
+from gee_constant import S1_OPTPARAM, S2_OPTPARAM
 
 
 def download_images(url_images):
@@ -33,7 +33,7 @@ def reformat_dataframe(df):
     link"""
     df["image_id"] = df.apply(lambda row: row["properties"]["title"], axis=1)
     # print(df.head)
-    df["download_path"] = df.apply(lambda row: get_zip_path(row), axis=1)
+    df["DOWNLOAD_PATH"] = df.apply(lambda row: get_zip_path(row), axis=1)
     return df
 
 def title_param1(image_id):
@@ -54,7 +54,7 @@ def get_image_download_path(df, image_id):
     :returns the path to the download"""
     # print(df["image_id"])
     # print(image_id)
-    zip_path = df["download_path"][df["image_id"] == image_id]
+    zip_path = df["DOWNLOAD_PATH"][df["image_id"] == image_id]
     return zip_path
 
 
@@ -65,9 +65,11 @@ def transformfilter2query(filter_name, filter_value):
 
 def get_download_zip_url(path_image_name, dict_param, sent=1):
     image_name=path_image_name.split("/")[-1]
-    dict_param.update(sent_1_optparam) # update the parameters with d
+    #dict_param.update(S1_OPTPARAM) # update the parameters with d
     if sent==1:
-        dict_param.update(sent_1_optparam)
+        dict_param.update(S1_OPTPARAM)
+    if sent==2:
+        dict_param.update(S2_OPTPARAM)
     proxy = None
     urlOpener = makeUrlOpener(proxy)
     lparam = []

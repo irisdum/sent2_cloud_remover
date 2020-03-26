@@ -1,5 +1,5 @@
 import ee
-from gee_constant import dict_collection
+from gee_constant import DICT_COLLECTION
 import argparse
 from datetime import date, timedelta
 import json
@@ -66,7 +66,7 @@ def define_geometry(list_coordinates):
 
 def display_search(begin_date, ending_date, zone, collection):
     # print("[INFO] searching images from collection {} \n beginning {} ending {} \n"
-    #       "in zone {}".format(dict_collection[collection], begin_date, ending_date, zone)
+    #       "in zone {}".format(DICT_COLLECTION[collection], begin_date, ending_date, zone)
     #       )
     pass
 
@@ -79,7 +79,7 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
     if type(begin_date) != type("u"):
         print("begin {} ending {}".format(begin_date.format().getInfo(), ending_date.format().getInfo()))
     display_search(begin_date, ending_date, zone, sent)
-    collection = ee.ImageCollection(dict_collection[sent])
+    collection = ee.ImageCollection(DICT_COLLECTION[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
     print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
     if sent == 2:
