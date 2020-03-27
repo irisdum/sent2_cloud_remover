@@ -5,7 +5,7 @@ import argparse
 
 from download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
-from fp_functions import sub_collection_tiles, extract_fp
+from fp_functions import sub_collection_tiles, extract_fp, check_clip_area
 from gee_constant import S1_OPTPARAM
 
 
@@ -89,7 +89,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     final_list = list_image_name(total_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
 
-    list_subcol_sent1 = sub_collection_tiles(total_collection, sent)  # Get subcollections list
+    list_subcol_sent1 = sub_collection_tiles(total_collection,zone, sent)  # Get subcollections list
     list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
     date_sent1 = list_subcol_sent1[0].first().date()
     # for subcol in list_subcol_sent1:
@@ -111,6 +111,7 @@ def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
      sent2criteria
      :param zone: """
     print("before clipping length collection = {}".format(collection.toList(100).length().getInfo()))
+
     collection_zone=collection.map(clip_on_geometry(zone))
     assert collection_zone.toList(100).length().getInfo() >0,"The clip function does not work"
     print("after clipping length = {}".format(collection_zone.toList(100).length().getInfo()))
@@ -138,7 +139,7 @@ def extract_name_date_first(collection, sent):
         # print("sent2")
         name = ee.Image(collection.first()).get("PRODUCT_ID").getInfo()
         # print("here")
-    zone = extract_fp(collection.first())
+    zone = extract_fp(collection.first(),sent)
 
     return name, date_coll, zone  # TODO take care of the zone format read
 
@@ -157,7 +158,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         "ccp": ccp})
     # Extract the List of subcollection with one subcollection = image between the range date
     # at one special tile
-    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, 2)
+    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1,zone, 2)
     list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
     list_name_sent1 = []
     assert len(list_subcol_sent2_t1) > 0, "No sentinel 2 list of subcollection has been created"
@@ -165,16 +166,22 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
 
         name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
                                                                    ccp, zone)  # filter the image with no many clouds
-        # on the specific zone
+        # on the specific zone which is the intersection of the two
+        print("zone {}".format(type(zone)))
+        print("zone  sent2 {}".format(type(zone)))
+        new_zone=check_clip_area(zone,zone_sent2) #corresponds to the intersection of the sent2 fp and the zone to download
+
         # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
         list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
         # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
         # image
         dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
-        list_name_sent1, date_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2, optparam1, "both")
+        list_name_sent1, date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
         dict_image_dwnld1.update(dict(zip(list_name_sent1,[eedate_2_string(date_sent1) for i in range(len(list_name_sent1))])))
     list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
     return dict_image_dwnld1,dict_image_dwnld2
+
+
 
 
 def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp):

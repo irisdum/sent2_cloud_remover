@@ -10,4 +10,4 @@ DIR_SENT=["sentinel1/", "sentinel2/"]
 TEMPORARY_DIR= "TEMPORARY_DIR/"
 DOWNLOAD_PATH= "./Downloads/" #path where the image are download from sara
 SENT_FORMAT=[".tiff", "jp2"]
-LISTE_BANDE_S2=["B1", "B2", "B3"]
+LISTE_BANDE_S2=["B04", "B03", "B02","B08"]

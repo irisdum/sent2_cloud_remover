@@ -3,7 +3,17 @@ import os
 import click
 from shutil import rmtree
 from gee_constant import DIR_T, DIR_SENT, TEMPORARY_DIR, SENT_FORMAT, LISTE_BANDE_S2
-from glob import glob
+import glob
+
+def list_directory(path_downloads):
+    """:returns a list of path to the directory which corresponds to all the unzip folders"""
+    list_dir=os.listdir(path_downloads)
+    return [path_downloads+ path +'/' for path in list_dir]
+
+def list_image(path_image_zip_dir,sent):
+
+    return glob.glob("{}**/*.{}".format(path_image_zip_dir,SENT_FORMAT[sent-1]),recursive=True)
+
 
 def create_hierarchy(output_path):
     """Create an approriate directory directory to download the data"""
@@ -76,14 +86,27 @@ def save_image(final_path, output_path_dir, sent, t):
     stroring_path=output_path_dir+hierarchy_path+image_name
     os.system("cp {} {}".format(final_path,stroring_path))
 
-def storing_process(output_path_dir,unzipped_path_dir,sent,t):
-    #Find the path of the .tif or jp2 images depending of sent
-    pass
-    #use glob
-    list_image_path=[]
+
+
+def storing_process(output_path_dir,unzipped_dwnld_path_dir,t):
+    # First get the list of all the directory downloads
+    list_dir=list_directory(unzipped_dwnld_path_dir)
+    for dir_image in list_dir :
+        #extract sentinel
+        sent=path_2_sent(dir_image)
+        list_image_path=list_image(dir_image,sent)
+
     assert len(list_image_path)>0,"No images format {} found in {}".format(SENT_FORMAT[sent - 1], unzipped_path_dir)
     #make the hierarchy
     create_hierarchy(output_path_dir)
     #store the image the images will be converted and band combined to be set in an appropriate directory
     store_image(list_image_path,sent,t,output_path_dir)
     #Delete the temporary directory
+
+def path_2_sent(path_unzipped_dir):
+    if "S1" in path_unzipped_dir:
+        return 1
+    elif "S2" in path_unzipped_dir:
+        return 2
+    else:
+        assert True, "Wrong path to unzipped dir {}".format(path_unzipped_dir)
