@@ -3,3 +3,4 @@ numpy==1.17
 google-api-python-client
 earthengine-api
 geopandas
+snap-stanford

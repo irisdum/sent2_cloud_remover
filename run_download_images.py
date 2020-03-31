@@ -6,7 +6,8 @@ import argparse
 from download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from fp_functions import sub_collection_tiles, extract_fp, check_clip_area
-from gee_constant import S1_OPTPARAM
+from gee_constant import S1_OPTPARAM, DOWNLOAD_PATH, DIR_T
+from store_data import preprocess_all
 
 
 def _argparser():
@@ -29,6 +30,10 @@ def _argparser():
     parser.add_argument("--optparam1", type=str, default=None, help="optional parameters to filter the data of "
                                                                     "sentinel 1 ")
     parser.add_argument("--ccp", type=int, default=20, help="Percentage of cloud allowed in the image")
+    parser.add_argument("--save", default=True, help="wether or not we are going to store the images")
+    parser.add_argument("--output_path", default=True, help="where the image preprocess and ordered are going "
+                                                            "to be stored")
+    parser.add_argument("--shp", default=True, help="path to the shapefile")
 
     return parser.parse_args()
 
@@ -55,15 +60,15 @@ def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
                                                        optparam1)  # get the sentinel 1 collection
     collection_sent1_t1_after = get_filter_collection(date_t, date_t.advance(i, "day"), zone, sent, optparam1)
     if opt_search == "both":
-        #print("both")
+        # print("both")
         total_collection = collection_sent1_t1_after.merge(collection_sent1_t1_before)
         len_collection = collection_lenght(total_collection)
         return len_collection, total_collection
     elif opt_search == "before":
-        #print(opt_search)
+        # print(opt_search)
         return collection_lenght(collection_sent1_t1_before), collection_sent1_t1_before
     else:
-        #print(opt_search)
+        # print(opt_search)
         assert opt_search == "after", "Wrong parameter opt_search should be after but is {}".format(opt_search)
         return collection_lenght(collection_sent1_t1_after), collection_sent1_t1_after
 
@@ -89,7 +94,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     final_list = list_image_name(total_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
 
-    list_subcol_sent1 = sub_collection_tiles(total_collection,zone, sent)  # Get subcollections list
+    list_subcol_sent1 = sub_collection_tiles(total_collection, zone, sent)  # Get subcollections list
     list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
     date_sent1 = list_subcol_sent1[0].first().date()
     # for subcol in list_subcol_sent1:
@@ -100,20 +105,22 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
 
     return list_name_sent1, date_sent1
 
+
 def clip_on_geometry(geometry):
     def clip0(image):
         return image.clip(geometry)
+
     return clip0
 
-def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
 
+def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
     """ Given a ee.ImageCollection returns the name of the image with cloud pixel coverage below than ccp and that fit
      sent2criteria
      :param zone: """
     print("before clipping length collection = {}".format(collection.toList(100).length().getInfo()))
 
-    collection_zone=collection.map(clip_on_geometry(zone))
-    assert collection_zone.toList(100).length().getInfo() >0,"The clip function does not work"
+    collection_zone = collection.map(clip_on_geometry(zone))
+    assert collection_zone.toList(100).length().getInfo() > 0, "The clip function does not work"
     print("after clipping length = {}".format(collection_zone.toList(100).length().getInfo()))
     collection_zone = opt_filter(collection_zone, {"ccp": ccp}, 2)
     assert collection_zone.toList(100).length().getInfo() > 0, "No sentinel 2 image found with the ccp {}".format(ccp)
@@ -139,7 +146,7 @@ def extract_name_date_first(collection, sent):
         # print("sent2")
         name = ee.Image(collection.first()).get("PRODUCT_ID").getInfo()
         # print("here")
-    zone = extract_fp(collection.first(),sent)
+    zone = extract_fp(collection.first(), sent)
 
     return name, date_coll, zone  # TODO take care of the zone format read
 
@@ -158,7 +165,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         "ccp": ccp})
     # Extract the List of subcollection with one subcollection = image between the range date
     # at one special tile
-    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1,zone, 2)
+    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, zone, 2)
     list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
     list_name_sent1 = []
     assert len(list_subcol_sent2_t1) > 0, "No sentinel 2 list of subcollection has been created"
@@ -169,7 +176,8 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         # on the specific zone which is the intersection of the two
         print("zone {}".format(type(zone)))
         print("zone  sent2 {}".format(type(zone)))
-        new_zone=check_clip_area(zone,zone_sent2) #corresponds to the intersection of the sent2 fp and the zone to download
+        new_zone = check_clip_area(zone,
+                                   zone_sent2)  # corresponds to the intersection of the sent2 fp and the zone to download
 
         # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
         list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
@@ -177,14 +185,13 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         # image
         dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
         list_name_sent1, date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
-        dict_image_dwnld1.update(dict(zip(list_name_sent1,[eedate_2_string(date_sent1) for i in range(len(list_name_sent1))])))
+        dict_image_dwnld1.update(
+            dict(zip(list_name_sent1, [eedate_2_string(date_sent1) for i in range(len(list_name_sent1))])))
     list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
-    return dict_image_dwnld1,dict_image_dwnld2
+    return dict_image_dwnld1, dict_image_dwnld2
 
 
-
-
-def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp):
+def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile):
     """
     :param bd2:
     :param ccp: cloud pixel coverage percentage
@@ -204,17 +211,26 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp):
     # print("CCP val : {} type :{}".format(ccp,type(ccp)))
     # print({"ccp": ccp})
     zone_sent2_init = gjson_2_eegeom(path_zone)
-    dic_name_t1_sent1,dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
+    dic_name_t1_sent1, dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
     print("{} {}".format(bd2, ed2))
-    print(dic_name_t1_sent1,dic_name_t1_sent2,)
-    dic_name_t2_sent1,dic_name_t2_sent2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1, ccp)
-    print(dic_name_t2_sent1,dic_name_t2_sent2,)
-    #print(dic_total)
-    download_all(dic_name_t2_sent1, 1, "")
-    download_all(dic_name_t1_sent1, 1, "")
-    download_all(dic_name_t2_sent2, 2, "")
-    download_all(dic_name_t1_sent2, 2, "")
+    print(dic_name_t1_sent1, dic_name_t1_sent2, )
+    dic_name_t2_sent1, dic_name_t2_sent2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1,
+                                                                ccp)
+    print(dic_name_t2_sent1, dic_name_t2_sent2, )
+
+    if save:
+        # TODO saving options + directory t1 and directory t2
+        download_all(dic_name_t2_sent1, 1, DOWNLOAD_PATH + DIR_T[0])
+        download_all(dic_name_t1_sent1, 1, DOWNLOAD_PATH + DIR_T[0])
+        download_all(dic_name_t2_sent2, 2, DOWNLOAD_PATH + DIR_T[1])
+        download_all(dic_name_t1_sent2, 2, DOWNLOAD_PATH + DIR_T[1])
+    if output_path is not None:
+        print("Starting preprocessing the images are going to be stored at {}".format(output_path))
+        preprocess_all(output_path, DOWNLOAD_PATH, path_shapefile)
+
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp))
+    main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
+         args.save,
+         args.output_path, args.shp)

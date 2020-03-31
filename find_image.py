@@ -106,10 +106,11 @@ def opt_filter(collection, opt_param, sent):
                 for polar in opt_param["polarisation"].split(","):
                     # print("Filter by polarisation {}".format(polar))
                     collection = collection.filter(ee.Filter.listContains('transmitterReceiverPolarisation', polar))
-            if "orbitDirection" in opt_param:
+            if True:
                 # print("Filter by orbit direction {}".format(opt_param["orbitDirection"].upper()))
                 collection = collection.filter(
-                    ee.Filter.eq('orbitProperties_pass', opt_param["orbitDirection"].upper()))
+                    ee.Filter.eq('orbitProperties_pass',"DESCENDING")) #                    ee.Filter.eq('orbitProperties_pass', "")) #
+
         else:  # sentinel2
             # print("Sentinel 2 default mode are MSI and Level 1C !!! To change that change the constant parameters !!")
             # print(opt_param)
