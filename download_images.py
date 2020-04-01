@@ -97,7 +97,7 @@ def download_url(zip_file_url, output_path=""):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     print(z)
     #z.write(output_path+"test.zip")
-    z.extractall()
+    z.extractall(output_path)
 
 
 def download_all(dic_download, sent, output_path):

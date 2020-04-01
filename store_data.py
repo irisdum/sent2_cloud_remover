@@ -56,7 +56,7 @@ def create_download_dir(download_path):
     if os.path.isdir(download_path):
         if click.confirm('The directory already exists, it will remove it do you want to continue?', default=True):
             print('Ok remove')
-            shutil.rmtree(output_path)
+            shutil.rmtree(download_path)
         else:
             return False
 

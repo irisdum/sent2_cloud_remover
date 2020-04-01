@@ -98,6 +98,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
 
     list_subcol_sent1 = sub_collection_tiles(total_collection, zone, sent)  # Get subcollections list
+    assert len(list_subcol_sent1)==1, "There are some SAR image that has not been considered"
     list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
     date_sent1 = list_subcol_sent1[0].first().date()
     # for subcol in list_subcol_sent1:
