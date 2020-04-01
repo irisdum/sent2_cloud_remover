@@ -10,7 +10,7 @@ from datetime import date
 
 def crop_image(image_path, path_shapefile, output_path):
     assert os.path.isfile(path_shapefile), "No path in {}".format(path_shapefile)
-    #assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
+    # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
     print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
     os.system("gdalwarp -cutline   {} {} {}".format(path_shapefile, image_path, output_path))
     return output_path
@@ -28,8 +28,8 @@ def list_directory(path_downloads):
 
 
 def list_band(path_image_zip_dir, sent):
-    #print(type(sent))
-    #print(glob.glob("{}/**/*.{}".format(path_image_zip_dir, SENT_FORMAT[sent - 1]), recursive=True))
+    # print(type(sent))
+    # print(glob.glob("{}/**/*.{}".format(path_image_zip_dir, SENT_FORMAT[sent - 1]), recursive=True))
     return glob.glob("{}/**/*.{}".format(path_image_zip_dir, SENT_FORMAT[sent - 1]), recursive=True)
 
 
@@ -43,12 +43,28 @@ def create_hierarchy(output_path):
         else:
             return False
     assert output_path[-1] == "/", "wrong output path directory should end with / but is {}".format(output_path)
-    print("create {} {}",output_path,output_path+TEMPORARY_DIR)
+    print("create {} {}", output_path, output_path + TEMPORARY_DIR)
     os.makedirs(output_path)  # it is the directory which contains all the images for one area
     os.makedirs(output_path + TEMPORARY_DIR)
     mk_sentineldir(output_path + DIR_T[0])
     mk_sentineldir(output_path + DIR_T[1])
-    assert os.path.isdir(output_path+TEMPORARY_DIR),"The directory has not been created yet {}".format(output_path+TEMPORARY_DIR)
+    assert os.path.isdir(output_path + TEMPORARY_DIR), "The directory has not been created yet {}".format(
+        output_path + TEMPORARY_DIR)
+
+
+def create_download_dir(download_path):
+    if os.path.isdir(download_path):
+        if click.confirm('The directory already exists, it will remove it do you want to continue?', default=True):
+            print('Ok remove')
+            shutil.rmtree(output_path)
+        else:
+            return False
+
+    os.makedirs(download_path)
+    os.makedirs(download_path + DIR_T[0])
+    os.makedirs(download_path + DIR_T[1])
+    return True
+
 
 def mk_sentineldir(path_time_dir):
     os.makedirs(path_time_dir)
@@ -72,7 +88,7 @@ def combine_image(lpath, output_path_dir, image_name, sent):
                                 "combine_image functions to accept {}".format(lpath)
         os.system("gdal_merge.py -separate -o {}  {} {} {} {}".format(
             output_path_dir + image_name, lpath[0], lpath[1], lpath[2], lpath[3]))
-    #-co PHOTOMETRIC=MINISBLACK
+    # -co PHOTOMETRIC=MINISBLACK
     return output_path_dir + image_name
 
 
@@ -107,7 +123,7 @@ def store_image(list_path_band, sent, t, output_path_dir, image_name, path_shape
     :param t : corresponds to the first date or second date of acquisition"""
     # Select only the requested bands in list_path_band
     list_path_band = sort_sent_band(list_path_band, sent)
-    print("DIR ",output_path + TEMPORARY_DIR)
+    print("DIR ", output_path + TEMPORARY_DIR)
     list_path_band_cropped = [
         crop_image(path_band, path_shapefile, output_path + TEMPORARY_DIR + path_band.split("/")[-1]) for path_band in
         list_path_band]
@@ -214,7 +230,7 @@ def select_dir_t(list_dir, dict_t):
 
 
 def extract_path_image_name(path_dir):
-    return path_dir.split("/")[-1][:-5]+".tiff"
+    return path_dir.split("/")[-1][:-5] + ".tiff"
 
 
 def create_summary(output_dir):
@@ -229,4 +245,4 @@ def main(output_path, download_path, path_shapefile):
 if __name__ == '__main__':
     download_path = DOWNLOAD_PATH
     output_path = "./test_kangaroo_image/"
-    main(output_path, download_path,path_shapefile="./confs/fp_kangaroo.shp")
+    main(output_path, download_path, path_shapefile="./confs/fp_kangaroo.shp")

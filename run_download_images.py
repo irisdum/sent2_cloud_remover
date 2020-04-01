@@ -1,5 +1,8 @@
 # File where the search of the image name in GEE scripts and the download procedure of auscohup are linked
 import json
+import os
+import shutil
+
 import ee
 import argparse
 
@@ -7,7 +10,7 @@ from download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from fp_functions import sub_collection_tiles, extract_fp, check_clip_area
 from gee_constant import S1_OPTPARAM, DOWNLOAD_PATH, DIR_T
-from store_data import preprocess_all
+from store_data import preprocess_all, create_download_dir
 
 
 def _argparser():
@@ -191,7 +194,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     return dict_image_dwnld1, dict_image_dwnld2
 
 
-def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile):
+def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile, click=None):
     """
     :param bd2:
     :param ccp: cloud pixel coverage percentage
@@ -203,6 +206,9 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     :param bd : string begin date from where we are looking for sentinel 2
     :param ed : string ending date
     """
+
+    assert create_download_dir(DOWNLOAD_PATH), "Download directory has not been well created"
+
     if optparam1 is None:
         optparam1 = default_param(1)
     else:
