@@ -23,11 +23,11 @@
       <outputImageInComplex>false</outputImageInComplex>
       <outputImageScaleInDb>false</outputImageScaleInDb>
       <createGammaBand>false</createGammaBand>
-      <createBetaBand>true</createBetaBand>
+      <createBetaBand>false</createBetaBand>
       <selectedPolarisations/>
       <outputSigmaBand>false</outputSigmaBand>
       <outputGammaBand>false</outputGammaBand>
-      <outputBetaBand>true</outputBetaBand>
+      <outputBetaBand>false</outputBetaBand>
     </parameters>
   </node>
   <node id="Terrain-Correction">
