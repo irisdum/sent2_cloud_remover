@@ -11,21 +11,10 @@
       <continueOnFail>false</continueOnFail>
     </parameters>
   </node>
-  <node id="Remove-GRD-Border-Noise">
-    <operator>Remove-GRD-Border-Noise</operator>
-    <sources>
-      <sourceProduct refid="Apply-Orbit-File"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-      <borderLimit>500</borderLimit>
-      <trimThreshold>0.5</trimThreshold>
-    </parameters>
-  </node>
   <node id="Calibration">
     <operator>Calibration</operator>
     <sources>
-      <sourceProduct refid="Remove-GRD-Border-Noise"/>
+      <sourceProduct refid="Apply-Orbit-File"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
@@ -56,4 +45,3 @@
   </node>
   </graph>
 
-</graph>
