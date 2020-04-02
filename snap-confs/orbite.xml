@@ -1,9 +1,14 @@
 <graph id="Graph-Orbite">
   <version>1.0</version>
-  <node id="Apply-Orbit-File">
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement"/>
+    </node>
+    <node id="Apply-Orbit-File">
     <operator>Apply-Orbit-File</operator>
     <sources>
-      <sourceProduct>${sourceProduct}</sourceProduct>
+      <sourceProduct refid="Read"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <orbitType>Sentinel Precise (Auto Download)</orbitType>
@@ -11,4 +16,15 @@
       <continueOnFail>false</continueOnFail>
     </parameters>
   </node>
+    <node id="Write">
+        <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Apply-Orbit-File"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>target.dim</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
 </graph>
+
