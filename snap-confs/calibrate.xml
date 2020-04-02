@@ -40,13 +40,4 @@
       <outputGammaBand>false</outputGammaBand>
       <outputBetaBand>true</outputBetaBand>
     </parameters>
-  </node>
-   <node id="Terrain-Correction">
-    <operator>Terrain-Correction</operator>
-    <sources>
-      <sourceProduct refid="Calibration"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-    </parameters>
-  </node>
 </graph>
