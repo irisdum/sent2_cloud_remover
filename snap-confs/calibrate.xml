@@ -41,8 +41,8 @@
       <outputBetaBand>true</outputBetaBand>
     </parameters>
   </node>
-   <node id="Range-Doppler-Terrain-Correction">
-    <operator>Range-Doppler-Terrain-Correction</operator>
+   <node id="Terrain-Correction">
+    <operator>Terrain-Correction</operator>
     <sources>
       <sourceProduct refid="Calibration"/>
     </sources>
