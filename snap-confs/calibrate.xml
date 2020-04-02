@@ -67,8 +67,8 @@
     </sources>
     <parameters>
       <file>${file}</file>
-      <formatName>BIGTIFF</formatName>
-      <deleteOutputOnFailure>false</deleteOutputOnFailure>
+      <formatName>GEOTIFF</formatName>
+      <deleteOutputOnFailure>true</deleteOutputOnFailure>
       <writeEntireTileRows>false</writeEntireTileRows>
       <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
     </parameters>
