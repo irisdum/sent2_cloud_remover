@@ -40,4 +40,5 @@
       <outputGammaBand>false</outputGammaBand>
       <outputBetaBand>true</outputBetaBand>
     </parameters>
+  </node>
 </graph>
