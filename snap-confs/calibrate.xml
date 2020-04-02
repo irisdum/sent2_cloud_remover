@@ -25,7 +25,7 @@
       <createGammaBand>false</createGammaBand>
       <createBetaBand>false</createBetaBand>
       <selectedPolarisations/>
-      <outputSigmaBand>false</outputSigmaBand>
+      <outputSigmaBand>true</outputSigmaBand>
       <outputGammaBand>false</outputGammaBand>
       <outputBetaBand>false</outputBetaBand>
     </parameters>
@@ -67,7 +67,7 @@
     </sources>
     <parameters>
       <file>${file}</file>
-      <formatName>GEOTIFF</formatName>
+      <formatName>BIGTIFF</formatName>
       <deleteOutputOnFailure>false</deleteOutputOnFailure>
       <writeEntireTileRows>false</writeEntireTileRows>
       <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
