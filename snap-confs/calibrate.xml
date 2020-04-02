@@ -41,7 +41,7 @@
       <outputBetaBand>true</outputBetaBand>
     </parameters>
   </node>
-  <node id="Terrain-Flattening">
+  <node id="Doppler-Terrain-Correction">
     <operator>Terrain-Flattening</operator>
     <sources>
       <sourceProduct refid="Calibration"/>
