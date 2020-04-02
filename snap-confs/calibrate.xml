@@ -43,14 +43,14 @@
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
       <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
-      <pixelSpacingInDegree>0.0</pixelSpacingInDegree>
+      <pixelSpacingInDegree>8.983152841195215E-5</pixelSpacingInDegree>
       <mapProjection>WGS84(DD)</mapProjection>
           <nodataValueAtSea>true</nodataValueAtSea>
       <saveDEM>false</saveDEM>
       <saveLocalIncidenceAngle>false</saveLocalIncidenceAngle>
       <saveProjectedLocalIncidenceAngle>false</saveProjectedLocalIncidenceAngle>
       <saveSelectedSourceBand>true</saveSelectedSourceBand>
-      <applyRadiometricNormalization>true</applyRadiometricNormalization>
+      <applyRadiometricNormalization>false</applyRadiometricNormalization>
       <saveSigmaNought>false</saveSigmaNought>
       <saveGammaNought>false</saveGammaNought>
       <saveBetaNought>false</saveBetaNought>
