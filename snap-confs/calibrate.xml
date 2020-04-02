@@ -41,4 +41,19 @@
       <outputBetaBand>true</outputBetaBand>
     </parameters>
   </node>
+  <node id="WriteTIFF">
+    <operator>Write</operator>
+    <sources>
+      <source>${source}</source>
+    </sources>
+    <parameters>
+      <file>${file}</file>
+      <formatName>GEOTIFF</formatName>
+      <deleteOutputOnFailure>false</deleteOutputOnFailure>
+      <writeEntireTileRows>false</writeEntireTileRows>
+      <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
+    </parameters>
+  </node>
+  </graph>
+
 </graph>
