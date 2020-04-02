@@ -1,6 +1,7 @@
 #!/bin/bash
 set -x
-
+export JAVA_OPTS="-Xmx4096m -XX:CompressedClassSpaceSize=256m"
+export _JAVA_OPTIONS="-Xmx4096m -XX:CompressedClassSpaceSize=256m"
 ############################################
 # User Configuration
 ############################################
@@ -48,6 +49,6 @@ mkdir -p "${targetDirectory}"
 for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
+  ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -Dsnap.gpf.useFileTileCache=false -t ${targetFile} ${sourceFile}
 done
 
