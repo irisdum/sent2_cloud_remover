@@ -37,12 +37,12 @@
     </sources>
     <parameters>
       <sourceBands/>
-      <demName>SRTM 1Sec</demName>
+      <demName>SRTM 3Sec</demName>
       <externalDEMFile/>
       <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
-      <pixelSpacingInMeter>0.0</pixelSpacingInMeter>
+      <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
       <pixelSpacingInDegree>0.0</pixelSpacingInDegree>
       <mapProjection>WGS84(DD)</mapProjection>
           <nodataValueAtSea>true</nodataValueAtSea>
