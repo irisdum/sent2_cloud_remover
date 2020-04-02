@@ -41,19 +41,12 @@
       <outputBetaBand>true</outputBetaBand>
     </parameters>
   </node>
-  <node id="Doppler-Terrain-Correction">
-    <operator>Terrain-Flattening</operator>
+   <node id="Range-Doppler-Terrain-Correction">
+    <operator>Range-Doppler-Terrain-Correction</operator>
     <sources>
       <sourceProduct refid="Calibration"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <demName>Local DSM</demName>
-      <demResamplingMethod>BICUBIC_INTERPOLATION</demResamplingMethod>
-      <externalDEMFile>subset.tif</externalDEMFile>
-      <externalDEMNoDataValue>-999.5</externalDEMNoDataValue>
-      <outputSimulatedImage>false</outputSimulatedImage>
-      <reGridMethod>false</reGridMethod>
     </parameters>
   </node>
 </graph>
