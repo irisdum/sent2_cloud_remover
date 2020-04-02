@@ -9,7 +9,7 @@
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
 export PATH=/home/dum031/snap/bin:$PATH
-gptPath="gpt"
+gptPath="gpt -e"
 
 ############################################
 # Command line handling
