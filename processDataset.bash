@@ -48,7 +48,7 @@ removeExtension() {
 mkdir -p "${targetDirectory}"
 
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
-for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
+for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
   ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
