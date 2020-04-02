@@ -44,7 +44,7 @@
   <node id="WriteTIFF">
     <operator>Write</operator>
     <sources>
-      <source>${source}</source>
+      <sourceProduct refid="Calibration"/>
     </sources>
     <parameters>
       <file>${file}</file>
