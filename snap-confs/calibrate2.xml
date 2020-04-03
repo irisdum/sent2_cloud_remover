@@ -44,7 +44,7 @@
   <node id="Subset">
     <operator>Subset</operator>
     <sources>
-      <sourceProduct refid="Terrain-Correction""/>
+      <sourceProduct refid="Terrain-Correction"/>
     </sources>
     <parameters>
       <sourceBands/>
@@ -52,8 +52,6 @@
       <copyMetadata>true</copyMetadata>
     </parameters>
   </node>
-
-
   <node id="Calibration">
     <operator>Calibration</operator>
     <sources>
