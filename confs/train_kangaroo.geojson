@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "train_kangaroo",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "train": "vf" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 149.905714982274247, -35.174595826285113 ], [ 149.905714982274247, -34.830808794032357 ], [ 150.588611672191291, -34.830808794032357 ], [ 150.588611672191291, -35.174595826285113 ], [ 149.905714982274247, -35.174595826285113 ] ] ] ] } }
+]
+}
