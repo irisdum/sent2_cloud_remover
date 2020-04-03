@@ -1,0 +1,38 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Apply-Orbit-File">
+    <operator>Apply-Orbit-File</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <orbitType>Sentinel Precise (Auto Download)</orbitType>
+      <polyDegree>3</polyDegree>
+      <continueOnFail>false</continueOnFail>
+    </parameters>
+  </node>
+  <node id="Subset">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Apply-Orbit-File"/>
+    </sources>
+    <parameters>
+      <sourceBands/>
+      <geoRegion>${geometry}</geoRegion>
+    </parameters>
+  </node>
+  <node id="WriteTIFF">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Subset"/>
+    </sources>
+    <parameters>
+      <file>${file}</file>
+      <formatName>GEOTIFF</formatName>
+      <deleteOutputOnFailure>false</deleteOutputOnFailure>
+      <writeEntireTileRows>false</writeEntireTileRows>
+      <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
+    </parameters>
+  </node>
+  </graph>
+

@@ -22,8 +22,6 @@
       <geoRegion>${geometry}</geoRegion>
     </parameters>
   </node>
-
-
   <node id="Calibration">
     <operator>Calibration</operator>
     <sources>
@@ -43,45 +41,15 @@
       <outputBetaBand>false</outputBetaBand>
     </parameters>
   </node>
-  <node id="Terrain-Correction">
-    <operator>Terrain-Correction</operator>
+  <node id="WriteTIFF">
+    <operator>Write</operator>
     <sources>
       <sourceProduct refid="Calibration"/>
     </sources>
     <parameters>
-      <sourceBands/>
-      <demName>SRTM 3Sec</demName>
-      <externalDEMFile/>
-      <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
-      <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
-      <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
-      <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
-      <pixelSpacingInDegree>8.983152841195215E-5</pixelSpacingInDegree>
-      <mapProjection>WGS84(DD)</mapProjection>
-          <nodataValueAtSea>true</nodataValueAtSea>
-      <saveDEM>false</saveDEM>
-      <saveLocalIncidenceAngle>false</saveLocalIncidenceAngle>
-      <saveProjectedLocalIncidenceAngle>false</saveProjectedLocalIncidenceAngle>
-      <saveSelectedSourceBand>true</saveSelectedSourceBand>
-      <applyRadiometricNormalization>false</applyRadiometricNormalization>
-      <saveSigmaNought>false</saveSigmaNought>
-      <saveGammaNought>false</saveGammaNought>
-      <saveBetaNought>false</saveBetaNought>
-      <incidenceAngleForSigma0>Use projected local incidence angle from DEM</incidenceAngleForSigma0>
-      <incidenceAngleForGamma0>Use projected local incidence angle from DEM</incidenceAngleForGamma0>
-      <auxFile/>
-      <externalAuxFile/>
-    </parameters>
-  </node>
-  <node id="WriteTIFF">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="Terrain-Correction"/>
-    </sources>
-    <parameters>
       <file>${file}</file>
       <formatName>GEOTIFF</formatName>
-      <deleteOutputOnFailure>true</deleteOutputOnFailure>
+      <deleteOutputOnFailure>false</deleteOutputOnFailure>
       <writeEntireTileRows>false</writeEntireTileRows>
       <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
     </parameters>

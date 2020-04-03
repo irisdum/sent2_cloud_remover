@@ -54,3 +54,6 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
   ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
 done
+
+####test if the image works
+gdalinfo output4.tif
