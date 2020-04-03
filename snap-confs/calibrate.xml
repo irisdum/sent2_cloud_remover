@@ -44,10 +44,24 @@
       <outputBetaBand>false</outputBetaBand>
     </parameters>
   </node>
+   <node id="Speckle-Filter">
+      <operator>Speckle-Filter</operator>
+      <sources>
+        <sourceProduct refid="Calibration"/>
+      </sources>
+      <parameters>
+        <sourceBands/>
+        <filter>Lee Sigma</filter>
+        <numLooksStr>'1'</numLooksStr>
+        <windowSize>'7x7'</windowSize>
+        <targetWindowSizeStr>'3x3'</targetWindowSizeStr>
+        <sigmaStr>'0.9'</sigmaStr>
+      </parameters>
+    </node>
   <node id="Terrain-Correction">
     <operator>Terrain-Correction</operator>
     <sources>
-      <sourceProduct refid="Calibration"/>
+      <sourceProduct refid="Speckle-Filter"/>
     </sources>
     <parameters>
       <sourceBands/>
