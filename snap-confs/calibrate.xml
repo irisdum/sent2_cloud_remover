@@ -31,7 +31,7 @@
       <sourceProduct refid="Subset"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>Amplitude_VV</sourceBands>
+      <sourceBands>${sourceBand}</sourceBands>
       <auxFile>Product Auxiliary File</auxFile>
       <externalAuxFile/>
       <outputImageInComplex>false</outputImageInComplex>

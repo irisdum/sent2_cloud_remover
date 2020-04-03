@@ -52,7 +52,10 @@ mkdir -p "${targetDirectory}"
 for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
+  file_name_vv="vv_${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
+  file_name_vh="vh_${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
+  ${gptPath} ${graphXmlPath} -e -p "vv_${parameterFilePath}"  -Pfile=file_name_vv  -t ${targetFile} ${sourceFile}
+  ${gptPath} ${graphXmlPath} -e -p "vh_${parameterFilePath}"  -Pfile=file_name_vh  -t ${targetFile} ${sourceFile}
 done
 
 ####test if the image works
