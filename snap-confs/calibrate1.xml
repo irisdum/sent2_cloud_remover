@@ -20,6 +20,7 @@
     <parameters>
       <sourceBands/>
       <geoRegion>${geometry}</geoRegion>
+        <copyMetadata>true</copyMetadata>
     </parameters>
   </node>
   <node id="Calibration">
