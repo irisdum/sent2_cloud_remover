@@ -54,9 +54,11 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
   file_name_vv="vv_${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
   file_name_vh="vh_${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
-  ${gptPath} ${graphXmlPath} -e -p "vv_${parameterFilePath}"  -Pfile=file_name_vv  -t ${targetFile} ${sourceFile}
-  ${gptPath} ${graphXmlPath} -e -p "vh_${parameterFilePath}"  -Pfile=file_name_vh  -t ${targetFile} ${sourceFile}
+  ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile=file_name_vv -PsourceBand=Amplitude_VV -t ${targetFile} ${sourceFile}
+  ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile=file_name_vh -PsourceBand=Amplitude_VH  -t ${targetFile} ${sourceFile}
+  gdalinfo "${file_name_vh}.tif"
+  gdalinfo "${file_name_vv}.tif"
 done
 
 ####test if the image works
-gdalinfo output4.tif
+#gdalinfo output4.tif
