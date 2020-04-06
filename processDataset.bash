@@ -28,11 +28,9 @@ sourceDirectory="$3"
 # use fourth parameter for path to target products
 targetDirectory="$4"
 
-# the fifth parameter is a file prefix for the target product name, typically indicating the type of processing
-targetFilePrefix="$5"
 
 #the sixth parameter is the path to the WKT subset .txt file
-wktFile="$6"
+wktFile="$5"
    
 ############################################
 # Helper functions
@@ -52,7 +50,7 @@ mkdir -p "${targetDirectory}"
 
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
 for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
-  echo "$F"
+  # echo "$F"
   sourceFile="$(realpath "$F")"
   # During the preprocess we split the images on smaller tiles
   # shellcheck disable=SC1035
@@ -60,7 +58,7 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   echo "${wktFile}"
   i=1
   while IFS =read -r poly; do
-    targetFilePrefix="${targetFilePrefix}"
+    targetFilePrefix="process_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VV -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vh_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VH -Pgeometry="${poly}"  -t  ${targetFile} ${sourceFile}
