@@ -3,7 +3,7 @@
 import ee
 import json
 from find_image import next_day, eedate_2_string
-from gee_constant import ORBIT_ID
+from gee_constant import ORBIT_ID, FACTEUR_AREA
 
 
 def is_contained(zone, image_fp):
@@ -99,11 +99,11 @@ def sub_collection_tiles(collection, zone, sent=2):
     return list_subcollection
 
 
-def extract_fp(image, sent):
+def extract_fp(image, sent=0):
     """    :param sent:
 :returns an ee.Geometry
     """
-    fp = image.get("system:footprint")
+    fp = ee.Image(image).get("system:footprint")
     coordo = ee.Geometry(fp).coordinates()
     return ee.Geometry.Polygon(coordo)
     # print(type(fp))
@@ -115,10 +115,73 @@ def check_clip_area(zone, zone_sent2):
     if ar_zone < ar_zone_sent2:
         print("There is an issue the area of the zone to dwnld is smaller than the area of the intersection ")
         print("zone : {} sent2: {}".format(ar_zone, ar_zone_sent2))
-        return ee.Geometry(zone.intersection(zone_sent2,0.001))
+        return ee.Geometry(zone.intersection(zone_sent2, 0.001))
     else:
         print("Everything normal")
         return ee.Geometry(zone_sent2)
     pass
+
+
+def zone_in_images(zone, ImageCollection):
+    """:param :zone ee.Geometry
+    :param list_image : list of ee.Image
+    :returns bool wether or not the Images in the image collection represent the area"""
+    list_inter = []  # list of intersection of the fp of all the images with the zone (ee.Geometry)
+    list_image = ee.List(ImageCollection.toList(100))
+    n = list_image.length().getInfo()
+    if n == 0:
+        return False
+    else:
+        for i in range(n):
+            image = ee.Image(list_image.get(i))
+            geo = extract_fp(image)
+            geo_inter = geo.intersection(zone)
+            list_inter = add_distinct_geom(list_inter, geo_inter)
+        # compute the area
+        area_union = get_list_area(list_inter)
+        if area_union > FACTEUR_AREA * zone.area(0.001).getInfo():
+            print("The geometries of the Image Collection contains the geometry")
+            return True
+        else:
+            return False
+
+
+def add_distinct_geom(list_geom, new_geom):
+    """Given a list of geometry that does not intersect returns a list of the geometry that does not instersect with
+    the union of new_geom """
+    add_geom = True  # boolean True if the new_geom has no intersection with the geom of the list
+    print("The list is len {}".format(len(list_geom)))
+    if len(list_geom) == 1:
+        if new_geom.intersects(list_geom[0]):
+            print("There is a union between the two geometry ")
+            # there is an intersection between the two element : return in a list the union
+            return [new_geom.union(list_geom[0])]
+        else:
+            print("There is no union")
+            return list_geom + [new_geom]
+    elif len(list_geom) == 0:
+        return [new_geom]
+    else:
+        for i, geom in enumerate(list_geom):
+            if new_geom.intersects(geom):
+                add_geom = False
+                list_geom.pop(i)
+                return add_distinct_geom(list_geom, new_geom.union(geom))
+        if add_geom is True:
+            print("There is no intersection between new geom and all the elements of the list")
+            return list_geom + [new_geom]
+
+
+def get_list_area(list_geom):
+    """Given a list of geometry returns the total area"""
+    total_area = 0
+    for geom in list_geom:
+        total_area += geom.area(0.001).getInfo()
+    return total_area
+
+def merge_image_collection(collection1,collection2):
+    """Function which check if one the fp of one collection is include into another one, if yes keep the one with the biggest intersection area"""
+    pass
+
 # TODO do a function which check if the initial zone is include on both fp is it is keep only the images.clip(ini_zone) où il y
 ##TODO a le moins d'image. Pareil pour sentinel 1 : prendre la zone

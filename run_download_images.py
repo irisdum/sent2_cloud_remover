@@ -8,7 +8,7 @@ import argparse
 
 from download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
-from fp_functions import sub_collection_tiles, extract_fp, check_clip_area
+from fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
 from gee_constant import S1_OPTPARAM, DOWNLOAD_PATH, DIR_T
 from store_data import preprocess_all, create_download_dir
 
@@ -86,28 +86,35 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     """
     print("Test day +- {} from {}".format(0, date_t.format().getInfo()))
     i = 1
-    total_len, total_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+    total_len, dayli_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+    all_found= zone_in_images(zone,dayli_collection) #boolean wether or not all the good images have been selected
     print(type(zone), zone.getInfo())
-    while total_len < 1:  # iterate until a sentinel 1 image is found
+    final_collection=dayli_collection
+    while all_found is False:  # iterate until a sentinel 1 image is found
         print("Test day +- {} from {}".format(i, date_t.format().getInfo()))
         i += 1
-        total_len, total_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+        total_len, dayli_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
+        final_collection=final_collection.merge(dayli_collection)
+        #TODO : make a function which merge the collection : if one geometry of the image is include into another one : remove the includede image
+        all_found=zone_in_images(zone,final_collection)
     print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len, i))
 
-    final_list = list_image_name(total_collection, sent)
+    final_list = list_image_name(final_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
 
-    list_subcol_sent1 = sub_collection_tiles(total_collection, zone, sent)  # Get subcollections list
-    assert len(list_subcol_sent1)==1, "There are some SAR image that has not been considered"
-    list_name_sent1 = list_image_name(list_subcol_sent1[0], sent)
-    date_sent1 = list_subcol_sent1[0].first().date()
+    list_subcol_sent1 = sub_collection_tiles(final_collection, zone, sent)  # Get subcollections list
+    list_name_sent1=[]
+    list_date_sent1=[]
+    for sub_list in list_subcol_sent1:
+        list_name_sent1 += list_image_name(sub_list, sent)
+        list_date_sent1 += [sub_list.first().date() for image in list_image_name(sub_list, sent)]
     # for subcol in list_subcol_sent1:
     # name, date_coll, _ = extract_name_date_first(subcol, 1)
     # print("Sentinel 1 collected at {} for sent2 collected at {}".format(date_coll.format().getInfo(),
     # date_t.format().getInfo()))
     # list_name_sent1 += [name]  # collect the name of the sent1 images
 
-    return list_name_sent1, date_sent1
+    return list_name_sent1, list_date_sent1
 
 
 def clip_on_geometry(geometry):
@@ -188,9 +195,9 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
         # image
         dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
-        list_name_sent1, date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
+        list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
         dict_image_dwnld1.update(
-            dict(zip(list_name_sent1, [eedate_2_string(date_sent1) for i in range(len(list_name_sent1))])))
+            dict(zip(list_name_sent1, [eedate_2_string(date) for date in list_date_sent1])))
     list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
     return dict_image_dwnld1, dict_image_dwnld2
 
