@@ -31,6 +31,8 @@ targetDirectory="$4"
 # the fifth parameter is a file prefix for the target product name, typically indicating the type of processing
 targetFilePrefix="$5"
 
+#the sixth parameter is the path to the WKT subset .txt file
+wktFile="$6"
    
 ############################################
 # Helper functions
@@ -52,13 +54,19 @@ mkdir -p "${targetDirectory}"
 for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   echo "$F"
   sourceFile="$(realpath "$F")"
-  targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  file_name_vv="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
-  file_name_vh="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})")_prepro"
-  ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro" -PsourceBand=Amplitude_VV -t ${targetFile} ${sourceFile}
-  ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vh_$(removeExtension "$(basename ${F})")_prepro" -PsourceBand=Amplitude_VH  -t ${targetFile} ${sourceFile}
-  gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif"
-  gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif"
+  # During the preprocess we split the images on smaller tiles
+  # shellcheck disable=SC1035
+  i=1
+  while IFS =read -r poly; do
+    targetFilePrefix="${targetFilePrefix}"
+    targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VV -Pgeometry=$poly -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vh_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VH -Pgeometry=$poly  -t  ${targetFile} ${sourceFile}
+    gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif_$i"
+    gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif_$i"
+    i=$((i+1))
+  done<$wktFile
+
 done
 
 ####test if the image works
