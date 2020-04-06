@@ -58,9 +58,10 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   while IFS= read -r poly; do
     targetFilePrefix="process1_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro}_$i" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
-    gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif_$i"
-    gdalinfo "${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro.tif_$i"
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b2_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B2" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b3_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B3" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b4_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B4" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
 
