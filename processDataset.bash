@@ -56,6 +56,8 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   sourceFile="$(realpath "$F")"
   # During the preprocess we split the images on smaller tiles
   # shellcheck disable=SC1035
+  echo "${sourceFile}"
+  echo "${wktFile}"
   i=1
   while IFS =read -r poly; do
     targetFilePrefix="${targetFilePrefix}"
