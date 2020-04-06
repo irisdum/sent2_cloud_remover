@@ -1,9 +1,20 @@
  <graph id="Processing sentinel2">
     <version>1.0</version>
+     <node id="Subset">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters>
+      <sourceBands/>
+      <geoRegion>${geometry}</geoRegion>
+      <copyMetadata>true</copyMetadata>
+    </parameters>
+  </node>
     <node id="Resample">
       <operator>Resample</operator>
       <sources>
-        <sourceProduct>${sourceProduct}</sourceProduct>
+        <sourceProduct refid="Subset"/>
       </sources>
       <parameters>
         <targetResolution>10</targetResolution>
@@ -14,21 +25,10 @@
         <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
       </parameters>
     </node>
-     <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Resample"/>
-    </sources>
-    <parameters>
-      <sourceBands/>
-      <geoRegion>${geometry}</geoRegion>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node>
      <node id="WriteTIFF">
     <operator>Write</operator>
     <sources>
-      <sourceProduct refid="Subset"/>
+      <sourceProduct refid="Resample"/>
     </sources>
     <parameters>
       <file>${file}</file>
