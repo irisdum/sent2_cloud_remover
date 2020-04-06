@@ -49,7 +49,7 @@ mkdir -p "${targetDirectory}"
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
 for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   # echo "$F"
-  sourceFile="$F"
+  sourceFile="$F/MTD_MSIL1C.xml"
   # During the preprocess we split the images on smaller tiles
   # shellcheck disable=SC1035
   echo "${sourceFile}"
