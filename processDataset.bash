@@ -57,8 +57,8 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.SAFE); do
   echo "${sourceFile}"
   echo "${wktFile}"
   i=1
-  while IFS =read -r poly; do
-    targetFilePrefix="process_${i}"
+  while IFS= read -r poly; do
+    targetFilePrefix="process1_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vv_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VV -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/vh_$(removeExtension "$(basename ${F})")_prepro}_$i" -PsourceBand=Amplitude_VH -Pgeometry="${poly}"  -t  ${targetFile} ${sourceFile}
