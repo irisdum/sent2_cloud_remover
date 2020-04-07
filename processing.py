@@ -72,6 +72,8 @@ def get_band_image_name(image_path, output_dir):
 
 
 def get_name_sent_vrt(band_vrt, output_dir):
+    print(band_vrt)
+    print(band_vrt.split("/"))
     return output_dir + band_vrt.split("/")[-1][3:]
 
 
