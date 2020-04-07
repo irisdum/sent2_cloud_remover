@@ -2,6 +2,8 @@
 import argparse
 import glob
 import os
+import shutil
+import click
 
 from converter import geojson_2_bboxcoordo
 from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR
@@ -68,6 +70,15 @@ def get_band_image_name(image_path, output_dir):
 def get_name_sent_vrt(band_vrt,output_dir):
     return output_dir+band_vrt.split("/")[-1][3:]
 
+def create_safe_directory(output_dir):
+    if os.path.isdir(output_dir):
+        if click.confirm('The directory already exists, it will remove it do you want to continue?', default=True):
+            print('Ok remove')
+            shutil.rmtree(output_dir)
+        else:
+            return False
+    os.makedirs(output_dir)
+
 
 def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
@@ -83,6 +94,8 @@ def _argparser():
 
 
 def main(input_dir, output_dir, list_band2, list_band1,path_geojson):
+    create_safe_directory(output_dir+TEMPORARY_DIR)
+    create_safe_directory(output_dir + TILING_DIR)
     if list_band2 is None:
         list_band2 = [b.lower().replace("0", "") for b in
                       LISTE_BANDE[1]]  # liste band of sentinel 2, convert it from B02->b2
