@@ -118,7 +118,7 @@ def main(input_dir, output_dir, list_band2, list_band1,path_geojson):
         print("The image {} has been created".format(output_name))
         list_name_band_sent1_vrt += [output_name]
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent1_vrt, list_name_band_sent2_vrt))
-    combine_band(list_name_band_sent2_vrt + list_name_band_sent1_vrt,output_dir+TILING_DIR)
+    combine_band(list_2_str(list_name_band_sent2_vrt + list_name_band_sent1_vrt),output_dir+TILING_DIR)
 
 
 if __name__ == '__main__':
