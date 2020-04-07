@@ -23,6 +23,8 @@ def geojson_2_bboxcoordo(path_geojson):
     with open(path_geojson) as f:
         data = json.load(f)
     polygon=data["features"]
+    print(type(polygon))
+    print(polygon)
     str_poly = json.dumps(polygon["geometry"])
     g = geojson.loads(str_poly)
     sh=shape(g)
