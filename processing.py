@@ -29,8 +29,8 @@ def mosaic_image(list_path, output_dir, path_geojson):
 def combine_band(list_path_vrt, output_dir):
     """Given a list of all vrt file for a sentinel"""
     output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
-    print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
-    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
+    print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name,list_2_str(list_path_vrt)))
+    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
 
 
 def compute_the_intersection(image_path, zone_path):
@@ -128,7 +128,7 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
         print("The image {} has been created".format(output_name))
         list_name_band_sent1_vrt += [output_name]
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent1_vrt, list_name_band_sent2_vrt))
-    combine_band(list_2_str(list_name_band_sent2_vrt + list_name_band_sent1_vrt), output_dir + TILING_DIR)
+    combine_band(list_name_band_sent2_vrt + list_name_band_sent1_vrt, output_dir + TILING_DIR)
 
 
 if __name__ == '__main__':
