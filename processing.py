@@ -110,7 +110,6 @@ def _argparser():
 
 def create_tiling_hierarchy(input_dir,output_dir):
     for t in [0,1]:
-        create_safe_directory(input_dir + DIR_T[t])
         create_safe_directory(input_dir + TEMPORARY_DIR[t])
     for cst in [XDIR,LABEL_DIR]:
         create_safe_directory(output_dir)
