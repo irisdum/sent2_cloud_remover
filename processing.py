@@ -31,7 +31,7 @@ def combine_band(list_path_vrt, output_dir):
     output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
     print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name,list_2_str(list_path_vrt)))
     os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
-
+    return output_name
 
 def compute_the_intersection(image_path, zone_path):
     """:param image_path : path to the image
@@ -128,9 +128,9 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
         print("The image {} has been created".format(output_name))
         list_name_band_sent1_vrt += [output_name]
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent1_vrt, list_name_band_sent2_vrt))
-    combine_band(list_name_band_sent2_vrt + list_name_band_sent1_vrt, output_dir + TILING_DIR)
-
-
+    total_image=combine_band(list_name_band_sent2_vrt + list_name_band_sent1_vrt, output_dir + TILING_DIR)
+    tiling(total_image,output_dir+TILING_DIR)
+    
 if __name__ == '__main__':
     args = _argparser()
     main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
