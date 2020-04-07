@@ -17,18 +17,18 @@ def crop_image(image_path, path_shapefile, output_path):
     return output_path
 
 
-def mosaic_image(list_path, output_dir,path_geojson):
+def mosaic_image(list_path, output_dir, path_geojson):
     """Given the path to multiple images of the same band create a mosaic"""
     output_name = get_band_image_name(list_path[0], output_dir)
-    str_bbox=geojson_2_bboxcoordo(path_geojson)
+    str_bbox = geojson_2_bboxcoordo(path_geojson)
     os.system("gdalbuildvrt  {} {}".format(output_name, list_2_str(list_path)))
     assert os.path.isfile(output_name), "The file has not been created at {}".format(output_name)
     return output_name
 
 
-def combine_band(list_path_vrt,output_dir):
+def combine_band(list_path_vrt, output_dir):
     """Given a list of all vrt file for a sentinel"""
-    output_name = get_name_sent_vrt(list_path_vrt[0],output_dir)
+    output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
     print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
     os.system("gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
 
@@ -71,8 +71,14 @@ def get_band_image_name(image_path, output_dir):
     return output_dir + image_name.split(VAR_NAME)[0] + ".vrt"
 
 
-def get_name_sent_vrt(band_vrt,output_dir):
-    return output_dir+band_vrt.split("/")[-1][3:]
+def get_name_sent_vrt(band_vrt, output_dir):
+    return output_dir + band_vrt.split("/")[-1][3:]
+
+
+def reproject_sent2(path_vrt, output_dir):
+    name = path_vrt.split("/")[-1]
+    os.system("gdalwarp -t_srs EPSG:4326 {} {}".format(path_vrt, output_dir + name))
+    return output_dir + name
 
 def create_safe_directory(output_dir):
     if os.path.isdir(output_dir):
@@ -97,9 +103,10 @@ def _argparser():
     return parser.parse_args()
 
 
-def main(input_dir, output_dir, list_band2, list_band1,path_geojson):
-    create_safe_directory(output_dir+TEMPORARY_DIR)
+def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
+    create_safe_directory(output_dir + TEMPORARY_DIR)
     create_safe_directory(output_dir + TILING_DIR)
+    create_safe_directory(input_dir + TEMPORARY_DIR)
     if list_band2 is None:
         list_band2 = [b.lower().replace("0", "") for b in
                       LISTE_BANDE[1]]  # liste band of sentinel 2, convert it from B02->b2
@@ -109,18 +116,19 @@ def main(input_dir, output_dir, list_band2, list_band1,path_geojson):
     list_name_band_sent1_vrt = []
     for b in list_band2:
         list_image = get_path_tile(b, input_dir)
-        output_name = mosaic_image(list_image, output_dir+TEMPORARY_DIR,path_geojson)
+        output_name = mosaic_image(list_image, input_dir + TEMPORARY_DIR, path_geojson)
         print("The image {} has been created".format(output_name))
+        output_name = reproject_sent2(output_name, output_dir + TEMPORARY_DIR)
         list_name_band_sent2_vrt += [output_name]
     for b in list_band1:
         list_image = get_path_tile(b, input_dir)
-        output_name = mosaic_image(list_image, output_dir+TEMPORARY_DIR,path_geojson)
+        output_name = mosaic_image(list_image, output_dir + TEMPORARY_DIR, path_geojson)
         print("The image {} has been created".format(output_name))
         list_name_band_sent1_vrt += [output_name]
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent1_vrt, list_name_band_sent2_vrt))
-    combine_band(list_2_str(list_name_band_sent2_vrt + list_name_band_sent1_vrt),output_dir+TILING_DIR)
+    combine_band(list_2_str(list_name_band_sent2_vrt + list_name_band_sent1_vrt), output_dir + TILING_DIR)
 
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2,args.bands1,args.geojson)
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
