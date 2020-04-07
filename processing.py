@@ -55,6 +55,7 @@ def list_2_str(list):
     ch = ""
     for p in list:
         ch += "{} ".format(p)
+    print(ch)
     return ch
 
 
