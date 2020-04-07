@@ -58,10 +58,10 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   while IFS= read -r poly; do
     targetFilePrefix="process1_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b2_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B2" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b3_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B3" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b4_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B4" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b2_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B2" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b3_$(removeExtension "$(basename ${F})")_prepro${i}" -PBands="B3" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b4_$(removeExtension "$(basename ${F})")_prepro${i}" -PBands="B4" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro${i}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
 
