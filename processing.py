@@ -94,7 +94,7 @@ def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
     parser.add_argument('--input_dir', type=str, default="/datastore/dum031/data/dataset1/prepro7/date2/",
                         help="path to input directory ")
-    parser.add_argument('--output_dir', type=str, default="/datastore/dum031/data/dataset1/prepro7/date2/finalDataset",
+    parser.add_argument('--output_dir', type=str, default="/datastore/dum031/data/dataset1/prepro7/date2/finalDataset/",
                         help="path to the output directory")
     parser.add_argument("--bands2", nargs="+", default=None, help="list of all the bands of sentinel 2 format B02,B03")
 
