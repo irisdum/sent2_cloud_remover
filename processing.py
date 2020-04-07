@@ -21,7 +21,7 @@ def mosaic_image(list_path, output_dir,path_geojson):
     """Given the path to multiple images of the same band create a mosaic"""
     output_name = get_band_image_name(list_path[0], output_dir)
     str_bbox=geojson_2_bboxcoordo(path_geojson)
-    os.system("gdalbuildvrt -te {} {} {}".format(str_bbox,output_name, list_2_str(list_path)))
+    os.system("gdalbuildvrt  {} {}".format(output_name, list_2_str(list_path)))
     assert os.path.isfile(output_name), "The file has not been created at {}".format(output_name)
     return output_name
 
