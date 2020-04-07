@@ -104,7 +104,7 @@ class Sen2TileMeta(object):
         
         # Now build up the viewing angle per grid cell, from the separate layers
         # given for each detector for each band. Initially I am going to keep
-        # the bands separate, just to see how that looks. 
+        # the band separate, just to see how that looks.
         # The names of things in the XML suggest that these are view angles,
         # but the numbers suggest that they are angles as seen from the pixel's 
         # frame of reference on the ground, i.e. they are in fact what we ultimately want. 
@@ -470,7 +470,7 @@ def calcMGRSnameFromCoords(epsg, easting, northing):
     latitudebandWidth = 8
     # Note that we use the average latitude across this level in the UTM zone. This is
     # so we can match how ESA do it (without actually knowing how ESA do it), especially in
-    # the tiles on the boundary between J and K latitude bands, in the centre of each zone. 
+    # the tiles on the boundary between J and K latitude band, in the centre of each zone.
     latbandNdx = int((avgLatitude - latitudebandStart) / latitudebandWidth) + letters.index('C')
     # Only allow latitude band letters up to X. Should do something to 
     # cope with polar regions, which are supposed to be different......

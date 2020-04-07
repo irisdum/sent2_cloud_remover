@@ -13,3 +13,6 @@ SENT_FORMAT=["tiff", "jp2"]
 LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08"]]
 
 FACTEUR_AREA=0.9
+
+VAR_NAME="_prepro"
+

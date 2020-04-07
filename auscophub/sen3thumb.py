@@ -16,7 +16,7 @@ def sen3thumb(zipfilename, finalOutputDir,
     """
     Making thumbnail for Sentinel-3 using SNAP pconvert
     """
-    # define bands for product
+    # define band for product
     if not bands:
         if 'OL_1' in zipfilename:
             bands ='17,6,3'       #

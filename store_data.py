@@ -73,18 +73,18 @@ def mk_sentineldir(path_time_dir):
 
 
 def combine_image(lpath, output_path_dir, image_name, sent):
-    """Given a list of path to different image bands : combine them to create one final image
+    """Given a list of path to different image band : combine them to create one final image
     :param sent: 1 or 2
     :returns : str the output paths"""
-    print("The bands are going to be combined in the following order from top to bottom {}".format(lpath))
+    print("The band are going to be combined in the following order from top to bottom {}".format(lpath))
     # Combine all the images and store them in the temporary directory
     if sent == 1:
-        assert len(lpath) == 2, "Wrong bands selected should be 4 bands for sentinel 2 if not change de combine_image" \
+        assert len(lpath) == 2, "Wrong band selected should be 4 band for sentinel 2 if not change de combine_image" \
                                 " functions to accept {}".format(lpath)
         os.system("gdal_merge.py -separate -o {} -co PHOTOMETRIC=MINISBLACK {} {}".format(
             output_path_dir + image_name, lpath[0], lpath[1]))
     elif sent == 2:
-        assert len(lpath) == 4, "Wrong bands selected should be 4 bands for sentinel 2 if not change de " \
+        assert len(lpath) == 4, "Wrong band selected should be 4 band for sentinel 2 if not change de " \
                                 "combine_image functions to accept {}".format(lpath)
         os.system("gdal_merge.py -separate -o {}  {} {} {} {}".format(
             output_path_dir + image_name, lpath[0], lpath[1], lpath[2], lpath[3]))
@@ -94,7 +94,7 @@ def combine_image(lpath, output_path_dir, image_name, sent):
 
 def sent2_convert(list_image_path, output_path_dir):
     """:param list_image_path : list of path to jpg2 images
-    :param lband : list of the bands to be selectec to create the final sentinel image"""
+    :param lband : list of the band to be selectec to create the final sentinel image"""
     assert type(list_image_path) == type([]), "Wrong input format should be list but is {}".format(list_image_path)
     l_path_tiff = []
     for path_jp2 in list_image_path:
@@ -118,10 +118,10 @@ def store_image(list_path_band, sent, t, output_path_dir, image_name, path_shape
     :param path_shapefile:
 :param init_image_dir:
     :param output_path_dir:
-    :param list_path_band : list path of the bands of the same image
+    :param list_path_band : list path of the band of the same image
     :param sent : 1 or 2 depending of the satellite used,
     :param t : corresponds to the first date or second date of acquisition"""
-    # Select only the requested bands in list_path_band
+    # Select only the requested band in list_path_band
     list_path_band = sort_sent_band(list_path_band, sent)
     print("DIR ", output_path + TEMPORARY_DIR)
     list_path_band_cropped = [
@@ -179,7 +179,7 @@ def sort_sent_band(list_sent_band_path, sent):
         for path in list_sent_band_path:
             if band in path:
                 final_image_path += [path]
-    assert len(final_image_path) > 0, "No image has been selected the bands might not be correct {}".format(
+    assert len(final_image_path) > 0, "No image has been selected the band might not be correct {}".format(
         LISTE_BANDE[sent - 1])
     return final_image_path
 
