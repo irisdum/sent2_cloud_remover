@@ -9,10 +9,13 @@ DIR_T=["date1/", "date2/"]
 DIR_SENT=["sentinel1/", "sentinel2/"]
 DOWNLOAD_PATH= "./Downloads/" # /datastore/dum031/data/dataset1/ #path where the image are download from sara
 TEMPORARY_DIR= "temporary_dir/"
+TILING_DIR="tiling_dir/"
 SENT_FORMAT=["tiff", "jp2"]
 LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08"]]
 
 FACTEUR_AREA=0.9
 
 VAR_NAME="_prepro"
+
+OVERLAP=50
 

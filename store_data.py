@@ -7,13 +7,7 @@ from gee_constant import DIR_T, DIR_SENT, TEMPORARY_DIR, SENT_FORMAT, LISTE_BAND
 import glob
 from datetime import date
 
-
-def crop_image(image_path, path_shapefile, output_path):
-    assert os.path.isfile(path_shapefile), "No path in {}".format(path_shapefile)
-    # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
-    print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    os.system("gdalwarp -cutline   {} {} {}".format(path_shapefile, image_path, output_path))
-    return output_path
+from processing import crop_image
 
 
 def list_directory(path_downloads):

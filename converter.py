@@ -19,6 +19,17 @@ def geojson_2_WKT(path_geojson,path_wkt):
         print(wkt_str)
     f.close()
 
+def geojson_2_bboxcoordo(path_geojson):
+    with open(path_geojson) as f:
+        data = json.load(f)
+    polygon=data["features"]
+    str_poly = json.dumps(polygon["geometry"])
+    g = geojson.loads(str_poly)
+    sh=shape(g)
+    coordo=sh.bounds
+    print("Minx {}, miny {}, maxx {}, maxy{}".format(coordo[0],coordo[1],coordo[2],coordo[3]))
+    return "{} {} {} {}".format(coordo[0],coordo[1],coordo[2],coordo[3])
+
 def main(input_gjson,output_txt):
     geojson_2_WKT(input_gjson,output_txt)
 
