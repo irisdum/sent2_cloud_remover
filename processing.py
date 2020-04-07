@@ -71,9 +71,9 @@ def get_name_sent_vrt(band_vrt,output_dir):
 
 def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
-    parser.add_argument('--input_dir', type=str, default="/datastore/dum031/dataset1/prepro7/date2",
+    parser.add_argument('--input_dir', type=str, default="/datastore/dum031/dataset1/prepro7/date2/",
                         help="path to input directory ")
-    parser.add_argument('--output_dir', type=str, default="/datastore/dum031/dataset1/prepro7/date2",
+    parser.add_argument('--output_dir', type=str, default="/datastore/dum031/dataset1/prepro7/date2/",
                         help="path to the output directory")
     parser.add_argument("--bands2", nargs="+", default=None, help="list of all the bands of sentinel 2 format B02,B03")
 
