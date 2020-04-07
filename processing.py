@@ -29,6 +29,7 @@ def mosaic_image(list_path, output_dir,path_geojson):
 def combine_band(list_path_vrt,output_dir):
     """Given a list of all vrt file for a sentinel"""
     output_name = get_name_sent_vrt(list_path_vrt[0],output_dir)
+    print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
     os.system("gdalbuildvrt -separate {} {}".format(output_name, list_path_vrt))
 
 
