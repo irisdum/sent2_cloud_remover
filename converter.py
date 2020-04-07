@@ -22,7 +22,7 @@ def geojson_2_WKT(path_geojson,path_wkt):
 def geojson_2_bboxcoordo(path_geojson):
     with open(path_geojson) as f:
         data = json.load(f)
-    polygon=data["features"]
+    polygon=data["features"][0]
     print(type(polygon))
     print(polygon)
     str_poly = json.dumps(polygon["geometry"])
