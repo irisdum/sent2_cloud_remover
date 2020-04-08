@@ -86,7 +86,11 @@ def reproject_sent(path_image, output_dir, path_geojson):
     name = path_image.split("/")[-1]
     str_bbox = geojson_2_bboxcoordo(path_geojson)
     print("STR BBOX {}".format(str_bbox))
+    print("BEFORE WARP ")
+    os.system("gdalinfo {} ".format(path_image))
     os.system("gdalwarp -t_srs EPSG:4326  {} {}".format(path_image, output_dir + name))
+    print("AFTER WARP {}")
+    os.system("gdalinfo {}".format(output_dir+name))
     return output_dir + name
 
 
