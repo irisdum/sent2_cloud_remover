@@ -128,11 +128,11 @@ def create_tiling_hierarchy(output_dir):
 def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel1 at t1
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 2, path_geojson)  # sentinel1 at t2
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel2 at t1
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel1 at t1
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel1 at t2
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel2 at t1
     ##LABEL FOLDER
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 2, path_geojson)  # sentinel2 at t2
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson)  # sentinel2 at t2
 
 
 def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson):
