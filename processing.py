@@ -108,17 +108,17 @@ def _argparser():
     parser.add_argument("--geojson", default="./confs/train_kangaroo.geojson", help="path to the zone geojson")
     return parser.parse_args()
 
-def create_tiling_hierarchy(input_dir,output_dir):
-    
+def create_tiling_hierarchy(output_dir):
+    create_safe_directory(output_dir)
     for cst in [XDIR,LABEL_DIR]:
         print("BUILDING DATA {}".format(cst))
-        create_safe_directory(output_dir)
+
         create_safe_directory(output_dir+cst)
         create_safe_directory(output_dir+cst+TEMPORARY_DIR)
         create_safe_directory(output_dir+cst+TILING_DIR)
 
 def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
-    create_tiling_hierarchy(input_dir,output_dir)
+    create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
     input_dir_t1 = input_dir + DIR_T[0]
     list_name_band_sent2_vrt_t1 = create_vrt(list_band2,2,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
