@@ -33,6 +33,8 @@ def combine_band(list_path_vrt, output_dir):
     output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
     print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
     os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
+    print("AFTER COMBINE ")
+    os.system("gdalinfo {}".format(output_name))
     return output_name
 
 
@@ -149,9 +151,12 @@ def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_g
 
 def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     create_safe_directory(output_dir)
+
     total_image = combine_band(list_image, output_dir)
+    print("BEFORE CROP")
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
+    print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir,sent,t)
 
