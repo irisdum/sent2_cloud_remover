@@ -10,7 +10,7 @@ from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_D
 
 
 def crop_image(image_path, path_geojson, output_path):
-    assert os.path.isfile(path_geojson), "No path in {}".format(path_shapefile)
+    assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
     str_bbox=geojson_2_bboxcoordo(path_geojson)
     #print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
