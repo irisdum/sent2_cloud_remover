@@ -112,6 +112,7 @@ def create_tiling_hierarchy(input_dir,output_dir):
     for t in [0,1]:
         create_safe_directory(input_dir + TEMPORARY_DIR)
     for cst in [XDIR,LABEL_DIR]:
+        print("BUILDING DATA {}".format(cst))
         create_safe_directory(output_dir)
         create_safe_directory(output_dir+cst)
         create_safe_directory(output_dir+cst+TEMPORARY_DIR)
@@ -121,10 +122,10 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     create_tiling_hierarchy(input_dir,output_dir)
     ## Create the dataX folder
     input_dir_t1 = input_dir + DIR_T[0]
-    list_name_band_sent2_vrt_t1 = create_vrt(list_band2,2,input_dir_t1, output_dir+XDIR, path_geojson)
-    list_name_band_sent1_vrt_t1 = create_vrt(list_band1,1 ,input_dir_t1, output_dir+XDIR, path_geojson)
+    list_name_band_sent2_vrt_t1 = create_vrt(list_band2,2,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
+    list_name_band_sent1_vrt_t1 = create_vrt(list_band1,1 ,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
     input_dir_t2=input_dir.split("/")[:-1].DIR_T[1]
-    list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir+XDIR, path_geojson)
+    list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent2_vrt_t1, list_name_band_sent2_vrt_t1))
     total_image_x = combine_band(list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1+list_name_band_sent1_vrt_t2, output_dir +XDIR+TILING_DIR)
     shp_file_t1=tiling(total_image_x, output_dir + XDIR+TILING_DIR)
@@ -146,9 +147,9 @@ def create_vrt(list_band, sent ,input_dir, output_dir, path_geojson):
     for b in list_band:
         # reprojection of sentinel 2 images and warp on the input_geojon
         list_image = get_path_tile(b, input_dir)
-        output_name = mosaic_image(list_image, input_dir + TEMPORARY_DIR)
+        output_name = mosaic_image(list_image, input_dir)
         print("The image {} has been created".format(output_name))
-        output_name = reproject_sent(output_name, output_dir + TEMPORARY_DIR, path_geojson)
+        output_name = reproject_sent(output_name, output_dir, path_geojson)
         list_band_vrt += [output_name]
     return list_band_vrt
 
