@@ -65,7 +65,7 @@ def list_2_str(list):
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
     os.system(
-        "gdal_retile.py {} -s_srs EPSG:4326 -v -targetDir {} -tileIndex {} ".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
+        "gdal_retile.py {}  -ps 256 -256 -s_srs EPSG:4326 -v -targetDir {} -tileIndex {} ".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
     return output_dir + "tiling_fp.shp"
 
 
