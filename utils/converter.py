@@ -33,3 +33,15 @@ def geojson_2_bboxcoordo(path_geojson):
     return "{} {} {} {}".format(coordo[0],coordo[1],coordo[2],coordo[3])
 
 
+def geojson_2_strcoordo_ul_lr(path_geojson):
+    with open(path_geojson) as f:
+        data = json.load(f)
+    polygon=data["features"][0]
+    print(type(polygon))
+    print(polygon)
+    str_poly = json.dumps(polygon["geometry"])
+    g = geojson.loads(str_poly)
+    sh=shape(g)
+    coordo=sh.bounds
+    print("Minx {}, miny {}, maxx {}, maxy{}".format(coordo[0],coordo[1],coordo[2],coordo[3]))
+    return "{} {} {} {}".format(coordo[0], coordo[3], coordo[2], coordo[1])
