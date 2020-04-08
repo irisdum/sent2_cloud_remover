@@ -5,7 +5,7 @@ import os
 import shutil
 import click
 
-from converter import geojson_2_bboxcoordo
+from utils.converter import geojson_2_bboxcoordo
 from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T
 
 
@@ -63,8 +63,9 @@ def list_2_str(list):
 
 def tiling(image_vrt, output_dir):
     os.system("gdal_retile.py {} -v  -targetDir {} -overlap {} -v -tileIndex {}".format(image_vrt, output_dir, OVERLAP,
-                                                                                    "tiling_fp.shp"))
+                                                                                        "tiling_fp.shp"))
     return output_dir + "tiling_fp.shp"
+
 
 def get_band_image_name(image_path, output_dir):
     assert output_dir[-1] == "/", "The path of output dir should end with / {}".format(output_dir)
@@ -88,7 +89,9 @@ def reproject_sent(path_image, output_dir, path_geojson):
 
 def create_safe_directory(output_dir):
     if os.path.isdir(output_dir):
-        if click.confirm('The directory {} already exists, it will remove it do you want to continue?'.format(output_dir), default=True):
+        if click.confirm(
+                'The directory {} already exists, it will remove it do you want to continue?'.format(output_dir),
+                default=True):
             print('Ok remove')
             shutil.rmtree(output_dir)
         else:
@@ -106,36 +109,47 @@ def _argparser():
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
     parser.add_argument("--geojson", default="./confs/train_kangaroo.geojson", help="path to the zone geojson")
+    parser.add_argument("--shp", default="./confs/train_kangaroo.shp", help="path to the esri shapefile")
     return parser.parse_args()
+
 
 def create_tiling_hierarchy(output_dir):
     create_safe_directory(output_dir)
-    for cst in [XDIR,LABEL_DIR]:
+    for cst in [XDIR, LABEL_DIR]:
         print("BUILDING DATA {}".format(cst))
 
-        create_safe_directory(output_dir+cst)
-        create_safe_directory(output_dir+cst+TEMPORARY_DIR)
-        create_safe_directory(output_dir+cst+TILING_DIR)
+        create_safe_directory(output_dir + cst)
+        create_safe_directory(output_dir + cst + TEMPORARY_DIR)
+        create_safe_directory(output_dir + cst + TILING_DIR)
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
+
+def main(input_dir, output_dir, list_band2, list_band1, path_geojson, path_shapefile):
     create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
     input_dir_t1 = input_dir + DIR_T[0]
-    list_name_band_sent2_vrt_t1 = create_vrt(list_band2,2,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
-    list_name_band_sent1_vrt_t1 = create_vrt(list_band1,1 ,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
-    input_dir_t2=input_dir+DIR_T[1]
-    list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
+    list_name_band_sent2_vrt_t1 = create_vrt(list_band2, 2, input_dir_t1, output_dir + XDIR + TEMPORARY_DIR,
+                                             path_geojson)
+    list_name_band_sent1_vrt_t1 = create_vrt(list_band1, 1, input_dir_t1, output_dir + XDIR + TEMPORARY_DIR,
+                                             path_geojson)
+    input_dir_t2 = input_dir + DIR_T[1]
+    list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir + XDIR + TEMPORARY_DIR,
+                                             path_geojson)
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent2_vrt_t1, list_name_band_sent2_vrt_t1))
-    total_image_x = combine_band(list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1+list_name_band_sent1_vrt_t2, output_dir +XDIR+TILING_DIR)
-    shp_file_t1=tiling(total_image_x, output_dir + XDIR+TILING_DIR)
+    total_image_x = combine_band(
+        list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1 + list_name_band_sent1_vrt_t2,
+        output_dir + XDIR + TILING_DIR)
+    # CROP this image on the geometry
+    final_image_x_path = crop_image(total_image_x, path_shapefile, output_dir + XDIR + TILING_DIR + "merged_imageX.vrt")
+    shp_file_t1 = tiling(final_image_x_path, output_dir + XDIR + TILING_DIR)
     print("The prepro of dataX is done")
     ##Create the label folder
     list_name_band_sent2_vrt_t2 = create_vrt(list_band2, 2, input_dir_t2, output_dir + LABEL_DIR, path_geojson)
-    total_image_label=combine_band(list_name_band_sent2_vrt_t2,output_dir+LABEL_DIR+TILING_DIR)
-    shp_t2=tiling(total_image_label,output_dir+LABEL_DIR+TILING_DIR)
+    total_image_label = combine_band(list_name_band_sent2_vrt_t2, output_dir + LABEL_DIR + TILING_DIR)
+    crop_image_label=crop_image(total_image_label, path_shapefile, output_dir + LABEL_DIR + TILING_DIR + "merged_imageX.vrt")
+    shp_t2 = tiling(crop_image_label, output_dir + LABEL_DIR + TILING_DIR)
 
 
-def create_vrt(list_band, sent ,input_dir, output_dir, path_geojson):
+def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
     """Given these parameters construct VRT format image For each bands create a mosaic if needed"""
     list_band_vrt = []
     if list_band is None and sent == 2:
@@ -155,4 +169,4 @@ def create_vrt(list_band, sent ,input_dir, output_dir, path_geojson):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson, args.shp)

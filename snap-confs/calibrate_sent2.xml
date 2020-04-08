@@ -32,7 +32,7 @@
     </sources>
     <parameters>
       <file>${file}</file>
-      <formatName>GEOTIFF</formatName>
+      <formatName>GeoTIFF-BigTIFF</formatName>
       <deleteOutputOnFailure>true</deleteOutputOnFailure>
       <writeEntireTileRows>false</writeEntireTileRows>
       <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
