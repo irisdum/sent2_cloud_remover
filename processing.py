@@ -63,11 +63,9 @@ def list_2_str(list):
     return ch
 
 
-def tiling(image_vrt, output_dir):
+def tiling(image_vrt, output_dir, sent=1, date_t=0):
     os.system(
-        "python ../gdal_retile_multi/gdal_retile_multi_N_p.py {} -v -targetDir {} -tileIndex {} ".format(image_vrt,
-                                                                                                         output_dir,
-                                                                                                         "tiling_fp.shp"))
+        "gdal_retile {} -v -targetDir {} -tileIndex {} ".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
     return output_dir + "tiling_fp.shp"
 
 
@@ -140,7 +138,7 @@ def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_g
     input_dir_t = input_dir + DIR_T[t]
     list_name_band = create_vrt(list_band, sent, input_dir_t, output_dir + sub_dir + TEMPORARY_DIR,
                                 path_geojson)
-    output_dir_tile = output_dir + "Sentinel{}_t{}/".format(sent, t)
+    output_dir_tile = output_dir + sub_dir+ "Sentinel{}_t{}/".format(sent, t)
     tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t)
 
 
@@ -149,7 +147,8 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     total_image = combine_band(list_image, output_dir)
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}".format(sent, t))
-    shp_file_t1 = tiling(crop_image_name, output_dir)
+    os.system("gdalinfo {}".format(crop_image_name))
+    shp_file_t1 = tiling(crop_image_name, output_dir,sent,t)
 
 
 def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
