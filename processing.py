@@ -9,11 +9,13 @@ from utils.converter import geojson_2_bboxcoordo
 from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T
 
 
-def crop_image(image_path, path_shapefile, output_path):
-    assert os.path.isfile(path_shapefile), "No path in {}".format(path_shapefile)
+def crop_image(image_path, path_geojson, output_path):
+    assert os.path.isfile(path_geojson), "No path in {}".format(path_shapefile)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
-    print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path))
+    str_bbox=geojson_2_bboxcoordo(path_geojson)
+    #print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
+    #os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
+    os.system("gdal_translate {} {} -a_ullr  {} ".format(image_path,output_path,str_bbox))
     return output_path
 
 
@@ -139,13 +141,13 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson, path_shape
         list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1 + list_name_band_sent1_vrt_t2,
         output_dir + XDIR + TILING_DIR)
     # CROP this image on the geometry
-    final_image_x_path = crop_image(total_image_x, path_shapefile, output_dir + XDIR + TILING_DIR + "merged_imageX.vrt")
+    final_image_x_path = crop_image(total_image_x, path_geojson, output_dir + XDIR + TILING_DIR + "merged_imageX.vrt")
     shp_file_t1 = tiling(final_image_x_path, output_dir + XDIR + TILING_DIR)
     print("The prepro of dataX is done")
     ##Create the label folder
     list_name_band_sent2_vrt_t2 = create_vrt(list_band2, 2, input_dir_t2, output_dir + LABEL_DIR, path_geojson)
     total_image_label = combine_band(list_name_band_sent2_vrt_t2, output_dir + LABEL_DIR + TILING_DIR)
-    crop_image_label=crop_image(total_image_label, path_shapefile, output_dir + LABEL_DIR + TILING_DIR + "merged_imageX.vrt")
+    crop_image_label=crop_image(total_image_label, path_geojson, output_dir + LABEL_DIR + TILING_DIR + "merged_imageX.vrt")
     shp_t2 = tiling(crop_image_label, output_dir + LABEL_DIR + TILING_DIR)
 
 
