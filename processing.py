@@ -146,7 +146,7 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     create_safe_directory(output_dir)
     total_image = combine_band(list_image, output_dir)
     crop_image_name = crop_image(total_image, path_geojson,
-                                 output_dir + "merged_crop_sent{}_t{}".format(sent, t))
+                                 output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir,sent,t)
 
