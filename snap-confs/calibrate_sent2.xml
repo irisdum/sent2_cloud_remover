@@ -14,10 +14,20 @@
         <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
       </parameters>
     </node>
+     <node id="Reproject">
+      <operator>Reproject</operator>
+      <sources>
+        <sourceProduct refid="Resample"/>
+      </sources>
+      <parameters>
+        <crs>EPSG:4326</crs>
+        <addDeltaBands>false</addDeltaBands>
+      </parameters>
+    </node>
      <node id="Subset">
     <operator>Subset</operator>
     <sources>
-      <sourceProduct refid="Resample"/>
+      <sourceProduct refid="Reproject"/>
     </sources>
     <parameters>
       <sourceBands/>
