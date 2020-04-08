@@ -6,16 +6,16 @@ import shutil
 import click
 
 from utils.converter import geojson_2_bboxcoordo
-from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T
+from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T, DIR_SENT
 
 
 def crop_image(image_path, path_geojson, output_path):
     assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
-    str_bbox=geojson_2_bboxcoordo(path_geojson)
-    #print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    #os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
-    os.system("gdal_translate {} {} -a_ullr  {} ".format(image_path,output_path,str_bbox))
+    str_bbox = geojson_2_bboxcoordo(path_geojson)
+    # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
+    # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
+    os.system("gdal_translate {} {} -a_ullr  {} ".format(image_path, output_path, str_bbox))
     return output_path
 
 
@@ -64,8 +64,10 @@ def list_2_str(list):
 
 
 def tiling(image_vrt, output_dir):
-    os.system("python ../gdal_retile_multi/gdal_retile_multi_N_p.py {} -v -targetDir {} -tileIndex {} ".format(image_vrt, output_dir,
-                                                                                        "tiling_fp.shp"))
+    os.system(
+        "python ../gdal_retile_multi/gdal_retile_multi_N_p.py {} -v -targetDir {} -tileIndex {} ".format(image_vrt,
+                                                                                                         output_dir,
+                                                                                                         "tiling_fp.shp"))
     return output_dir + "tiling_fp.shp"
 
 
@@ -119,36 +121,35 @@ def create_tiling_hierarchy(output_dir):
     create_safe_directory(output_dir)
     for cst in [XDIR, LABEL_DIR]:
         print("BUILDING DATA {}".format(cst))
-
         create_safe_directory(output_dir + cst)
         create_safe_directory(output_dir + cst + TEMPORARY_DIR)
-        create_safe_directory(output_dir + cst + TILING_DIR)
 
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson, path_shapefile):
+def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
-    input_dir_t1 = input_dir + DIR_T[0]
-    list_name_band_sent2_vrt_t1 = create_vrt(list_band2, 2, input_dir_t1, output_dir + XDIR + TEMPORARY_DIR,
-                                             path_geojson)
-    list_name_band_sent1_vrt_t1 = create_vrt(list_band1, 1, input_dir_t1, output_dir + XDIR + TEMPORARY_DIR,
-                                             path_geojson)
-    input_dir_t2 = input_dir + DIR_T[1]
-    list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir + XDIR + TEMPORARY_DIR,
-                                             path_geojson)
-    print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent2_vrt_t1, list_name_band_sent2_vrt_t1))
-    total_image_x = combine_band(
-        list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1 + list_name_band_sent1_vrt_t2,
-        output_dir + XDIR + TILING_DIR)
-    # CROP this image on the geometry
-    final_image_x_path = crop_image(total_image_x, path_geojson, output_dir + XDIR + TILING_DIR + "merged_imageX.vrt")
-    shp_file_t1 = tiling(final_image_x_path, output_dir + XDIR + TILING_DIR)
-    print("The prepro of dataX is done")
-    ##Create the label folder
-    list_name_band_sent2_vrt_t2 = create_vrt(list_band2, 2, input_dir_t2, output_dir + LABEL_DIR, path_geojson)
-    total_image_label = combine_band(list_name_band_sent2_vrt_t2, output_dir + LABEL_DIR + TILING_DIR)
-    crop_image_label=crop_image(total_image_label, path_geojson, output_dir + LABEL_DIR + TILING_DIR + "merged_imageX.vrt")
-    shp_t2 = tiling(crop_image_label, output_dir + LABEL_DIR + TILING_DIR)
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel1 at t1
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 2, path_geojson)  # sentinel1 at t2
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel2 at t1
+    ##LABEL FOLDER
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 2, path_geojson)  # sentinel2 at t2
+
+
+def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson):
+    """Given a Sentinel and a time build the tiles """
+    input_dir_t = input_dir + DIR_T[t]
+    list_name_band = create_vrt(list_band, sent, input_dir_t, output_dir + sub_dir + TEMPORARY_DIR,
+                                path_geojson)
+    output_dir_tile = output_dir + "Sentinel{}_t{}/".format(sent, t)
+    tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t)
+
+
+def tiling_sent(list_image, sent, output_dir, path_geojson, t):
+    create_safe_directory(output_dir)
+    total_image = combine_band(list_image, output_dir)
+    crop_image_name = crop_image(total_image, path_geojson,
+                                 output_dir + "merged_crop_sent{}_t{}".format(sent, t))
+    shp_file_t1 = tiling(crop_image_name, output_dir)
 
 
 def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
@@ -171,4 +172,4 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson, args.shp)
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
