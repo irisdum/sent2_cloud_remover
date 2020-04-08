@@ -109,8 +109,7 @@ def _argparser():
     return parser.parse_args()
 
 def create_tiling_hierarchy(input_dir,output_dir):
-    for t in [0,1]:
-        create_safe_directory(input_dir + TEMPORARY_DIR)
+    
     for cst in [XDIR,LABEL_DIR]:
         print("BUILDING DATA {}".format(cst))
         create_safe_directory(output_dir)
