@@ -64,7 +64,7 @@ def list_2_str(list):
 
 
 def tiling(image_vrt, output_dir):
-    os.system("gdal_retile.py {} -v  -targetDir {} -overlap {} -v -tileIndex {} -useDirForEachRow ".format(image_vrt, output_dir, OVERLAP,
+    os.system("python ../gdal_retile_multi/gdal_retile_multi_N_p.py {} -v -targetDir {} -tileIndex {} ".format(image_vrt, output_dir,
                                                                                         "tiling_fp.shp"))
     return output_dir + "tiling_fp.shp"
 
