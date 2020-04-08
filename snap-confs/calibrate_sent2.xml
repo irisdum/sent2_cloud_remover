@@ -13,6 +13,7 @@
         <bandResamplings>${Bands}</bandResamplings>
         <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
       </parameters>
+    </node>
      <node id="Subset">
     <operator>Subset</operator>
     <sources>
