@@ -5,7 +5,7 @@ import os
 import shutil
 import click
 
-from utils.converter import geojson_2_bboxcoordo
+from converter import geojson_2_bboxcoordo
 from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T
 
 
