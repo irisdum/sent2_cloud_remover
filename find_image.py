@@ -132,11 +132,6 @@ def _argparser():
     return parser.parse_args()
 
 
-def extract_fp(image):
-    """Given an ee.Image extract its fp"""
-    pass
-
-
 def list_image_name(image_collection, sent):
     """    :param sent:
     :param image_collection : an ee image collection

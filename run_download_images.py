@@ -1,16 +1,14 @@
 # File where the search of the image name in GEE scripts and the download procedure of auscohup are linked
 import json
-import os
-import shutil
 
 import ee
 import argparse
 
-from download_images import download_all
+from utils.download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
-from fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
-from gee_constant import S1_OPTPARAM, DOWNLOAD_PATH, DIR_T
-from store_data import preprocess_all, create_download_dir
+from utils.fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
+from gee_constant import S1_OPTPARAM, DOWNLOAD_PATH
+from store_data import create_download_dir
 
 
 def _argparser():
