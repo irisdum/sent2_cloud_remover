@@ -123,7 +123,7 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     input_dir_t1 = input_dir + DIR_T[0]
     list_name_band_sent2_vrt_t1 = create_vrt(list_band2,2,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
     list_name_band_sent1_vrt_t1 = create_vrt(list_band1,1 ,input_dir_t1, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
-    input_dir_t2=input_dir.split("/")[:-1].DIR_T[1]
+    input_dir_t2=input_dir+DIR_T[1]
     list_name_band_sent1_vrt_t2 = create_vrt(list_band1, 1, input_dir_t2, output_dir+XDIR+TEMPORARY_DIR, path_geojson)
     print("Sentinel 1 {} Sentinel 2 {}".format(list_name_band_sent2_vrt_t1, list_name_band_sent2_vrt_t1))
     total_image_x = combine_band(list_name_band_sent2_vrt_t1 + list_name_band_sent1_vrt_t1+list_name_band_sent1_vrt_t2, output_dir +XDIR+TILING_DIR)
