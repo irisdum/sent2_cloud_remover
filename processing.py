@@ -6,7 +6,7 @@ import shutil
 import click
 
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
+from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 
 
 def crop_image(image_path, path_geojson, output_path):
@@ -91,7 +91,7 @@ def reproject_sent(path_image, output_dir, path_geojson):
     #print("STR BBOX {}".format(str_bbox))
     #print("BEFORE WARP ")
     os.system("gdalinfo {} ".format(path_image))
-    os.system("gdalwarp -t_srs EPSG:4326  {} {}".format(path_image, output_dir + name))
+    os.system("gdalwarp -t_srs {}  {}  -tr 10 10 {}".format(EPSG,path_image, output_dir + name))
     #print("AFTER WARP {}")
     #os.system("gdalinfo {}".format(output_dir+name))
     return output_dir + name

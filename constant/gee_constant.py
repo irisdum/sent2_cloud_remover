@@ -23,3 +23,5 @@ VAR_NAME="_prepro"
 ## TILING OPTION
 OVERLAP=10  #overlap of the tiling
 
+##PROJECTION SENTINEL 2
+EPSG="EPSG:32756"
