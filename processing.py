@@ -69,7 +69,7 @@ def list_2_str(list):
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     #os.system("gdalinfo {}".format(image_vrt))
-    os.system("../gdal_retile_multi/gdal_retile_multi_N_p.py {}-ps 256 256 -s_srs EPSG:4326 -v -targetDir {} -tileIndex {}".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
+    os.system("python ../gdal_retile_multi/gdal_retile_multi_N_p.py {}-ps 256 256 -s_srs EPSG:4326 -v -targetDir {} -tileIndex {}".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
     return output_dir + "tiling_fp.shp"
 
 
