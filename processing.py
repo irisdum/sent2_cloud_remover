@@ -69,7 +69,7 @@ def list_2_str(list):
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     #os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} -optfile {}".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t),"confs/retile_optfile.txt"))
+    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {}".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t),"confs/retile_optfile.txt"))
     return output_dir + "tiling_fp.shp"
 
 
