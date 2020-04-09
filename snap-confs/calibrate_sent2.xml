@@ -20,7 +20,7 @@
       <sourceProduct refid="Resample"/>
     </sources>
     <parameters>
-      <sourceBands/>
+        <sourceBands>${Bands}</sourceBands>
       <geoRegion>${geometry}</geoRegion>
       <copyMetadata>true</copyMetadata>
     </parameters>
