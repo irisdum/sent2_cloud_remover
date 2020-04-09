@@ -16,7 +16,7 @@ def crop_image(image_path, path_geojson, output_path):
     # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
     # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
 
-    os.system("gdal_translate {} {} -a_ullr  {} ".format(image_path, output_path, str_bbox))
+    os.system("gdal_translate {} {} -a_ullr  {} -a_srs {} ".format(image_path, output_path, str_bbox,EPSG))
     return output_path
 
 
@@ -118,7 +118,7 @@ def _argparser():
     parser.add_argument("--bands2", nargs="+", default=None, help="list of all the bands of sentinel 2 format B02,B03")
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
-    parser.add_argument("--geojson", default="./confs/train_kangaroo.geojson", help="path to the zone geojson")
+    parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
     parser.add_argument("--shp", default="./confs/train_kangaroo.shp", help="path to the esri shapefile")
     return parser.parse_args()
 
