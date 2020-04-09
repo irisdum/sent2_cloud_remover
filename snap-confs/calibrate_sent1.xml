@@ -67,7 +67,6 @@
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
       <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
-      <pixelSpacingInDegree>8.983152841195215E-5</pixelSpacingInDegree>
       <mapProjection>WGS84(DD)</mapProjection>
           <nodataValueAtSea>true</nodataValueAtSea>
       <saveDEM>false</saveDEM>
