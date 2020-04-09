@@ -1,9 +1,7 @@
 # File where all the functions linked with sent 2 footprints are sentinel 1 footprints are defined
 
 import ee
-import json
-from find_image import next_day, eedate_2_string
-from gee_constant import ORBIT_ID, FACTEUR_AREA
+from constant.gee_constant import ORBIT_ID, FACTEUR_AREA
 
 
 def is_contained(zone, image_fp):

@@ -2,8 +2,7 @@
 import os
 import shutil
 import click
-from shutil import rmtree
-from gee_constant import DIR_T, DIR_SENT, TEMPORARY_DIR, SENT_FORMAT, LISTE_BANDE, DOWNLOAD_PATH
+from constant.gee_constant import DIR_T, DIR_SENT, TEMPORARY_DIR, SENT_FORMAT, LISTE_BANDE, DOWNLOAD_PATH
 import glob
 from datetime import date
 

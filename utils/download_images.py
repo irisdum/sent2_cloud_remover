@@ -1,14 +1,13 @@
 # Functions to download images
 import io
-from io import StringIO  ## for Python 3
 
-from auscophub.saraclient import searchSara, makeUrlOpener, makeQueryUrl, readJsonUrl
+from auscophub.saraclient import searchSara, makeUrlOpener
 import pandas as pd
 import requests
 import zipfile
 
 from find_image import next_string_date
-from gee_constant import S1_OPTPARAM, S2_OPTPARAM
+from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM
 
 
 def download_images(url_images):

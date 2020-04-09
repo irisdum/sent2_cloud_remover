@@ -6,7 +6,7 @@ import shutil
 import click
 
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, TILING_DIR, XDIR, LABEL_DIR, DIR_T, DIR_SENT
+from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
 
 
 def crop_image(image_path, path_geojson, output_path):
@@ -67,9 +67,9 @@ def list_2_str(list):
 
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
-    print("IMAGE VRT which is goin to be tiled {}".format(image_vrt))
-    os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -overlap {} -ps 256 256 -s_srs EPSG:4326 -v -targetDir {} -tileIndex {} ".format(image_vrt,OVERLAP,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
+    print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
+    #os.system("gdalinfo {}".format(image_vrt))
+    os.system("gdal_retile.py {} -overlap {} -ps 256 256 -s_srs EPSG:4326 -v -targetDir {} -tileIndex {} -co NUM_THREADS=ALL_CPUS ".format(image_vrt,OVERLAP,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t)))
     return output_dir + "tiling_fp.shp"
 
 
@@ -80,19 +80,19 @@ def get_band_image_name(image_path, output_dir):
 
 
 def get_name_sent_vrt(band_vrt, output_dir):
-    print(band_vrt)
-    print(band_vrt.split("/"))
+    #print(band_vrt)
+    #print(band_vrt.split("/"))
     return output_dir + band_vrt.split("/")[-1][3:]
 
 
 def reproject_sent(path_image, output_dir, path_geojson):
     name = path_image.split("/")[-1]
     str_bbox = geojson_2_bboxcoordo(path_geojson)
-    print("STR BBOX {}".format(str_bbox))
-    print("BEFORE WARP ")
+    #print("STR BBOX {}".format(str_bbox))
+    #print("BEFORE WARP ")
     os.system("gdalinfo {} ".format(path_image))
     os.system("gdalwarp -t_srs EPSG:4326  {} {}".format(path_image, output_dir + name))
-    print("AFTER WARP {}")
+    #print("AFTER WARP {}")
     os.system("gdalinfo {}".format(output_dir+name))
     return output_dir + name
 
@@ -126,7 +126,7 @@ def _argparser():
 def create_tiling_hierarchy(output_dir):
     create_safe_directory(output_dir)
     for cst in [XDIR, LABEL_DIR]:
-        print("BUILDING DATA {}".format(cst))
+   #     print("BUILDING DATA {}".format(cst))
         create_safe_directory(output_dir + cst)
         create_safe_directory(output_dir + cst + TEMPORARY_DIR)
 
@@ -154,10 +154,10 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     create_safe_directory(output_dir)
 
     total_image = combine_band(list_image, output_dir)
-    print("BEFORE CROP")
+    #print("BEFORE CROP")
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
-    print("AFTER CROP")
+    #print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir,sent,t)
 

@@ -1,5 +1,5 @@
 import ee
-from gee_constant import DICT_COLLECTION
+from constant.gee_constant import DICT_COLLECTION
 import argparse
 from datetime import date, timedelta
 import json
