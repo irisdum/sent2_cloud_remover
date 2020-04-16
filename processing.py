@@ -17,7 +17,7 @@ def get_band_scale(raster, b):
 
 
 def convert2float32(path_image, output_dir):
-    output_path = output_dir + path_image.split("/")[-1].split(".")[-1]+"f32.tif"
+    output_path = output_dir + path_image.split("/")[-1].split(".")[0]+"f32.vrt"
     str_scale = get_scale(path_image)
     os.system("gdal_translate {}  {} -ot Float32 {} ".format(path_image, output_path, str_scale))
     return output_path

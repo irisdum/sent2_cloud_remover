@@ -94,11 +94,14 @@ The preprocessed image are stored in two different directories depending on thei
 
 Once the images are preprocessed, it is now time to sort the data in order to split the training data and the label in two
 different directories : 
-- dataX: contains Sentinel 1 and 2 at the first date range and Sentinel 1 at the second date range
+- dataX: contains Sentinel 1 and 2 at the first date range and Sentinel 1 at the second date range  
+    - Sentinel1_t0 : directory with Sentinel 1 images 
+    - Sentinel1_t1
+    - Sentinel2_t0 
 - label: contains Sentinel 2 at the second date range
 
 For dataX : 
-Usig gdalbuildvrt a VRT file is created creating first a mosaic for each image bands. Then another VRT file is made merging
+Using gdalbuildvrt a VRT file is created creating first a mosaic for each image bands. Then another VRT file is made merging
 the required bands together : 
 
 
