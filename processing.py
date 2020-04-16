@@ -4,9 +4,34 @@ import glob
 import os
 import shutil
 import click
-
+from osgeo import gdal
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
 from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
+
+
+def get_band_scale(raster, b):
+    band = raster.GetRasterBand(b)
+    if band.GetMinimum() is None or band.GetMaximum() is None:
+        band.ComputeStatistics(0)
+    return band.GetMinimum(), band.GetMaximum()
+
+
+def convert2float32(path_image, output_dir):
+    output_path = output_dir + path_image.split("/")[-1].split(".")[-1]+"f32.tif"
+    str_scale = get_scale(path_image)
+    os.system("gdal_translate {}  {} -ot Float32 {} ".format(path_image, output_path, str_scale))
+    return output_path
+
+
+def get_scale(path_image):
+    str_scale = ""
+    raster = gdal.Open(path_image)
+    n_band = raster.RasterCount
+    for b in range(1, n_band + 1):
+        band_min, band_max = get_band_scale(raster, b)
+        str_scale += " -scale_{} {} {} 0 1 ".format(b, band_min, band_max)
+    print(str_scale)
+    return str_scale
 
 
 def crop_image(image_path, path_geojson, output_path):
@@ -16,7 +41,8 @@ def crop_image(image_path, path_geojson, output_path):
     # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
     # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
 
-    os.system("gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10 ".format(image_path, output_path, str_bbox,EPSG))
+    os.system(
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10 ".format(image_path, output_path, str_bbox, EPSG))
     return output_path
 
 
@@ -33,9 +59,9 @@ def combine_band(list_path_vrt, output_dir):
     """Given a list of all vrt file for a sentinel"""
     output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
     print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
-    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
+    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))  # Sent2 RGB NIR
     print("AFTER COMBINE ")
-    #os.system("gdalinfo {}".format(output_name))
+    # os.system("gdalinfo {}".format(output_name))
     return output_name
 
 
@@ -68,8 +94,11 @@ def list_2_str(list):
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
-    #os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {}".format(image_vrt,output_dir,"tiling_sent{}_t{}_fp.shp".format(sent,date_t),"confs/retile_optfile.txt"))
+    # os.system("gdalinfo {}".format(image_vrt))
+    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {}".format(image_vrt, output_dir,
+                                                                                  "tiling_sent{}_t{}_fp.shp".format(
+                                                                                      sent, date_t),
+                                                                                  "confs/retile_optfile.txt"))
     return output_dir + "tiling_fp.shp"
 
 
@@ -80,20 +109,20 @@ def get_band_image_name(image_path, output_dir):
 
 
 def get_name_sent_vrt(band_vrt, output_dir):
-    #print(band_vrt)
-    #print(band_vrt.split("/"))
+    # print(band_vrt)
+    # print(band_vrt.split("/"))
     return output_dir + band_vrt.split("/")[-1][3:]
 
 
 def reproject_sent(path_image, output_dir, path_geojson):
     name = path_image.split("/")[-1]
     str_bbox = geojson_2_bboxcoordo(path_geojson)
-    #print("STR BBOX {}".format(str_bbox))
-    #print("BEFORE WARP ")
+    # print("STR BBOX {}".format(str_bbox))
+    # print("BEFORE WARP ")
     os.system("gdalinfo {} ".format(path_image))
-    os.system("gdalwarp -t_srs {}  {}  -tr 10 10 {}".format(EPSG,path_image, output_dir + name))
-    #print("AFTER WARP {}")
-    #os.system("gdalinfo {}".format(output_dir+name))
+    os.system("gdalwarp -t_srs {}  {}  -tr 10 10 {}".format(EPSG, path_image, output_dir + name))
+    # print("AFTER WARP {}")
+    # os.system("gdalinfo {}".format(output_dir+name))
     return output_dir + name
 
 
@@ -126,7 +155,7 @@ def _argparser():
 def create_tiling_hierarchy(output_dir):
     create_safe_directory(output_dir)
     for cst in [XDIR, LABEL_DIR]:
-   #     print("BUILDING DATA {}".format(cst))
+        #     print("BUILDING DATA {}".format(cst))
         create_safe_directory(output_dir + cst)
         create_safe_directory(output_dir + cst + TEMPORARY_DIR)
 
@@ -147,7 +176,7 @@ def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_g
     input_dir_t = input_dir + DIR_T[t]
     list_name_band = create_vrt(list_band, sent, input_dir_t, output_dir + sub_dir + TEMPORARY_DIR,
                                 path_geojson)
-    output_dir_tile = output_dir + sub_dir+ "Sentinel{}_t{}/".format(sent, t)
+    output_dir_tile = output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
     tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t)
 
 
@@ -155,12 +184,12 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     create_safe_directory(output_dir)
 
     total_image = combine_band(list_image, output_dir)
-    #print("BEFORE CROP")
+    # print("BEFORE CROP")
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
-    #print("AFTER CROP")
+    # print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
-    shp_file_t1 = tiling(crop_image_name, output_dir,sent,t)
+    shp_file_t1 = tiling(crop_image_name, output_dir, sent, t)
 
 
 def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
@@ -177,6 +206,8 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
         output_name = mosaic_image(list_image, input_dir)
         print("The image {} has been created".format(output_name))
         output_name = reproject_sent(output_name, output_dir, path_geojson)
+        # if sentinel 2 : convert to Float 32
+        output_name=convert2float32(output_name, output_dir)
         list_band_vrt += [output_name]
     return list_band_vrt
 
