@@ -39,7 +39,7 @@ def plot_gray(raster_array, name_image="", bound_x=None, bound_y=None):
     if bound_y is None:
         bound_y = BOUND_Y
     assert len(raster_array.shape) == 2, "More than one band dim are {}".format(raster_array.shape)
-    fig, ax = plt.subplots
+    fig, ax = plt.subplots()
     plot_subset_array(raster_array,ax, bound_x=bound_x, bound_y=bound_y)
     plt.show()
 
