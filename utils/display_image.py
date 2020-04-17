@@ -1,16 +1,48 @@
 # File with all the functions used to display mages in jupyter Notebook are written
 
 import glob
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
+from osgeo import gdal
 
 from constant.gee_constant import BOUND_X, BOUND_Y
 
 
+def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_y=None, band=0):
+    """
+    :param path_image:
+    :param mode:
+    :param name_image:
+    :param bound_x:
+    :param bound_y:
+    :param band: useful only if mode GRAY
+    :return:
+    """
+    assert mode in ["GRAY", "RGB", "NIR"], "The display mode {} is undefined please select in [GRAY,RGB,NIR]".format(
+        mode)
+    raster = gdal.Open(path_image)
+    if name_image is None:
+        name_image = path_image.split("/")[-1]
+    if mode == "GRAY":
+        plot_gray(raster.ReadAsArray()[band, :, :])
+    else:
+        plot_sent2(raster.ReadAsArray, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
+
+
+def plot_gray(raster_array, name_image="", bound_x=None, bound_y=None):
+    if bound_x is None:
+        bound_x = BOUND_X
+    if bound_y is None:
+        bound_y = BOUND_Y
+    assert len(raster_array.shape) == 2, "More than one band dim are {}".format(raster_array.shape)
+    fig, ax = plt.subplots
+    plot_subset_array(raster_array,ax, bound_x=bound_x, bound_y=bound_y)
+    plt.show()
+
 def find_image_indir(path_dir, image_format):
     """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
     dir"""
-    assert image_format in ["vrt", "tif","SAFE/"], "Wrong format should be vrt or tif but is {}".format(format)
+    assert image_format in ["vrt", "tif", "SAFE/"], "Wrong format should be vrt or tif SAFE/ but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
     return glob.glob("{}*.{}".format(path_dir, image_format))
 
@@ -29,13 +61,13 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
     if mode == "RGB":
         print("The plot is made with sent2 b4 as band 0, b3 as band 1 and b2 as band 2 in the raster array")
         ax.set_title("{} in RGB".format(name_image))
-        raster_array=np.moveaxis(raster_array[:3, :, :], 0, -1)
-        plot_subset_array(raster_array,ax,bound_x,bound_y)
+        raster_array = np.moveaxis(raster_array[:3, :, :], 0, -1)
+        plot_subset_array(raster_array, ax, bound_x, bound_y)
     else:
         print("The plot is made with sent2 b8 as band 0, b4 as band 1 and b3 as band 2")
         ax.set_title("{} in NIR".format(name_image))
         nir_array = np.array([raster_array[3, :, :], raster_array[0, :, :], raster_array[1, :, :]])
-        plot_subset_array(nir_array,ax,bound_x,bound_y)
+        plot_subset_array(nir_array, ax, bound_x, bound_y)
     plt.show()
 
 
