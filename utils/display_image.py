@@ -24,7 +24,11 @@ def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_
     if name_image is None:
         name_image = path_image.split("/")[-1]
     if mode == "GRAY":
-        plot_gray(raster.ReadAsArray()[band, :, :])
+        raster_array=raster.ReadAsArray()
+        if len(raster_array.shape)>2:
+            plot_gray(raster_array[band, :, :])
+        else:
+            plot_gray(raster_array)
     else:
         plot_sent2(raster.ReadAsArray, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
 
