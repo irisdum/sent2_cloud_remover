@@ -1,6 +1,7 @@
 # File with all the functions used to display mages in jupyter Notebook are written
+
 import glob
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 from constant.gee_constant import BOUND_X, BOUND_Y
@@ -9,7 +10,7 @@ from constant.gee_constant import BOUND_X, BOUND_Y
 def find_image_indir(path_dir, image_format):
     """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
     dir"""
-    assert image_format in ["vrt", "tif"], "Wrong format should be vrt or tif but is {}".format(format)
+    assert image_format in ["vrt", "tif","SAFE"], "Wrong format should be vrt or tif but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
     return glob.glob("{}.{}".format(path_dir, image_format))
 
