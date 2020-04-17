@@ -26,22 +26,25 @@ def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_
     if mode == "GRAY":
         raster_array=raster.ReadAsArray()
         if len(raster_array.shape)>2:
-            plot_gray(raster_array[band, :, :])
+            plot_gray(raster_array[band, :, :],name_image)
         else:
-            plot_gray(raster_array)
+            plot_gray(raster_array,name_image)
     else:
         plot_sent2(raster.ReadAsArray, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
 
 
-def plot_gray(raster_array, name_image="", bound_x=None, bound_y=None):
+def plot_gray(raster_array, name_image, bound_x=None, bound_y=None,ax=None):
     if bound_x is None:
         bound_x = BOUND_X
     if bound_y is None:
         bound_y = BOUND_Y
     assert len(raster_array.shape) == 2, "More than one band dim are {}".format(raster_array.shape)
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(15,15))
+        ax.set_title(name_image)
     plot_subset_array(raster_array,ax, bound_x=bound_x, bound_y=bound_y)
     plt.show()
+
 
 def find_image_indir(path_dir, image_format):
     """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
