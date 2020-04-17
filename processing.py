@@ -207,8 +207,8 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
         print("The image {} has been created".format(output_name))
         output_name = reproject_sent(output_name, output_dir, path_geojson)
         # if sentinel 2 : convert to Float 32
-        if sent==2:
-            output_name=convert2float32(output_name, output_dir)
+        # if sent==2:
+        #     output_name=convert2float32(output_name, output_dir)
         list_band_vrt += [output_name]
     return list_band_vrt
 
