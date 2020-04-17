@@ -1,7 +1,7 @@
 # File with all the functions used to display mages in jupyter Notebook are written
 
 import glob
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 
