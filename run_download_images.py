@@ -243,6 +243,8 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
         return True
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append("./")
     args = _argparser()
     main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
          args.save,
