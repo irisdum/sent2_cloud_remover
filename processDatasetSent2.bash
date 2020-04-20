@@ -33,6 +33,9 @@ targetDirectory="$4"
 #the sixth parameter is the path to the WKT subset .txt file
 wktFile="$5"
 
+#Cloud mask path with S2 dir
+
+cloud_mask_path="$6"
 
 ############################################
 # Helper functions
@@ -64,5 +67,7 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
-
+  cloud_path="${F}/${cloud_mask_path}"
+  gdal_rasterize  -l MaskFeature ${cloud_path} -tr 10 10 -burn 255 "${targetDirectory}/cloud_mask_$(removeExtension "$(basename ${F})").tif"
 done
+
