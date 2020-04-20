@@ -13,9 +13,9 @@ TILING_DIR="tiling_dir/"
 XDIR="dataX/"
 LABEL_DIR="label/"
 SENT_FORMAT=["tiff", "jp2"]
-LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08"]]
+LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08","cloud_mask"]]
 
-NAME_CLOUD_MASK="MSK_CLOUDS_B00.gml"
+
 
 ### DOWNLOADING CRITERIA
 FACTEUR_AREA=0.9 # correspond of the minimum area of the zone the sentinel 1 should cover

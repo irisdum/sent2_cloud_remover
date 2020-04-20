@@ -10,7 +10,7 @@ from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR,
     NAME_CLOUD_MASK
 
 
-def find_cloud_mask(input_dir):
+def find_cloud_mask(input_dir): ##UNUSED
     """Find the path of the cloud mask in the Sent2 .SAFE directory"""
     assert input_dir[-1] == "/", "Wrong input dir format should end with / {}".format(input_dir)
     l = glob.glob("{}**/*{}".format(input_dir, NAME_CLOUD_MASK), recursive=True)
@@ -18,11 +18,8 @@ def find_cloud_mask(input_dir):
     return l[0]
 
 
-def add_cloud_mask_band(path_sent2_dir):
-    pass
 
-
-def rasterize_cloud_mask(path_cloud, outpath):
+def rasterize_cloud_mask(path_cloud, outpath): #UNUSED
     """Given a file at path_could app, use gdal_rasterize"""
     os.system("gdal_rasterize  -l MaskFeature {} -tr 10 10 - burn 255 {}".format(path_cloud, outpath))
     return outpath
