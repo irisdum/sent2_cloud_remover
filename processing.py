@@ -6,8 +6,7 @@ import shutil
 import click
 from osgeo import gdal
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG, \
-    NAME_CLOUD_MASK
+from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 
 
 def find_cloud_mask(input_dir): ##UNUSED

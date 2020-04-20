@@ -232,8 +232,8 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
 
     if save:
         # TODO saving options + directory t1 and directory t2
-        download_all(dic_name_t2_sent1, 1, DOWNLOAD_PATH)
-        download_all(dic_name_t1_sent1, 1, DOWNLOAD_PATH)
+        #download_all(dic_name_t2_sent1, 1, DOWNLOAD_PATH)
+        #download_all(dic_name_t1_sent1, 1, DOWNLOAD_PATH)
         download_all(dic_name_t2_sent2, 2, DOWNLOAD_PATH)
         download_all(dic_name_t1_sent2, 2, DOWNLOAD_PATH)
     # if output_path is not None:
