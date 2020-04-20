@@ -112,6 +112,7 @@ def download_all(dic_download, sent, output_path):
 
 
 def main():
+
     proxy = None
     urlOpener = makeUrlOpener(proxy)
     image_id_test = "S1B_IW_GRDH_1SSH_20200322T220406_20200322T220435_020810_027767_839F"
@@ -129,4 +130,6 @@ def main():
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append("../")
     main()
