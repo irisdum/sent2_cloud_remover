@@ -67,6 +67,7 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   done<"${wktFile}"
   cloud_path=$( find "${F}" -name "MSK_CLOUDS_B00.gml" )
   echo "$cloud_path"
+  echo "${targetDirectory}/cloud_mask_$(removeExtension "$(basename ${F})").tif"
   gdal_rasterize  -l MaskFeature ${cloud_path} -tr 10 10 -burn 255 "${targetDirectory}/cloud_mask_$(removeExtension "$(basename ${F})").tif"
 done
 
