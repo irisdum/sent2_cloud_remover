@@ -3,6 +3,7 @@ import json
 
 import ee
 import argparse
+import sys
 
 from utils.download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
@@ -243,7 +244,7 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
         return True
 
 if __name__ == '__main__':
-    import sys
+
     sys.path.append("./")
     args = _argparser()
     main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
