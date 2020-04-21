@@ -12,7 +12,7 @@ def convert_array(raster_array, scale_s1=SCALE_S1):
     if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
         return uin16_2_float32(raster_array)
     elif raster_array.dtype == np.float32:
-        return raster_array.divide(scale_s1).astype(np.float(32))
+        return np.divide(raster_array,scale_s1).astype(np.float(32))
 
 
 def uin16_2_float32(raster_array, max_scale=CONVERTOR):
