@@ -8,11 +8,16 @@ from osgeo import gdal
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
 
 
-def convert_array(raster_array, scale_s1=SCALE_S1):
+def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
     if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
         return uin16_2_float32(raster_array)
     elif raster_array.dtype == np.float32:
-        return np.divide(raster_array,scale_s1).astype(np.float32)
+        return np.divide(raster_array, scale_s1).astype(np.float32)
+    elif mode == "CLOUD_MASK":
+        np.where(raster_array == 1, 0, raster_array)  # clear land pixel
+        np.where(raster_array == 4, 0, raster_array)  # snow (cf http://www.pythonfmask.org/en/latest/fmask_fmask.html)
+        np.where(raster_array == 5, 0, raster_array)  # water
+        return np.divide(raster_array, 5).astype(np.float32)
 
 
 def uin16_2_float32(raster_array, max_scale=CONVERTOR):
@@ -20,7 +25,7 @@ def uin16_2_float32(raster_array, max_scale=CONVERTOR):
     return scaled_array.astype(np.float32)
 
 
-def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0):
+def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0, cm_band=True, ax=None):
     """
     :param path_image:
     :param mode:
@@ -37,27 +42,27 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
     if name_image is None:
         name_image = path_image.split("/")[-1]
     raster_array = raster.ReadAsArray()
-    raster_array=convert_array(raster_array)
+    raster_array = convert_array(raster_array, mode)
     if mode is None:
         nband = raster_array.shape[0]
         if nband == 2:  # sentinel 1
             size_x, size_y = raster_array.shape[1], raster_array.shape[2]
             raster_array = np.array(
-                [np.zeros((size_x, size_y)), raster_array[0, :, :], raster_array[1, :, :], np.zeros((size_x, size_y)),
-                 np.zeros((size_x, size_y))])
+                [np.zeros((size_x, size_y)), raster_array[0, :, :], raster_array[1, :, :], np.zeros((size_x, size_y))])
             mode = "RGB"
         elif nband >= 3:
             mode = "RGB"
+
         else:
             mode = "GRAY"
 
     if mode == "GRAY":
         if len(raster_array.shape) > 2:
-            plot_gray(raster_array[band, :, :], name_image)
+            plot_gray(raster_array[band, :, :], name_image, ax=ax)
         else:
-            plot_gray(raster_array, name_image)
+            plot_gray(raster_array, name_image, ax=ax)
     else:
-        plot_sent2(raster_array, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
+        plot_sent2(raster_array, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x, ax=ax)
 
 
 def info_image(path_tif):
@@ -103,7 +108,7 @@ def find_image_indir(path_dir, image_format):
 def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):
     assert mode in ["RGB", "NIR", "CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(
         mode)
-    assert raster_array.shape[0] > 3, "Wrong sentinel 2 input format should be at least 4 bands {}".format(
+    assert raster_array.shape[0] >= 3, "Wrong sentinel 2 input format should be at least 4 bands {}".format(
         raster_array.shape[0])
     if ax is None:
         fig, ax = plt.subplots()
@@ -125,7 +130,7 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
     else:
         print("plot of the cloud mask which is the last band")
         ax.set_title("{} cloud mask".format(name_image))
-        plot_subset_array(raster_array[4, :, :], bound_x, bound_y)
+        plot_subset_array(raster_array[4, :, :], ax, bound_x, bound_y)
     plt.show()
 
 

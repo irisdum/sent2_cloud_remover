@@ -76,7 +76,7 @@ def is_conform(path_tile):
     return True
 
 
-def main(path_final_dataset, opt_remove):
+def main(path_final_dataset, opt_remove=False):
     list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0", path_final_dataset + XDIR + "Sentinel1_t1",
                      path_final_dataset + XDIR + "Sentinel2_t0", path_final_dataset + LABEL_DIR + "Sentinel2_t1"]
     list_not_conform = []

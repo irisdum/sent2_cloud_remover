@@ -31,11 +31,11 @@ def get_band_scale(raster, b):
     return band.GetMinimum(), band.GetMaximum()
 
 
-def convert2float32(path_image, output_dir):
-    output_path = output_dir + path_image.split("/")[-1].split(".")[0] + "f32.vrt"
-    str_scale = get_scale(path_image)
-    os.system("gdal_translate {}  {} -ot Float32 {} ".format(path_image, output_path, str_scale))
-    return output_path
+# def convert2float32(path_image, output_dir):
+#     output_path = output_dir + path_image.split("/")[-1].split(".")[0] + "f32.vrt"
+#     str_scale = get_scale(path_image)
+#     os.system("gdal_translate {}  {} -ot Float32 {} ".format(path_image, output_path, str_scale))
+#     return output_path
 
 
 def get_scale(path_image):
