@@ -30,14 +30,20 @@ def is_no_data(raster, sent):
 
     return False
 
+def is_no_signal(raster_array):
+    if np.count_nonzero(raster_array)==0:
+        return True
+    else:
+        return False
 
-def is_s2_cloud(s2_raster_array,cloud_thr=CLOUD_THR):
+
+def is_s2_cloud(s2_raster_array, cloud_thr=CLOUD_THR):
     """Given a sentinel 2 raster check if the cloud mask band contains cloud pixels value at 2**16-1
     :returns bool """
     cloud_mask_array = s2_raster_array[-1, :, :]
-    nb_cloud=np.count_nonzero(cloud_mask_array==2)
-    nb_shadow=np.count_nonzero(cloud_mask_array==3)
-    if nb_cloud+nb_shadow>CLOUD_THR:
+    nb_cloud = np.count_nonzero(cloud_mask_array == 2)
+    nb_shadow = np.count_nonzero(cloud_mask_array == 3)
+    if nb_cloud + nb_shadow > CLOUD_THR:
         return True
     else:
         return False
@@ -62,6 +68,9 @@ def is_conform(path_tile):
     assert raster_array.shape[0] in [len(LISTE_BANDE[0]),
                                      len(LISTE_BANDE[1])], "Wrong tile shape {} should be {} or {} bands" \
         .format(raster.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
+    if is_no_signal(raster_array):
+        return False
+
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
         if is_s2_cloud(raster_array):
             print("Image {} clouds ".format(path_tile.split("/")[-1]))
@@ -73,7 +82,25 @@ def is_conform(path_tile):
         if is_no_data(raster, 1):
             print("Image {} no_data ".format(path_tile.split("/")[-1]))
             return False
+
     return True
+
+
+def get_unconformed(path_final_dataset):
+    list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0", path_final_dataset + XDIR + "Sentinel1_t1",
+                     path_final_dataset + XDIR + "Sentinel2_t0", path_final_dataset + LABEL_DIR + "Sentinel2_t1"]
+    list_not_conform = []
+    for path_sent_dir in list_sent_dir:
+        list_tiles = get_all_tiles_path(path_sent_dir)
+        for path_tile in list_tiles:
+            if is_conform(path_tile):
+                pass
+            else:
+                # add it to the list of all the not appropriate tiles
+                list_not_conform += [extract_relative_path(path_tile)]
+    return list(set(list_not_conform))
+
+
 
 
 def main(path_final_dataset, opt_remove=False):
