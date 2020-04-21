@@ -12,7 +12,7 @@ def uin16_2_float32(raster_array,max_scale=CONVERTOR):
     scaled_array=np.divide(raster_array,max_scale)
     return scaled_array.astype(np.float32)
 
-def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_y=None, band=0):
+def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0):
     """
     :param path_image:
     :param mode:
@@ -27,14 +27,25 @@ def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_
     raster = gdal.Open(path_image)
     if name_image is None:
         name_image = path_image.split("/")[-1]
+    raster_array = raster.ReadAsArray()
+    if mode is None:
+        nband=raster_array.shape[0]
+        if nband==2: #sentinel 1
+            size_x,size_y=raster_array.shape[1],raster_array.shape[2]
+            raster_array=np.array([np.zeros((size_x,size_y)),raster_array[0,:,:],raster_array[1,:,:]])
+            mode="RGB"
+        elif nband>=3:
+            mode="RGB"
+        else:
+            mode="GRAY"
+            
     if mode == "GRAY":
-        raster_array=raster.ReadAsArray()
         if len(raster_array.shape)>2:
             plot_gray(raster_array[band, :, :],name_image)
         else:
             plot_gray(raster_array,name_image)
     else:
-        plot_sent2(raster.ReadAsArray, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
+        plot_sent2(raster_array, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
 
 
 def info_image(path_tif):

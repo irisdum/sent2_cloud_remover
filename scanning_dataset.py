@@ -4,7 +4,7 @@ import argparse
 from osgeo import gdal
 import numpy as np
 
-from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR
+from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR
 
 
 def is_no_data(raster, sent):
@@ -31,15 +31,16 @@ def is_no_data(raster, sent):
     return False
 
 
-def is_s2_cloud(s2_raster_array):
+def is_s2_cloud(s2_raster_array,cloud_thr=CLOUD_THR):
     """Given a sentinel 2 raster check if the cloud mask band contains cloud pixels value at 2**16-1
     :returns bool """
     cloud_mask_array = s2_raster_array[-1, :, :]
-    if np.all(cloud_mask_array == 0):
-        return False
-    else:
-        print("Cloud pixels detected {}".format(np.count_nonzero(cloud_mask_array)))
+    nb_cloud=np.count_nonzero(cloud_mask_array==2)
+    nb_shadow=np.count_nonzero(cloud_mask_array==3)
+    if nb_cloud+nb_shadow>CLOUD_THR:
         return True
+    else:
+        return False
 
 
 def extract_relative_path(path_tif):
