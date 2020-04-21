@@ -5,12 +5,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 
-from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE,CONVERTOR
+from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
 
 
-def uin16_2_float32(raster_array,max_scale=CONVERTOR):
-    scaled_array=np.divide(raster_array,max_scale)
+def convert_array(raster_array, scale_s1=SCALE_S1):
+    if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
+        return uin16_2_float32(raster_array)
+    elif raster_array.dtype == np.float32:
+        return raster_array.divide(scale_s1).astype(np.float(32))
+
+
+def uin16_2_float32(raster_array, max_scale=CONVERTOR):
+    scaled_array = np.divide(raster_array, max_scale)
     return scaled_array.astype(np.float32)
+
 
 def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0):
     """
@@ -22,28 +30,32 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
     :param band: useful only if mode GRAY
     :return:
     """
-    assert mode in [None,"GRAY", "RGB", "NIR","CLOUD_MASK"], "The display mode {} is undefined please select in [GRAY,RGB,NIR,CLOUD_MASK]".format(
+    assert mode in [None, "GRAY", "RGB", "NIR",
+                    "CLOUD_MASK"], "The display mode {} is undefined please select in [GRAY,RGB,NIR,CLOUD_MASK]".format(
         mode)
     raster = gdal.Open(path_image)
     if name_image is None:
         name_image = path_image.split("/")[-1]
     raster_array = raster.ReadAsArray()
+    raster_array=convert_array(raster_array)
     if mode is None:
-        nband=raster_array.shape[0]
-        if nband==2: #sentinel 1
-            size_x,size_y=raster_array.shape[1],raster_array.shape[2]
-            raster_array=np.array([np.zeros((size_x,size_y)),raster_array[0,:,:],raster_array[1,:,:],np.zeros((size_x,size_y)),np.zeros((size_x,size_y))])
-            mode="RGB"
-        elif nband>=3:
-            mode="RGB"
+        nband = raster_array.shape[0]
+        if nband == 2:  # sentinel 1
+            size_x, size_y = raster_array.shape[1], raster_array.shape[2]
+            raster_array = np.array(
+                [np.zeros((size_x, size_y)), raster_array[0, :, :], raster_array[1, :, :], np.zeros((size_x, size_y)),
+                 np.zeros((size_x, size_y))])
+            mode = "RGB"
+        elif nband >= 3:
+            mode = "RGB"
         else:
-            mode="GRAY"
+            mode = "GRAY"
 
     if mode == "GRAY":
-        if len(raster_array.shape)>2:
-            plot_gray(raster_array[band, :, :],name_image)
+        if len(raster_array.shape) > 2:
+            plot_gray(raster_array[band, :, :], name_image)
         else:
-            plot_gray(raster_array,name_image)
+            plot_gray(raster_array, name_image)
     else:
         plot_sent2(raster_array, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
 
@@ -67,17 +79,16 @@ def info_image(path_tif):
         print("[ MAX ] = ", band.GetMaximum())
 
 
-
-def plot_gray(raster_array, name_image, bound_x=None, bound_y=None,ax=None):
+def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
     if bound_x is None:
         bound_x = BOUND_X
     if bound_y is None:
         bound_y = BOUND_Y
     assert len(raster_array.shape) == 2, "More than one band dim are {}".format(raster_array.shape)
     if ax is None:
-        fig, ax = plt.subplots(figsize=(15,15))
+        fig, ax = plt.subplots(figsize=(15, 15))
         ax.set_title(name_image)
-    plot_subset_array(raster_array,ax, bound_x=bound_x, bound_y=bound_y)
+    plot_subset_array(raster_array, ax, bound_x=bound_x, bound_y=bound_y)
     plt.show()
 
 
@@ -90,8 +101,9 @@ def find_image_indir(path_dir, image_format):
 
 
 def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):
-    assert mode in ["RGB", "NIR","CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(mode)
-    assert raster_array.shape[0] > 3 , "Wrong sentinel 2 input format should be at least 4 bands {}".format(
+    assert mode in ["RGB", "NIR", "CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(
+        mode)
+    assert raster_array.shape[0] > 3, "Wrong sentinel 2 input format should be at least 4 bands {}".format(
         raster_array.shape[0])
     if ax is None:
         fig, ax = plt.subplots()
@@ -113,7 +125,7 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
     else:
         print("plot of the cloud mask which is the last band")
         ax.set_title("{} cloud mask".format(name_image))
-        plot_subset_array(raster_array[4,:,:],bound_x,bound_y)
+        plot_subset_array(raster_array[4, :, :], bound_x, bound_y)
     plt.show()
 
 
@@ -133,4 +145,3 @@ def plot_s2(raster_array, opt="RGB"):
         ax.set_title("NIR")
         ax.imshow(np.moveaxis(nir_array, 0, -1))
     plt.show()
-
