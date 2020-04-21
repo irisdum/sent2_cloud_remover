@@ -127,6 +127,7 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         print("The plot is made with sent2 b8 as band 0, b4 as band 1 and b3 as band 2")
         ax.set_title("{} in NIR".format(name_image))
         nir_array = np.array([raster_array[3, :, :], raster_array[0, :, :], raster_array[1, :, :]])
+        nir_array = np.moveaxis(nir_array, 0, -1)
         plot_subset_array(nir_array, ax, bound_x, bound_y)
     else:
         print("plot of the cloud mask which is the last band")
