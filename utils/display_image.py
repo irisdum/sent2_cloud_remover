@@ -5,8 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 
-from constant.gee_constant import BOUND_X, BOUND_Y
+from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE,CONVERTOR
 
+
+def uin16_2_float32(raster_array,max_scale=CONVERTOR):
+    scaled_array=np.divide(raster_array,max_scale)
+    return scaled_array.astype(np.float32)
 
 def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_y=None, band=0):
     """
@@ -18,7 +22,7 @@ def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_
     :param band: useful only if mode GRAY
     :return:
     """
-    assert mode in ["GRAY", "RGB", "NIR"], "The display mode {} is undefined please select in [GRAY,RGB,NIR]".format(
+    assert mode in ["GRAY", "RGB", "NIR","CLOUD_MASK"], "The display mode {} is undefined please select in [GRAY,RGB,NIR,CLOUD_MASK]".format(
         mode)
     raster = gdal.Open(path_image)
     if name_image is None:
@@ -31,6 +35,26 @@ def display_image(path_image, mode="GRAY", name_image=None, bound_x=None, bound_
             plot_gray(raster_array,name_image)
     else:
         plot_sent2(raster.ReadAsArray, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x)
+
+
+def info_image(path_tif):
+    raster = gdal.Open(path_tif)
+    n_band = raster.RasterCount
+    for b in range(n_band):
+        # Read the raster band as separate variable
+        band = raster.GetRasterBand(b + 1)
+        # Check type of the variable 'band'
+        type(band)
+        # Data type of the values
+        print("The band {} data_tye {}".format(b, gdal.GetDataTypeName(band.DataType)))
+        if band.GetMinimum() is None or band.GetMaximum() is None:
+            band.ComputeStatistics(0)
+            print("Statistics computed.")
+        # Print only selected metadata:
+        print("[ NO DATA VALUE ] = ", band.GetNoDataValue())  # none
+        print("[ MIN ] = ", band.GetMinimum())
+        print("[ MAX ] = ", band.GetMaximum())
+
 
 
 def plot_gray(raster_array, name_image, bound_x=None, bound_y=None,ax=None):
@@ -55,8 +79,8 @@ def find_image_indir(path_dir, image_format):
 
 
 def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):
-    assert mode in ["RGB", "NIR"], "mode {} is undifined should be in RGB or NIR".format(mode)
-    assert raster_array.shape[0] == 4, "Wrong sentinel 2 input format should be 4 bands not {}".format(
+    assert mode in ["RGB", "NIR","CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(mode)
+    assert raster_array.shape[0] == len(LISTE_BANDE[1]), "Wrong sentinel 2 input format should be 4 bands not {}".format(
         raster_array.shape[0])
     if ax is None:
         fig, ax = plt.subplots()
@@ -70,11 +94,15 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         ax.set_title("{} in RGB".format(name_image))
         raster_array = np.moveaxis(raster_array[:3, :, :], 0, -1)
         plot_subset_array(raster_array, ax, bound_x, bound_y)
-    else:
+    elif mode == "NIR":
         print("The plot is made with sent2 b8 as band 0, b4 as band 1 and b3 as band 2")
         ax.set_title("{} in NIR".format(name_image))
         nir_array = np.array([raster_array[3, :, :], raster_array[0, :, :], raster_array[1, :, :]])
         plot_subset_array(nir_array, ax, bound_x, bound_y)
+    else:
+        print("plot of the cloud mask which is the last band")
+        ax.set_title("{} cloud mask".format(name_image))
+        plot_subset_array(raster_array[4,:,:],bound_x,bound_y)
     plt.show()
 
 
@@ -94,3 +122,4 @@ def plot_s2(raster_array, opt="RGB"):
         ax.set_title("NIR")
         ax.imshow(np.moveaxis(nir_array, 0, -1))
     plt.show()
+

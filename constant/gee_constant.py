@@ -13,7 +13,7 @@ TILING_DIR="tiling_dir/"
 XDIR="dataX/"
 LABEL_DIR="label/"
 SENT_FORMAT=["tiff", "jp2"]
-LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08","cloud_mask"]]
+LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08","cm"]]
 
 
 
@@ -32,3 +32,6 @@ EPSG="EPSG:32756"
 ## DISPALY CONSTANT
 BOUND_X=[100,1000]
 BOUND_Y=[100,1000]
+
+## CONVERT Uint16 2 Float 32
+CONVERTOR=10000

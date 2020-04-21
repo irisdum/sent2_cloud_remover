@@ -68,7 +68,7 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   echo "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
   temp_cloud="temp_cloud_mask_$(removeExtension "$(basename ${F})").tif"
   fmask_sentinel2Stacked.py -o "${targetDirectory}${temp_cloud}" --safedir ${F} -v --mincloudsize 30 --cloudprobthreshold 5
-  gdal_translate "${targetDirectory}${temp_cloud}" -ot Uint16 "${targetDirectory}cm_$(removeExtension "$(basename ${F})").tif"
+  gdal_translate "${targetDirectory}${temp_cloud}" -ot Uint16 -tr 10 10 "${targetDirectory}cm_$(removeExtension "$(basename ${F})").tif"
 
 done
 
