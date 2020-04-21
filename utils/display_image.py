@@ -91,7 +91,7 @@ def find_image_indir(path_dir, image_format):
 
 def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):
     assert mode in ["RGB", "NIR","CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(mode)
-    assert raster_array.shape[0] == len(LISTE_BANDE[1]), "Wrong sentinel 2 input format should be 4 bands not {}".format(
+    assert raster_array.shape[0] > 3 , "Wrong sentinel 2 input format should be at least 4 bands {}".format(
         raster_array.shape[0])
     if ax is None:
         fig, ax = plt.subplots()
