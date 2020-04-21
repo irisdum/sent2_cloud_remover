@@ -22,7 +22,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
     :param band: useful only if mode GRAY
     :return:
     """
-    assert mode in ["GRAY", "RGB", "NIR","CLOUD_MASK"], "The display mode {} is undefined please select in [GRAY,RGB,NIR,CLOUD_MASK]".format(
+    assert mode in [None,"GRAY", "RGB", "NIR","CLOUD_MASK"], "The display mode {} is undefined please select in [GRAY,RGB,NIR,CLOUD_MASK]".format(
         mode)
     raster = gdal.Open(path_image)
     if name_image is None:
@@ -38,7 +38,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
             mode="RGB"
         else:
             mode="GRAY"
-            
+
     if mode == "GRAY":
         if len(raster_array.shape)>2:
             plot_gray(raster_array[band, :, :],name_image)
