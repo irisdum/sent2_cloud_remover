@@ -8,7 +8,7 @@ import sys
 from utils.download_images import download_all
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from utils.fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
-from constant.gee_constant import S1_OPTPARAM, DOWNLOAD_PATH
+from constant.gee_constant import S1_OPTPARAM, DOWNLOAD_PATH, DIR_T
 from store_data import create_download_dir
 
 
@@ -214,7 +214,7 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     :param ed : string ending date
     """
 
-    assert create_download_dir(DOWNLOAD_PATH), "Download directory has not been well created"
+    assert create_download_dir(output_path), "Download directory has not been well created"
 
     if optparam1 is None:
         optparam1 = default_param(1)
@@ -233,13 +233,11 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
 
     if save:
         # TODO saving options + directory t1 and directory t2
-        #download_all(dic_name_t2_sent1, 1, DOWNLOAD_PATH)
-        #download_all(dic_name_t1_sent1, 1, DOWNLOAD_PATH)
-        download_all(dic_name_t2_sent2, 2, DOWNLOAD_PATH)
-        download_all(dic_name_t1_sent2, 2, DOWNLOAD_PATH)
-    # if output_path is not None:
-    #     print("Starting preprocessing the images are going to be stored at {}".format(output_path))
-    #     preprocess_all(output_path, DOWNLOAD_PATH, path_shapefile)
+        download_all(dic_name_t2_sent1, 1, output_path+DIR_T[1])
+        download_all(dic_name_t1_sent1, 1, output_path+DIR_T[0])
+        download_all(dic_name_t2_sent2, 2, output_path+DIR_T[1])
+        download_all(dic_name_t1_sent2, 2, output_path+DIR_T[0])
+
     else:
         return True
 
