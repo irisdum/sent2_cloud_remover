@@ -32,7 +32,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
         nband=raster_array.shape[0]
         if nband==2: #sentinel 1
             size_x,size_y=raster_array.shape[1],raster_array.shape[2]
-            raster_array=np.array([np.zeros((size_x,size_y)),raster_array[0,:,:],raster_array[1,:,:]])
+            raster_array=np.array([np.zeros((size_x,size_y)),raster_array[0,:,:],raster_array[1,:,:],np.zeros((size_x,size_y))])
             mode="RGB"
         elif nband>=3:
             mode="RGB"
