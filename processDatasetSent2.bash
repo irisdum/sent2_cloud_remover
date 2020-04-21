@@ -65,10 +65,10 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
-  cloud_path=$( find "${F}" -name "MSK_CLOUDS_B00.gml" )
-  echo "$cloud_path"
   echo "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
-  gdal_rasterize  -l MaskFeature ${cloud_path} -tr 10 10 -burn 65535 -ot UInt16 "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
+  temp_cloud="temp_cloud_mask_$(removeExtension "$(basename ${F})").tif"
+  fmask_sentinel2Stacked.py -o "${targetDirectory}${temp_cloud}" --safedir ${F} -v --mincloudsize 30 --cloudprobthreshold 5
+  gdal_translate "${targetDirectory}${temp_cloud}" -ot Uint16 "${targetDirectory}cm_$(removeExtension "$(basename ${F})").tif"
 
 done
 

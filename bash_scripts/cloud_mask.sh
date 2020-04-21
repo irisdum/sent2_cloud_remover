@@ -1,0 +1,1 @@
+fmask_sentinel2Stacked.py -o no_cloud3.tif --safedir dataset1/date1/S2A_MSIL1C_20191022T000241_N0208_R030_T56HKG_20191022T012314.SAFE/ -v --mincloudsize 30 --cloudprobthreshold5
