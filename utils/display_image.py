@@ -42,7 +42,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
     if name_image is None:
         name_image = path_image.split("/")[-1]
     raster_array = raster.ReadAsArray()
-    raster_array = convert_array(raster_array, mode)
+    raster_array = convert_array(raster_array,mode=mode)
     if mode is None:
         nband = raster_array.shape[0]
         if nband == 2:  # sentinel 1
