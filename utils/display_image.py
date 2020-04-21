@@ -94,7 +94,8 @@ def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
         fig, ax = plt.subplots(figsize=(15, 15))
         ax.set_title(name_image)
     plot_subset_array(raster_array, ax, bound_x=bound_x, bound_y=bound_y)
-    plt.show()
+    if ax is None:
+        plt.show()
 
 
 def find_image_indir(path_dir, image_format):
@@ -131,7 +132,8 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         print("plot of the cloud mask which is the last band")
         ax.set_title("{} cloud mask".format(name_image))
         plot_subset_array(raster_array[4, :, :], ax, bound_x, bound_y)
-    plt.show()
+    if ax is None:
+        plt.show()
 
 
 def plot_subset_array(raster_array, ax, bound_x, bound_y):
