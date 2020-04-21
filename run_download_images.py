@@ -233,10 +233,10 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
 
     if save:
         # TODO saving options + directory t1 and directory t2
-        download_all(dic_name_t2_sent1, 1, output_path+DIR_T[1])
-        download_all(dic_name_t1_sent1, 1, output_path+DIR_T[0])
-        download_all(dic_name_t2_sent2, 2, output_path+DIR_T[1])
-        download_all(dic_name_t1_sent2, 2, output_path+DIR_T[0])
+        download_all(dic_name_t2_sent1, sent=1,output_path= output_path+DIR_T[1])
+        download_all(dic_name_t1_sent1, sent=1, output_path=output_path+DIR_T[0])
+        download_all(dic_name_t2_sent2, sent=2,output_path= output_path+DIR_T[1])
+        download_all(dic_name_t1_sent2, sent=2,output_path= output_path+DIR_T[0])
 
     else:
         return True
