@@ -7,6 +7,27 @@ from osgeo import gdal
 
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
 
+def plot_allbands_hist(path_tif,ax):
+    raster=gdal.Open(path_tif)
+    image=raster.ReadAsArray()
+    image=np.moveaxis(image,0,-1)
+    if ax is None:
+        fig,ax=plt.subplots()
+    ax.hist(image.ravel(), bins = 256, color = 'orange', )
+    nb=image.shape[-1]
+    if nb==5:
+        nb-=1
+    l_legend=[]
+    l_color=["red","green","blue","gray","pink"]
+    for b in range(nb):
+        ax.hist(image[:, :, b].ravel(), bins = 256, color = l_color[b], alpha = 0.5)
+        l_legend+=["Bande {}".format(b+1)]
+        ax.set_xlabel('Intensity Value')
+        ax.set_ylabel('Count')
+        ax.legend(l_legend)
+    if ax is None:
+        plt.show()
+
 
 def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
     if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale

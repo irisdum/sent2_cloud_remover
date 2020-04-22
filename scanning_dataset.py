@@ -5,7 +5,7 @@ from osgeo import gdal
 import numpy as np
 import os
 from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR
-
+import random
 
 def is_no_data(raster, sent):
     """Given a raster check if there are no data:
@@ -77,6 +77,34 @@ def get_all_tiles_path(path_sent_dir):
     return l
 
 
+def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
+    random.seed(seed)
+
+    assert len(list_all_tiles) > 0, "No tiles found in {}".format(path_sent_tiles)
+    sample_path = random.sample(list_all_tiles, nb_sample)
+    return [extract_tile_id(path) for path in sample_path]
+
+
+def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/"):
+    l_unconformed_id = get_unconformed(path_final_dataset)
+    list_all_tiles = glob.glob(path_final_dataset + sent_dir + "**/*.tif", recursive=True)
+    print("Initial dataset size {}".format(len(list_all_tiles)))
+    l_all_id = [extract_tile_id(path) for path in list_all_tiles]
+    print(l_all_id[:10])
+    for id_tile in l_unconformed_id:
+        # print(id_tile in l_unconformed_id)
+        # print("remove {} ".format(id_tile))
+        l_all_id.remove(id_tile)
+    print("Final dataset size {}".format(len(l_all_id)))
+    return l_all_id
+
+def find_path(sent_dir, image_id):
+    print(sent_dir + "**/*{}".format(image_id))
+    l = glob.glob(sent_dir + "**/*{}".format(image_id), recursive=True)
+    assert len(l) > 0, "No image found with id {} at {}".format(image_id, sent_dir)
+    return l[0]
+
+
 def is_conform(path_tile):
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
@@ -138,6 +166,8 @@ def main(path_final_dataset, opt_remove=False):
                 if opt_remove:
                     pass
     print(list(set(list_not_conform)))
+
+
 
 
 def _argparser():
