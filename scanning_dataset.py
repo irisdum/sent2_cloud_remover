@@ -74,6 +74,7 @@ def is_conform(path_tile):
                                      len(LISTE_BANDE[1])], "Wrong tile shape {} should be {} or {} bands" \
         .format(raster.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
     if is_no_signal(raster_array):
+        print("Image {} only 0 ".format(path_tile.split("/")[-1]))
         return False
 
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
