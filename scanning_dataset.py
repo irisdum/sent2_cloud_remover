@@ -92,8 +92,8 @@ def is_conform(path_tile):
 
 
 def get_unconformed(path_final_dataset):
-    list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0", path_final_dataset + XDIR + "Sentinel1_t1",
-                     path_final_dataset + XDIR + "Sentinel2_t0", path_final_dataset + LABEL_DIR + "Sentinel2_t1"]
+    list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0/", path_final_dataset + XDIR + "Sentinel1_t1/",
+                     path_final_dataset + XDIR + "Sentinel2_t0/", path_final_dataset + LABEL_DIR + "Sentinel2_t1/"]
     list_not_conform = []
     for path_sent_dir in list_sent_dir:
         list_tiles = get_all_tiles_path(path_sent_dir)
