@@ -3,7 +3,7 @@ import glob
 import argparse
 from osgeo import gdal
 import numpy as np
-
+import os
 from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR
 
 
@@ -57,6 +57,8 @@ def extract_relative_path(path_tif):
 
 def get_all_tiles_path(path_sent_dir):
     """Given the path to Sentineli_tj directory returns a list of all the paths to all the tiles of the image"""
+    assert os.path.isdir(path_sent_dir),"The dir {} does not exist".format(path_sent_dir)
+    print("research :  {}**/*.tif".format(path_sent_dir))
     l = glob.glob("{}**/*.tif".format(path_sent_dir), recursive=True)
     assert len(l) > 0, "No image found in {}".format(path_sent_dir)
     return l
