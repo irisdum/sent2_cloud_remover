@@ -30,8 +30,17 @@ def is_no_data(raster, sent):
 
     return False
 
+
+def is_wrong_size(raster_array):
+    size_x, size_y = raster_array.shape[1], raster_array.shape[2]
+    if size_x == 256 and size_y == 256:
+        pass
+    else:
+        return True
+
+
 def is_no_signal(raster_array):
-    if np.count_nonzero(raster_array)==0:
+    if np.count_nonzero(raster_array) == 0:
         return True
     else:
         return False
@@ -54,13 +63,14 @@ def extract_relative_path(path_tif):
     l = path_tif.split("/")
     return "/".join(l[-3:-1])
 
+
 def extract_tile_id(path_tif):
     return path_tif.split("/")[-1][-9:]
 
 
 def get_all_tiles_path(path_sent_dir):
     """Given the path to Sentineli_tj directory returns a list of all the paths to all the tiles of the image"""
-    assert os.path.isdir(path_sent_dir),"The dir {} does not exist".format(path_sent_dir)
+    assert os.path.isdir(path_sent_dir), "The dir {} does not exist".format(path_sent_dir)
     print("research :  {}**/*.tif".format(path_sent_dir))
     l = glob.glob("{}**/*.tif".format(path_sent_dir), recursive=True)
     assert len(l) > 0, "No image found in {}".format(path_sent_dir)
@@ -73,6 +83,11 @@ def is_conform(path_tile):
     assert raster_array.shape[0] in [len(LISTE_BANDE[0]),
                                      len(LISTE_BANDE[1])], "Wrong tile shape {} should be {} or {} bands" \
         .format(raster.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
+
+    if is_wrong_size(raster_array):
+        print("Image {} wrong size ".format(path_tile.split("/")[-1]))
+        return False
+
     if is_no_signal(raster_array):
         print("Image {} only 0 ".format(path_tile.split("/")[-1]))
         return False
@@ -105,8 +120,6 @@ def get_unconformed(path_final_dataset):
                 # add it to the list of all the not appropriate tiles
                 list_not_conform += [extract_tile_id(path_tile)]
     return list(set(list_not_conform))
-
-
 
 
 def main(path_final_dataset, opt_remove=False):
