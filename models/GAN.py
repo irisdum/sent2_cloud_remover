@@ -92,7 +92,8 @@ class GAN():
             return tf.keras.activations.relu(x)
 
         if model_yaml["last_activation"]=="tanh":
-            last_activ=lambda x : tf.keras.activations.tanh(x)
+            print("use tanh keras")
+            last_activ= lambda x: tf.keras.activations.tanh(x)
         else:
             last_activ=model_yaml["last_activation"]
 
@@ -111,7 +112,8 @@ class GAN():
         x=Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                          padding=model_yaml["padding"],
                          activation=last_activ)(x)
-        print("last layer gene", type(x))
+        print("last layer gene", x)
+        print(type(img_input))
         model=Model(img_input, x, name='GAN_generator')
         if print_summary:
             model.summary()
