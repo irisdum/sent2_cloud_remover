@@ -14,12 +14,13 @@ from ruamel import yaml
 class GAN():
     def __init__(self, train_yaml, model_yaml):
         """:param train_yaml,model_yaml two dictionnaries"""
+        print(train_yaml)
+        print(model_yaml)
         self.img_rows = 256
         self.img_cols = 256
         self.channels = CHANNEL
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         optimizer = Adam(learning_rate=train_yaml["lr"], beta_1=train_yaml["beta1"])
-
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator(model_yaml)
         # self.discriminator.compile(loss='binary_crossentropy',
