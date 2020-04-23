@@ -90,7 +90,7 @@ class GAN():
             x = Dropout(rate=model_yaml["do_rate"])(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
             x = add([x, input])
-            #x=tf.keras.activations.relu(x)
+            x=ReLU()(x)
             return x
 
         if model_yaml["last_activation"]=="tanh":
