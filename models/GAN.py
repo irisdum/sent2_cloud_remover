@@ -2,9 +2,9 @@
 import tensorflow as tf
 from tensorflow import keras
 
-from tf.keras.layers import Input, Dense, Reshape, Flatten, Dropout, BatchNormalization, Conv2D, ReLU, add,ZeroPadding2D
-from tf.keras.models import Sequential, Model
-from tf.keras.optimizers import Adam
+from tensorflow.keras.layers import Input, Dense, Reshape, Flatten, Dropout, BatchNormalization, Conv2D, ReLU, add,ZeroPadding2D
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL, LEARNING_RATE, BETA_1, LOGDIR
 
 import numpy as np
