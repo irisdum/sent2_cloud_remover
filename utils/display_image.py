@@ -159,12 +159,21 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         plt.show()
 
 
-def plot_subset_array(raster_array, ax, bound_x, bound_y):
-    if is_low_contrast(raster_array):
-        print("rescale hist")
-        raster_array=equalize_hist(raster_array)
+def plot_subset_array(raster_array, ax, bound_x, bound_y,rescaled=True):
+    if rescaled:
+        raster_array=rescale_image(raster_array)
     ax.imshow(raster_array[bound_x[0]:bound_x[1], bound_y[0]:bound_y[1]])
 
+def rescale_image(raster_array):
+    print("Warning the array should be channel last !")
+    rescaled_array=np.zeros(raster_array.shape)
+    for b in range(raster_array.shape[-1]):
+        if is_low_contrast(raster_array[:,:,b]):
+            print("rescale_img")
+            rescaled_array[:,:,b]=equalize_hist(raster_array[:,:,b])
+        else:
+            rescaled_array[:, :, b]=raster_array[:,:,b]
+    return rescaled_array
 
 def plot_s2(raster_array, opt="RGB"):
     fig, ax = plt.subplots()
