@@ -8,7 +8,7 @@ def main(path_train,path_model):
 
 def open_yaml(path_yaml):
     with open(path_yaml) as f:
-        return yaml.load(f, Loader=yaml.FullLoader)
+        return yaml.load(f)
 
 if __name__ == '__main__':
     path_train="./GAN_confs/train.yaml"
