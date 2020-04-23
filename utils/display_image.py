@@ -39,7 +39,8 @@ def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
         np.where(raster_array == 4, 0, raster_array)  # snow (cf http://www.pythonfmask.org/en/latest/fmask_fmask.html)
         np.where(raster_array == 5, 0, raster_array)  # water
         return np.divide(raster_array, 5).astype(np.float32)
-
+    else:
+        return np.divide(raster_array,np.max(raster_array))
 
 def uin16_2_float32(raster_array, max_scale=CONVERTOR):
     scaled_array = np.divide(raster_array, max_scale)

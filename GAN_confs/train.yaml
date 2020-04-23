@@ -1,0 +1,10 @@
+### YAML TO THE TRAIN PARAMETERS
+
+## Parameter for the Adam optimizer
+lr: 0.0002
+beta1: 0.5
+
+## Path to the logdir tensorboard directory
+logdir: "/datastore/dum031/models/"
+
+
