@@ -73,6 +73,7 @@ class GAN():
         # layer 3
         x = ZeroPadding2D(padding=(1, 1))(x)
         x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
+        print(x)
         model=Model(discri_input,x,name="GAN_discriminator")
         if print_summary:
             model.summary()
