@@ -104,8 +104,8 @@ class GAN():
             x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                        activation="relu")(x)
 
-        for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
-            x = build_resnet_block(x)
+        #for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
+         #   x = build_resnet_block(x)
         for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
             x=Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                              activation="relu")(x)
