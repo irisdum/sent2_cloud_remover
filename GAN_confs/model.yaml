@@ -15,7 +15,7 @@ last_layer: [4,3]
 last_activation: tanh
 
 #batch norm momentum
-momentum: 0.99
+bn_momentum: 0.99
 #dropout rate
 do_rate: 0.5
 
