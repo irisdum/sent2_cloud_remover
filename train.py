@@ -12,5 +12,5 @@ def open_yaml(path_yaml):
 
 if __name__ == '__main__':
     path_train="./GAN_confs/train.yaml"
-    path_model="./GAN_confs/train.yaml"
+    path_model="./GAN_confs/model.yaml"
     main(path_train,path_model)

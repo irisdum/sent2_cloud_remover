@@ -20,7 +20,8 @@ class GAN():
         self.img_cols = 256
         self.channels = CHANNEL
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        optimizer = Adam(learning_rate=train_yaml["lr"], beta_1=train_yaml["beta1"])
+        print(type(train_yaml["lr"]))
+        optimizer = Adam(train_yaml["lr"], train_yaml["beta1"])
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator(model_yaml)
         # self.discriminator.compile(loss='binary_crossentropy',
