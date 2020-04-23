@@ -2,7 +2,7 @@
 import tensorflow as tf
 from tensorflow import keras
 
-from tensorflow.keras.layers import Input, Dense, Reshape, Flatten, Dropout, BatchNormalization, Conv2D, ReLU, add,ZeroPadding2D
+from tensorflow.keras.layers import Input, Dense, Add, Reshape, Flatten, Dropout, BatchNormalization, Conv2D, ReLU, add,ZeroPadding2D
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL, LEARNING_RATE, BETA_1, LOGDIR
@@ -89,7 +89,7 @@ class GAN():
             x = ReLU()(x)
             x = Dropout(rate=model_yaml["do_rate"])(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            x = add([x, input])
+            x = Add()[x, input]
             x=ReLU()(x)
             return x
 
