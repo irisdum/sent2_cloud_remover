@@ -85,12 +85,12 @@ class GAN():
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
                        strides=tuple(model_yaml["stride"]))(input)
-            #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            #x = tf.keras.activations.relu(x)
-            #x = Dropout(rate=model_yaml["do_rate"])(x)
-            #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            #x = add([x, input])
-            #x=tf.keras.activations.relu(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
+            x = ReLU()(x)
+            x = Dropout(rate=model_yaml["do_rate"])(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
+            x = add([x, input])
+            x=tf.keras.activations.relu(x)
             return x
 
         if model_yaml["last_activation"]=="tanh":
