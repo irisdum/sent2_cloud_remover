@@ -58,7 +58,7 @@ def create_input(image_id, input_dir, output_dir):
             assert raster_array.shape[0]==final_array.shape[0], "Wrong dimension between final_array {} and raster_array {}".format(final_array.shape,raster_array.shape)
             final_array[:,:,count_dim:count_dim+raster_array.shape[-1]]=raster_array #we add the array into the final_array
             count_dim+=raster_array.shape[-1]
-        np.save("{}{}.npy".format(output_dir+name_dir,image_id[:-4]))
+        np.save("{}{}.npy".format(output_dir+name_dir,image_id[:-4]),final_array)
 
 
 def prepare_tiles_from_id(list_id,input_dir, output_dir):
