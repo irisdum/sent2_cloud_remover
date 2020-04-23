@@ -68,10 +68,10 @@ class GAN():
         x = ZeroPadding2D(padding=(1, 1))(x)
         x = Conv2D(256, 4, padding="valid", activation=d_activation,strides=(2,2))(x)
         # layer 4
-        x = ZeroPadding2D(padding=(2, 2))(x)
+        x = ZeroPadding2D(padding=(1, 1))(x)
         x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
         # layer 3
-        x = ZeroPadding2D(padding=(2, 2))(x)
+        x = ZeroPadding2D(padding=(1, 1))(x)
         x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
         model=Model(discri_input,x,name="GAN_discriminator")
         if print_summary:
