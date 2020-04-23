@@ -1,10 +1,10 @@
+
 ## Dataset cst
 CHANNEL=8
 
-## Optimizer Adam
-LEARNING_RATE=0.0002
-BETA_1=0.5
+
+## CONSTANT FOR THE LOADING DATASET JUST BEFORE THE TRAINING
+
+TRAINING_DIR=["train/","test/","val/"]
 
 
-## LOGDIR Tensorboard
-LOGDIR="/datastore/dum031/models/"

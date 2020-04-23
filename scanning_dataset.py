@@ -80,7 +80,7 @@ def get_all_tiles_path(path_sent_dir):
 def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
     random.seed(seed)
 
-    assert len(list_all_tiles) > 0, "No tiles found in {}".format(path_sent_tiles)
+    assert len(list_all_tiles) > 0, "No tiles found in {}".format(list_all_tiles)
     sample_path = random.sample(list_all_tiles, nb_sample)
     return [extract_tile_id(path) for path in sample_path]
 
@@ -99,6 +99,9 @@ def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/")
     return l_all_id
 
 def find_path(sent_dir, image_id):
+    """:returns a string which is the path of the image with the id image_id
+    """
+    assert os.path.isdir(sent_dir),"Wrong path to dir, path  {} does not exist ".format(sent_dir)
     print(sent_dir + "**/*{}".format(image_id))
     l = glob.glob(sent_dir + "**/*{}".format(image_id), recursive=True)
     assert len(l) > 0, "No image found with id {} at {}".format(image_id, sent_dir)
