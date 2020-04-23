@@ -89,8 +89,9 @@ class GAN():
             x = tf.keras.activations.relu(x)
             x = Dropout(rate=model_yaml["do_rate"])(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            x = add([x, input])
-            return tf.keras.activations.relu(x)
+            #x = add([x, input])
+            x=tf.keras.activations.relu(x)
+            return x
 
         if model_yaml["last_activation"]=="tanh":
             print("use tanh keras")
@@ -104,8 +105,8 @@ class GAN():
             x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                        activation="relu")(x)
 
-        #for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
-         #   x = build_resnet_block(x)
+        for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
+            x = build_resnet_block(x)
         for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
             x=Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                              activation="relu")(x)
