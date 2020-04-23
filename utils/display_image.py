@@ -123,7 +123,7 @@ def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
 def find_image_indir(path_dir, image_format):
     """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
     dir"""
-    assert image_format in ["vrt", "tif", "SAFE/"], "Wrong format should be vrt or tif SAFE/ but is {}".format(format)
+    assert image_format in ["vrt", "tif", "SAFE/","npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
     return glob.glob("{}*.{}".format(path_dir, image_format))
 
