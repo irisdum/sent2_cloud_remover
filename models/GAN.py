@@ -92,7 +92,7 @@ class GAN():
             return tf.keras.activations.relu(x)
 
         if model_yaml["last_activation"]=="tanh":
-            last_activ=tf.keras.activations.tanh
+            last_activ=tf.keras.activations.tanh()
         else:
             last_activ=model_yaml["last_activation"]
 
