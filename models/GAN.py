@@ -91,6 +91,11 @@ class GAN():
             x = add([x, input])
             return tf.keras.activations.relu(x)
 
+        if model_yaml["last_activation"]=="tanh":
+            last_activ=tf.keras.activations.tanh
+        else:
+            last_activ=model_yaml["last_activation"]
+
         img_input = tf.keras.Input(shape=tuple(model_yaml["input_shape"]))
         x=img_input
         for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
@@ -105,8 +110,8 @@ class GAN():
         # The last layer
         x=Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                          padding=model_yaml["padding"],
-                         activation=model_yaml["last_activation"])(x)
-
+                         activation=last_activ)(x)
+        print("last layer gene", type(x))
         model=Model(img_input, x, name='GAN_generator')
         if print_summary:
             model.summary()
