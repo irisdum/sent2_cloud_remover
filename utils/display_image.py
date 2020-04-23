@@ -4,7 +4,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
-
+from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
 
 def plot_allbands_hist(path_tif,ax):
@@ -160,6 +160,9 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
 
 
 def plot_subset_array(raster_array, ax, bound_x, bound_y):
+    if is_low_contrast(raster_array):
+        print("rescale hist")
+        raster_array=equalize_hist(raster_array)
     ax.imshow(raster_array[bound_x[0]:bound_x[1], bound_y[0]:bound_y[1]])
 
 

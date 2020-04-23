@@ -55,7 +55,7 @@ def create_input(image_id, input_dir, output_dir):
         for i,sent in enumerate(DICT_ORGA[name_dir]):
             image_path = find_path(input_dir + name_dir + sent, image_id)
             raster_array = modify_array(tiff_2_array(image_path)) # channel last s*s*channel
-            assert raster_array.shape[0]==final_array[0], "Wrong dimension between final_array {} and raster_array {}".format(final_array.shape,raster_array.shape)
+            assert raster_array.shape[0]==final_array.shape[0], "Wrong dimension between final_array {} and raster_array {}".format(final_array.shape,raster_array.shape)
             final_array[:,:,count_dim:count_dim+raster_array.shape[-1]]=raster_array #we add the array into the final_array
             count_dim+=raster_array.shape[-1]
         np.save("{}{}.npy".format(output_dir+name_dir,image_id[:-4]))
@@ -76,4 +76,4 @@ def create_input_dataset(dict_tiles,input_dir,output_dir):
     for sub_dir in dict_tiles:
         assert sub_dir in TRAINING_DIR, "Issue name directory is {} but should be in {}".format(sub_dir,TRAINING_DIR)
         prepare_tiles_from_id(dict_tiles[sub_dir],input_dir,output_dir+sub_dir)
-    
+
