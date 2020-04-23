@@ -159,7 +159,7 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         plt.show()
 
 
-def plot_subset_array(raster_array, ax, bound_x, bound_y,rescaled=True):
+def plot_subset_array(raster_array, ax, bound_x, bound_y,rescaled=False):
     if rescaled:
         raster_array=rescale_image(raster_array)
     ax.imshow(raster_array[bound_x[0]:bound_x[1], bound_y[0]:bound_y[1]])
