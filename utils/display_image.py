@@ -168,11 +168,8 @@ def rescale_image(raster_array):
     print("Warning the array should be channel last !")
     rescaled_array=np.zeros(raster_array.shape)
     for b in range(raster_array.shape[-1]):
-        if is_low_contrast(raster_array[:,:,b]):
-            print("rescale_img")
-            rescaled_array[:,:,b]=equalize_hist(raster_array[:,:,b])
-        else:
-            rescaled_array[:, :, b]=raster_array[:,:,b]
+        rescaled_array[:,:,b]=equalize_hist(raster_array[:,:,b])
+
     return rescaled_array
 
 def plot_s2(raster_array, opt="RGB"):
