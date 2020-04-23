@@ -72,7 +72,7 @@ class GAN():
         x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
         # layer 3
         x = ZeroPadding2D(padding=(2, 2))(x)
-        x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(2, 2))(x)
+        x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
         model=Model(discri_input,x,name="GAN_discriminator")
         if print_summary:
             model.summary()
@@ -83,7 +83,7 @@ class GAN():
         def build_resnet_block(input):
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
-                       strides=model_yaml["stride"])(input)
+                       strides=tuple(model_yaml["stride"]))(input)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
             x = tf.keras.activations.relu(x)
             x = Dropout(rate=model_yaml["do_rate"])(x)
@@ -94,16 +94,16 @@ class GAN():
         img_input = tf.keras.Input(shape=tuple(model_yaml["input_shape"]))
         x=img_input
         for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
-            x = Conv2D(param_lay[0], param_lay[1], strides=model_yaml["stride"], padding=model_yaml["padding"],
+            x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                        activation="relu")(x)
 
         for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
             x = build_resnet_block(x)
         for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
-            x=Conv2D(param_lay[0], param_lay[1], strides=model_yaml["stride"], padding=model_yaml["padding"],
+            x=Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]), padding=model_yaml["padding"],
                              activation="relu")(x)
         # The last layer
-        x=Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=model_yaml["stride"],
+        x=Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                          padding=model_yaml["padding"],
                          activation=model_yaml["last_activation"])(x)
 

@@ -8,7 +8,7 @@ nb_resnet_blocs: 9 # Number of Resnet Block
 k_resnet: 3 #size of the kernel during the resent blocks
 dim_resnet: 256  #the nber of filter used in the resnet blocks
 param_after_resnet: [[128,3],[64,3]]
-strides: (1,1)
+strides: [1,1]
 padding: same
 
 last_layer: [4,3]
