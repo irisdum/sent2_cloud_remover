@@ -56,7 +56,7 @@ class GAN():
             d_activation= lambda x: tf.keras.activations.relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
             d_activation= model_yaml["d_activation"]
-        discri_input=tf.keras.Input(shape=model_yaml["d_input_shape"])
+        discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
         #layer 1
         x=ZeroPadding2D(
             padding=(1, 1))(discri_input)
@@ -91,7 +91,7 @@ class GAN():
             x = add([x, input])
             return tf.keras.activations.relu(x)
 
-        img_input = tf.keras.Input(shape=model_yaml["input_shape"])
+        img_input = tf.keras.Input(shape=tuple(model_yaml["input_shape"]))
         x=img_input
         for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
             x = Conv2D(param_lay[0], param_lay[1], strides=model_yaml["stride"], padding=model_yaml["padding"],

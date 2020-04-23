@@ -2,7 +2,7 @@
 ######################################
 #### THE GENERATOR PARAM #############
 ######################################
-input_shape: (256,256,8)
+input_shape: [256,256,8]
 param_before_resnet: [[64,7],[128,3],[256,3]] # [dim,k] for the layers before the resnet blocks
 nb_resnet_blocs: 9 # Number of Resnet Block
 k_resnet: 3 #size of the kernel during the resent blocks
@@ -27,6 +27,6 @@ do_rate: 0.5
 
 lrelu_alpha: 0.1 #useful only if lrelu
 d_activation: "relu" #could alos be lrelu
-d_input_shape: (256,256,8)
+d_input_shape: [256,256,8]
 
 
