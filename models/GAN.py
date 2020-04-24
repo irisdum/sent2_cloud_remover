@@ -213,7 +213,7 @@ class GAN():
                 # update G network
                 print("Before G run ", self.g_input,batch_input.shape)
                 summary_str, g_loss = self.sess.run([self.g_optim, self.g_loss],
-                                                       feed_dict={self.g_input: batch_input})
+                                                       feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
                 self.writer.add_summary(summary_str, counter)
                 # display training status
                 counter += 1
