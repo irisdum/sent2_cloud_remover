@@ -178,7 +178,7 @@ class GAN():
 
 
         # saver to save model
-        self.saver = tf.train.Saver()
+        self.saver = tf.compat.v1.train.Saver()
 
         # summary writer
         self.writer = tf.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
