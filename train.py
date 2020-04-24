@@ -4,7 +4,7 @@ from ruamel import yaml
 import tensorflow as tf
 
 def main(path_train,path_model):
-    with tf.compat.v1.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True)) as sess:
 
         gan=GAN.GAN(open_yaml(path_train),open_yaml(path_model),sess)
         gan.build_model()
