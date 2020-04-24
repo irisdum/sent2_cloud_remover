@@ -205,11 +205,11 @@ class GAN():
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
                 # update D network
-                _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
+                summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
 
                 # update G network
-                _, summary_str, g_loss = self.sess.run([self.g_optim, self.g_loss],
+                summary_str, g_loss = self.sess.run([self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input})
                 self.writer.add_summary(summary_str, counter)
                 # display training status
