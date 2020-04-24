@@ -203,9 +203,9 @@ class GAN():
             # get batch data
             for idx in range(start_batch_id, self.num_batches):
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
-                print("batch_input",batch_input)
+                print("batch_input",batch_input.shape)
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
-                print("GT",batch_gt)
+                print("GT",batch_gt.shape)
                 # update D network
                 summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
