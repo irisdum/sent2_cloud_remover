@@ -135,10 +135,10 @@ class GAN():
     def build_model(self):
 
         #The input in the model graph
-        self.g_input=tf.keras.backend.placeholder(shape=(self.batch_size,self.data_X.shape[1],self.data_X.shape[2],self.data_X.shape[3])) #the input of the label of the generator
+        self.g_input=tf.keras.backend.placeholder(shape=(self.batch_size,self.data_X.shape[1],self.data_X.shape[2],self.data_X.shape[3]),name="Input_data") #the input of the label of the generator
         print("ginput",self.g_input)
         #the Ground truth images
-        self.gt_images=tf.keras.backend.placeholder(shape=tuple([self.batch_size]+self.model_yaml["dim_gt_image"]))
+        self.gt_images=tf.keras.backend.placeholder(shape=tuple([self.batch_size]+self.model_yaml["dim_gt_image"]),name="GT_image")
         print("gt_image",self.gt_images)
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
