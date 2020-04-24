@@ -98,7 +98,7 @@ class GAN():
             x = ReLU(name="g_block_{}_relu1".format(id))(x)
             x = Dropout(rate=model_yaml["do_rate"],name="g_block_{}_do".format(id))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,name="g_block_{}_bn2".format(id))(x)
-            x = Add()([x, input],name="g_block_{}_add".format(id))
+            x = Add(name="g_block_{}_add".format(id))([x, input])
             x = ReLU(name="g_block_{}_relu2".format(id))(x)
             return x
 
