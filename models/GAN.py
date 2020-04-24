@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
-from tensorflow_gan.python.losses.losses_impl import modified_discriminator_loss,modified_generator_loss
+from models.losses import modified_discriminator_loss,modified_generator_loss
 from ruamel import yaml
 import os
 
