@@ -174,7 +174,7 @@ class GAN():
         # initialize all variables
         tf.compat.v1.global_variables_initializer().run()
         # graph inputs for visualize training results
-        self.sample_z = self.data_X[0,:,:,:]
+        self.sample_z = np.resize(self.data_X[0,:,:,:],(1,self.data_X.shape[1],self.data_X.shape[2],self.data_X.shape[3])) #to visualize
 
 
         # saver to save model
@@ -205,15 +205,15 @@ class GAN():
             for idx in range(start_batch_id, self.num_batches):
                 print(idx * self.batch_size,(idx + 1) * self.batch_size)
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
-                print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
+                #print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
-                print("GT",batch_gt.shape)
+                #print("GT",batch_gt.shape)
                 # update D network
                 summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
                 #self.writer.add_summary(d_loss, counter)
                 # update G network
-                print("Before G run ", self.g_input,batch_input.shape)
+                #print("Before G run ", self.g_input,batch_input.shape)
                 summary_str,g_loss = self.sess.run([self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
 
