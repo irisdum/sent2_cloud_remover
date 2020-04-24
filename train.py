@@ -3,10 +3,14 @@ from models import GAN
 from ruamel import yaml
 import tensorflow as tf
 
+from processing import create_safe_directory
+
+
 def main(path_train,path_model):
     with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True)) as sess:
-
-        gan=GAN.GAN(open_yaml(path_train),open_yaml(path_model),sess)
+        train_yaml=open_yaml(path_train)
+        create_safe_directory(train_yaml["result_dir"])
+        gan=GAN.GAN(train_yaml,open_yaml(path_model),sess)
         gan.build_model()
         gan.train()
 
