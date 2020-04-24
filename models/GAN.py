@@ -64,7 +64,7 @@ class GAN():
             d_activation = lambda x: tf.keras.activations.relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
             d_activation = model_yaml["d_activation"]
-        with tf.variable_scope("discriminator", reuse=reuse):
+        with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
             # layer 1
             x = ZeroPadding2D(
@@ -109,7 +109,7 @@ class GAN():
             last_activ = model_yaml["last_activation"]
 
         # img_input = tf.keras.Input(shape=tuple(model_yaml["input_shape"]))
-        with tf.variable_scope("generator", reuse=reuse):
+        with tf.compat.v1.variable_scope("generator", reuse=reuse):
             x = img_input
             for i, param_lay in enumerate(
                     model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
@@ -152,13 +152,13 @@ class GAN():
         self.g_loss=modified_generator_loss(discri_output, add_summaries=True)
 
         # divide trainable variables into a group for D and a group for G
-        t_vars = tf.trainable_variables()
+        t_vars = tf.compat.v1.trainable_variables()
         d_vars = [var for var in t_vars if 'd_' in var.name]
         g_vars = [var for var in t_vars if 'g_' in var.name]
         print(d_vars,g_vars)
 
         # optimizers
-        with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+        with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
             self.d_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
                 .minimize(self.d_loss, var_list=d_vars)
             self.g_optim = tf.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
@@ -170,7 +170,7 @@ class GAN():
     def train(self):
 
         # initialize all variables
-        tf.global_variables_initializer().run()
+        tf.compat.v1.global_variables_initializer().run()
         # graph inputs for visualize training results
         self.sample_z = self.data_X[0,:,:,:]
 
