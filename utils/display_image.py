@@ -4,7 +4,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
-from skimage.exposure import is_low_contrast,equalize_hist
+#from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
 
 def plot_allbands_hist(path_tif,ax):
@@ -168,7 +168,7 @@ def rescale_image(raster_array):
     print("Warning the array should be channel last !")
     rescaled_array=np.zeros(raster_array.shape)
     for b in range(raster_array.shape[-1]):
-        rescaled_array[:,:,b]=equalize_hist(raster_array[:,:,b])
+        rescaled_array[:,:,b]=raster_array[:,:,b]
 
     return rescaled_array
 
