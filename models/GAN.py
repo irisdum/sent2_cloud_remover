@@ -207,17 +207,15 @@ class GAN():
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
                 print("GT",batch_gt.shape)
                 # update D network
-                output_run_d = self.sess.run([self.d_optim, self.d_loss],
+                summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
-                print(output_run_d)
-
-                self.writer.add_summary(output_run_d, counter)
+                #self.writer.add_summary(d_loss, counter)
                 # update G network
                 print("Before G run ", self.g_input,batch_input.shape)
                 output_run_g = self.sess.run([self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
                 print(output_run_g)
-                self.writer.add_summary(output_run_g, counter)
+                #self.writer.add_summary(output_run_g, counter)
                 # display training status
                 counter += 1
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
