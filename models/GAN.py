@@ -181,7 +181,7 @@ class GAN():
         self.saver = tf.compat.v1.train.Saver()
 
         # summary writer
-        self.writer = tf.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
+        self.writer = tf.compat.v1.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
 
         # restore check-point if it exits
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
