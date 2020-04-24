@@ -212,7 +212,7 @@ class GAN():
                 #self.writer.add_summary(d_loss, counter)
                 # update G network
                 print("Before G run ", self.g_input,batch_input.shape)
-                output_run_g = self.sess.run([self.g_optim, self.g_loss],
+                summary_str,g_loss = self.sess.run([self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
                 print(output_run_g)
                 #self.writer.add_summary(output_run_g, counter)
