@@ -8,7 +8,7 @@ from utils.display_image import find_image_indir
 from utils.display_image import convert_array
 from osgeo import gdal
 import numpy as np
-import tensorflow as tf
+
 
 def make_dataset_hierarchy(path_dataset):
     assert path_dataset[-1] == "/", "Wrong path should end with / not {}".format(path_dataset)
@@ -95,7 +95,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=None
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
     print("The shape of the data are data {} label {}".format(dataX.shape,data_label.shape))
-    return tf.convert_to_tensor(dataX), tf.convert_to_tensor(data_label)
+    return dataX, data_label
 
 
 def load_from_dir(path_dir, image_shape):
