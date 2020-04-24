@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Input, Dense, Add, Reshape, Flatten, Dropout
     ZeroPadding2D
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
-from constant.model_constant import CHANNEL, LEARNING_RATE, BETA_1, LOGDIR
+from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from tensorflow_gan.python.losses.losses_impl import modified_discriminator_loss,modified_generator_loss
