@@ -69,19 +69,19 @@ class GAN():
             # layer 1
             x = ZeroPadding2D(
                 padding=(1, 1))(discri_input)
-            x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2))(x)
+            x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv1")(x)
             # layer 2
             x = ZeroPadding2D(padding=(1, 1))(x)
-            x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2))(x)
+            x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv2")(x)
             # layer 3
             x = ZeroPadding2D(padding=(1, 1))(x)
-            x = Conv2D(256, 4, padding="valid", activation=d_activation, strides=(2, 2))(x)
+            x = Conv2D(256, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv3")(x)
             # layer 4
             x = ZeroPadding2D(padding=(1, 1))(x)
-            x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
+            x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1),name="d_conv4")(x)
             # layer 3
             x = ZeroPadding2D(padding=(1, 1))(x)
-            x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1))(x)
+            x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1),name="d_conv5")(x)
 
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
@@ -90,16 +90,16 @@ class GAN():
 
     def generator(self, img_input, model_yaml, is_training=True, print_summary=True, reuse=False):
 
-        def build_resnet_block(input):
+        def build_resnet_block(input,id=0):
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
-                       strides=tuple(model_yaml["stride"]))(input)
-            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            x = ReLU()(x)
-            x = Dropout(rate=model_yaml["do_rate"])(x)
-            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training)(x)
-            x = Add()([x, input])
-            x = ReLU()(x)
+                       strides=tuple(model_yaml["stride"]),name="g_block_{}_conv1".format(id))(input)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,name="g_block_{}_bn1".format(id))(x)
+            x = ReLU(name="g_block_{}_relu1".format(id))(x)
+            x = Dropout(rate=model_yaml["do_rate"],name="g_block_{}_do".format(id))(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,name="g_block_{}_bn2".format(id))(x)
+            x = Add()([x, input],name="g_block_{}_add".format(id))
+            x = ReLU(name="g_block_{}_relu2".format(id))(x)
             return x
 
         if model_yaml["last_activation"] == "tanh":
@@ -114,19 +114,17 @@ class GAN():
             for i, param_lay in enumerate(
                     model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
                 x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                           padding=model_yaml["padding"],
-                           activation="relu")(x)
+                           padding=model_yaml["padding"],name="g_conv{}".format(i),activation="relu")(x)
 
             for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
-                x = build_resnet_block(x)
+                x = build_resnet_block(x,id=j)
             for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
                 x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
                            padding=model_yaml["padding"],
                            activation="relu")(x)
             # The last layer
             x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
-                       padding=model_yaml["padding"],
-                       activation=last_activ)(x)
+                       padding=model_yaml["padding"],name="g_final_conv", activation=last_activ)(x)
             # print("last layer gene", x)
             # print(type(img_input))
         if print_summary:
