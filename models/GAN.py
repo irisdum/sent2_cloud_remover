@@ -140,7 +140,7 @@ class GAN():
         self.g_input=tf.keras.backend.placeholder(shape=(self.batch_size,self.data_X.shape[1],self.data_X.shape[2],self.data_X.shape[3])) #the input of the label of the generator
         print("ginput",self.g_input)
         #the Ground truth images
-        self.gt_images=tf.keras.backend.placeholder(shape=tuple([self.batch_size]+self.model_yaml["d_input_shape"]))
+        self.gt_images=tf.keras.backend.placeholder(shape=tuple([self.batch_size]+self.model_yaml["dim_gt_image"]))
         print("gt_image",self.gt_images)
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
@@ -161,9 +161,9 @@ class GAN():
 
         # optimizers
         with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
-            self.d_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
+            self.d_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
                 .minimize(self.d_loss, var_list=d_vars)
-            self.g_optim = tf.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
+            self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
                 .minimize(self.g_loss, var_list=g_vars)
 
         # for test
