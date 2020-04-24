@@ -2,8 +2,8 @@
 
 train_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/train/"
 ## Parameter for the Adam optimizer
-lr: 0.001
-fact_g_lr: 5 #multiply lr in the Generator Adam optimiser
+lr: 0.0002
+fact_g_lr: 1 #multiply lr in the Generator Adam optimiser
 beta1: 0.5
 
 ## Path to the logdir tensorboard directory
