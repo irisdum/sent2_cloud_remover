@@ -143,9 +143,9 @@ class GAN():
 
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
-        D_input_real=np.append(self.gt_images,self.gt_images,axis=-1)  #input in the discriminator correspond to a pair of s2 images
-        D_input_fake=np.append(self.gt_images,G,axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
-
+        D_input_real=tf.concat([self.gt_images,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
+        D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
+        print("concat res ",D_input_fake)
         self.d_loss=modified_discriminator_loss(D_input_real, D_input_fake, add_summaries=True)
         # THE GENERATOR LOSS
         discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
