@@ -152,9 +152,11 @@ class GAN():
         # THE GENERATOR LOSS
         discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
         self.g_loss=modified_generator_loss(discri_output, add_summaries=True)
-
+        print("loss g",self.g_loss)
+        print("loss d ",self.d_loss)
         # divide trainable variables into a group for D and a group for G
         t_vars = tf.compat.v1.trainable_variables()
+        print("tvariable to optimize",t_vars)
         d_vars = [var for var in t_vars if 'd_' in var.name]
         g_vars = [var for var in t_vars if 'g_' in var.name]
         print(d_vars,g_vars)
