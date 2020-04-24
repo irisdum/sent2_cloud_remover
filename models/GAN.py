@@ -203,7 +203,7 @@ class GAN():
             # get batch data
             for idx in range(start_batch_id, self.num_batches):
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
-                #print("batch_input",batch_input.shape)
+                print("batch_input",batch_input.shape)
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
                 #print("GT",batch_gt.shape)
                 # update D network
