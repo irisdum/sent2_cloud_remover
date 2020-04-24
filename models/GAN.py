@@ -138,11 +138,13 @@ class GAN():
 
         #The input in the model graph
         self.g_input=tf.keras.backend.placeholder(shape=(self.batch_size,self.data_X.shape[1],self.data_X.shape[2],self.data_X.shape[3])) #the input of the label of the generator
+        print("ginput",self.g_input)
         #the Ground truth images
         self.gt_images=tf.keras.backend.placeholder(shape=tuple([self.batch_size]+self.model_yaml["d_input_shape"]))
-
+        print("gt_image",self.gt_images)
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
+        print("output_g",G)
         D_input_real=tf.concat([self.gt_images,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
         D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
         print("concat res ",D_input_fake)

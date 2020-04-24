@@ -94,6 +94,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=None
     data_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
+    print("The shape of the data are data {} label {}".format(dataX.shape,data_label.shape))
     return dataX, data_label
 
 
