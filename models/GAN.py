@@ -154,10 +154,10 @@ class GAN():
         print("loss d ",self.d_loss)
         # divide trainable variables into a group for D and a group for G
         t_vars = tf.compat.v1.trainable_variables()
-        print("tvariable to optimize",t_vars)
+        #print("tvariable to optimize",t_vars)
         d_vars = [var for var in t_vars if 'd_' in var.name]
         g_vars = [var for var in t_vars if 'g_' in var.name]
-        print(d_vars,g_vars)
+        #print(d_vars,g_vars)
 
         # optimizers
         with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
@@ -211,6 +211,7 @@ class GAN():
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
 
                 # update G network
+                print("Before G run ", self.g_input,batch_input.shape)
                 summary_str, g_loss = self.sess.run([self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input})
                 self.writer.add_summary(summary_str, counter)
