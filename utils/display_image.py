@@ -29,6 +29,8 @@ def plot_allbands_hist(path_tif,ax):
         plt.show()
 
 
+
+
 def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
     if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
         return uin16_2_float32(raster_array)
@@ -41,6 +43,7 @@ def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
         return np.divide(raster_array, 5).astype(np.float32)
     else:
         return np.divide(raster_array,np.max(raster_array))
+
 
 def uin16_2_float32(raster_array, max_scale=CONVERTOR):
     scaled_array = np.divide(raster_array, max_scale)
@@ -184,3 +187,12 @@ def plot_s2(raster_array, opt="RGB"):
         ax.set_title("NIR")
         ax.imshow(np.moveaxis(nir_array, 0, -1))
     plt.show()
+
+def plot_one_band(raster_array,fig,ax,title=""):
+    if ax is None:
+        fig,ax=plt.subplots()
+    im = ax.imshow(raster_array, cmap='bone')
+    ax.set_title(title)
+    fig.colorbar(im, ax=ax, orientation='vertical')
+    if ax is None:
+        plt.show()
