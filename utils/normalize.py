@@ -16,11 +16,11 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
         dictlabel = DICT_BAND_LABEL
     dict_stats = {}
     for band in dict_bandX:
+        n_images = len(dict_bandX[band])
+        if band in dictlabel:
+            n_images += len(dictlabel[band])
+        fig, ax = plt.subplots(1, n_images, figsize=(20,20))
         for i, b_index in enumerate(dict_bandX[band]):
-            n_images = len(dict_bandX[band])
-            if band in dictlabel:
-                n_images += len(dictlabel[band])
-            fig, ax = plt.subplots(1, n_images, figsize=(15, 15))
             if i == 0:
                 band_array = arrayX[:, :, b_index]
                 if plot:
@@ -94,7 +94,8 @@ def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_ty
     print("THE STATISTICS {} COMPUTED ARE {}".format(dict_method[rescale_type],dict_stat))
     rescaled_dataX=image_rescaling(array_dataX,dict_band_X,dict_stat,rescaling_function(rescale_type))
     rescaled_label=image_rescaling(array_label,dict_band_label,dict_stat,rescaling_function(rescale_type))
-    print("AFTER THE RESCALING {} THE STATISTIC {} COMPUTED ARE {} ".format(rescale_type,dict_method[rescale_type],dict_stat))
+    dict_stat_after=compute_image_stats(rescaled_dataX,rescaled_label,dict_band_X,dict_band_label,plot=plot,stats=dict_method[rescale_type])
+    print("AFTER THE RESCALING {} THE STATISTIC {} COMPUTED ARE {} ".format(rescale_type,dict_method[rescale_type],dict_stat_after))
     return rescaled_dataX,rescaled_label
 
 
