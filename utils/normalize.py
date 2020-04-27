@@ -29,12 +29,12 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
                 # print("we add another band")
                 band_array = np.append(band_array, arrayX[:, :, b_index])
                 if plot:
-                    plot_one_band(band_array, fig, ax[i], title="DATA X band {} index {}".format(band, b_index))
+                    plot_one_band(arrayX[:, :, b_index], fig, ax[i], title="DATA X band {} index {}".format(band, b_index))
         if band in dictlabel:
             print("{} is also in label".format(band))
             for i, index in enumerate(dictlabel[band]):
                 band_array = np.append(band_array, arraylabel[:, :, index])
-                plot_one_band(band_array, fig, ax[i + len(dict_bandX[band]) - 1], title="LABEL {}".format(band))
+                plot_one_band(arraylabel[:, :, index], fig, ax[i + len(dict_bandX[band]) - 1], title="LABEL {}".format(band))
         plt.show()
         band_stat1, band_stat2 = compute_band_stats(band_array, stats)
         dict_stats.update({band: (band_stat1, band_stat2)})
