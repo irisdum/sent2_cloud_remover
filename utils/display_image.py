@@ -189,7 +189,7 @@ def plot_s2(raster_array, opt="RGB"):
     plt.show()
 
 def plot_one_band(raster_array,fig,ax,title=""):
-    print("Imagse shape {}".format(raster_array))
+    #print("Imagse shape {}".format(raster_array))
     if ax is None:
         fig,ax=plt.subplots()
     im = ax.imshow(raster_array, cmap='bone')

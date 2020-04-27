@@ -96,6 +96,7 @@ def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_ty
     rescaled_label=image_rescaling(array_label,dict_band_label,dict_stat,rescaling_function(rescale_type))
     dict_stat_after=compute_image_stats(rescaled_dataX,rescaled_label,dict_band_X,dict_band_label,plot=plot,stats=dict_method[rescale_type])
     print("AFTER THE RESCALING {} THE STATISTIC {} COMPUTED ARE {} ".format(rescale_type,dict_method[rescale_type],dict_stat_after))
+
     return rescaled_dataX,rescaled_label
 
 
