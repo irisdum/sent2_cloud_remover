@@ -1,7 +1,7 @@
 # a python file where all the functions likned withe the preprocessing of the data just before the networks are implemented
 # different methods are encode : normalization, centering or standardized values
 
-from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL
+from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_RESCALE
 from utils.display_image import plot_one_band
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,7 +19,7 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
         n_images = len(dict_bandX[band])
         if band in dictlabel:
             n_images += len(dictlabel[band])
-        fig, ax = plt.subplots(1, n_images, figsize=(20,20))
+        fig, ax = plt.subplots(1, n_images, figsize=(20, 20))
         for i, b_index in enumerate(dict_bandX[band]):
             if i == 0:
                 band_array = arrayX[:, :, b_index]
@@ -29,12 +29,14 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
                 # print("we add another band")
                 band_array = np.append(band_array, arrayX[:, :, b_index])
                 if plot:
-                    plot_one_band(arrayX[:, :, b_index], fig, ax[i], title="DATA X band {} index {}".format(band, b_index))
+                    plot_one_band(arrayX[:, :, b_index], fig, ax[i],
+                                  title="DATA X band {} index {}".format(band, b_index))
         if band in dictlabel:
             print("{} is also in label".format(band))
             for i, index in enumerate(dictlabel[band]):
                 band_array = np.append(band_array, arraylabel[:, :, index])
-                plot_one_band(arraylabel[:, :, index], fig, ax[i + len(dict_bandX[band]) - 1], title="LABEL {}".format(band))
+                plot_one_band(arraylabel[:, :, index], fig, ax[i + len(dict_bandX[band]) - 1],
+                              title="LABEL {}".format(band))
         plt.show()
         band_stat1, band_stat2 = compute_band_stats(band_array, stats)
         dict_stats.update({band: (band_stat1, band_stat2)})
@@ -86,18 +88,49 @@ def rescaling_function(methode):
 
 
 def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization", plot=True):
-
     dict_method = {"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
-    assert rescale_type in dict_method, "Rescaling undefined {} not in ".format(rescale_type,dict_method)
+    assert rescale_type in dict_method, "Rescaling undefined {} not in ".format(rescale_type, dict_method)
     dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dict_band_X, dictlabel=dict_band_label,
                                     plot=plot, stats=dict_method[rescale_type])
-    print("THE STATISTICS {} COMPUTED ARE {}".format(dict_method[rescale_type],dict_stat))
-    rescaled_dataX=image_rescaling(array_dataX,dict_band_X,dict_stat,rescaling_function(rescale_type))
-    rescaled_label=image_rescaling(array_label,dict_band_label,dict_stat,rescaling_function(rescale_type))
-    dict_stat_after=compute_image_stats(rescaled_dataX,rescaled_label,dict_band_X,dict_band_label,plot=plot,stats=dict_method[rescale_type])
-    print("AFTER THE RESCALING {} THE STATISTIC {} COMPUTED ARE {} ".format(rescale_type,dict_method[rescale_type],dict_stat_after))
+    print("THE STATISTICS {} COMPUTED ARE {}".format(dict_method[rescale_type], dict_stat))
+    rescaled_dataX = image_rescaling(array_dataX, dict_band_X, dict_stat, rescaling_function(rescale_type))
+    rescaled_label = image_rescaling(array_label, dict_band_label, dict_stat, rescaling_function(rescale_type))
+    dict_stat_after = compute_image_stats(rescaled_dataX, rescaled_label, dict_band_X, dict_band_label, plot=plot,
+                                          stats=dict_method[rescale_type])
+    print("AFTER THE RESCALING {} THE STATISTIC {} COMPUTED ARE {} ".format(rescale_type, dict_method[rescale_type],
+                                                                            dict_stat_after))
 
-    return rescaled_dataX,rescaled_label
+    return rescaled_dataX, rescaled_label
+
+
+def rescaling_combined_methods(array_dataX, array_label, dict_band_X, dict_band_label, dict_rescale_type=None,
+                               plot=True):
+    rescaled_arrayX = np.zeros(array_dataX.shape)
+    rescaled_label = np.zeros(array_label.shape)
+    dict_method = {"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
+    if dict_rescale_type is None:
+        dict_rescale_type = DICT_RESCALE  # by band gives the method used
+        for band in dict_rescale_type:
+            dx, dlabel = create_dict_bande(band, dict_band_X, dict_band_label)
+            rescale_type = dict_rescale_type[band]
+            dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
+                                            stats=dict_method[rescale_type])
+            rescaled_arrayX[:, :, dict_band_X[band]] = rescaling_function(rescale_type)(
+                array_dataX[:, :, dict_band_X[band]], dict_stat[band][0], dict_stat[band][1])
+            if band in dlabel:
+                rescaled_label[:, :, dict_band_label[band]] = rescaling_function(rescale_type)(
+                    array_label[:, :, dict_band_label[band]], dict_stat[band][0], dict_stat[band][1])
+
+    return rescaled_arrayX,rescaled_label
+
+def create_dict_bande(band, dict_bandX, dict_band_label):
+    dX = {}
+    dLabel = {}
+    if band in dict_bandX:
+        dX.update({band: dict_bandX[band]})
+    if band in dict_band_label:
+        dLabel.update({band: dict_band_label[band]})
+    return dX, dLabel
 
 
 def image_rescaling(data, dict_band, dict_stats, rescale_fun):

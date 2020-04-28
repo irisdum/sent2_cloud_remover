@@ -48,3 +48,5 @@ DICT_SHAPE={XDIR:(256,256,8),LABEL_DIR:(256,256,4)}
 ##The data rescaling before going into the NN
 DICT_BAND_LABEL={"R":[0],"G":[1],"B":[2],"NIR":[3]}
 DICT_BAND_X={"VV":[0,2],"VH":[1,3],"R":[4],"G":[5],"B":[6],"NIR":[7]}
+DICT_RESCALE={"R":"normalization","G":"normalization","B":"normalization","NIR":"normalization","VV":"standardization",
+              "VH":"standardization"}
