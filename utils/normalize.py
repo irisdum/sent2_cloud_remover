@@ -149,21 +149,27 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
     for i in range(batch_size):  # go over all the tiles in the batch tile to compute the stats
         array_dataX=batch_X[i,:,:,:]
         array_label=batch_label[i,:,:,:]
+        stat_one_batch={}
         for band in dict_rescale_type:
             dx, dlabel = create_dict_bande(band, dict_band_X, dict_band_label) #small dicts with only band
             rescale_type = dict_rescale_type[band]
             dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
                                             stats=dict_method[rescale_type], plot=False)
-            list_batch_stat+=[dict_stat]
+            stat_one_batch.update(dict_stat)
+        list_batch_stat+=[stat_one_batch]
     assert len(list_batch_stat)==batch_size, "Not enought stat has been computed {}".format(list_batch_stat)
     print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
     #initialize dict
     for i in range(len(list_batch_stat)):
         for band in list_batch_stat[i]:
-            dict_stat.update({band:dict_stat[band]+list_batch_stat[i][band]})
+            stat1=dict_stat[band][0]+list_batch_stat[i][band][0]
+            stat2 = dict_stat[band][1] + list_batch_stat[i][band][1]
+            dict_stat.update({band:(stat1,stat2)})
     # DIVIDE BY THE BS
     for band in dict_stat:
-        dict_stat.update({band:dict_stat[band]/batch_size})
+        stat1=dict_stat[band][0]/batch_size
+        stat2 = dict_stat[band][1] / batch_size
+        dict_stat.update({band:(stat1,stat2)})
     print("THE BATCH STATISTICS ARE {}".format(dict_stat))
 
 def create_dict_bande(band, dict_bandX, dict_band_label):

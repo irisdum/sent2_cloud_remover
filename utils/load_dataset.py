@@ -99,6 +99,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=None
 
 
 def load_from_dir(path_dir, image_shape):
+    assert os.path.isdir(path_dir),"Dir {} does not exist".format(path_dir)
     path_tile = find_image_indir(path_dir, "npy")
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     data_array = np.zeros(batch_x_shape)
