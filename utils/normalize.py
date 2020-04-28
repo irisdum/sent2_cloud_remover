@@ -175,6 +175,7 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
         stat2 = dict_stat[band][1] / batch_size
         dict_stat.update({band:(stat1,stat2)})
     print("THE BATCH STATISTICS ARE {}".format(dict_stat))
+    return dict_stat
 
 def create_dict_bande(band, dict_bandX, dict_band_label):
     dX = {}
