@@ -9,6 +9,8 @@ from utils.display_image import convert_array
 from osgeo import gdal
 import numpy as np
 
+from utils.normalize import rescale_on_batch
+
 
 def make_dataset_hierarchy(path_dataset):
     assert path_dataset[-1] == "/", "Wrong path should end with / not {}".format(path_dataset)
@@ -81,9 +83,8 @@ def create_input_dataset(dict_tiles, input_dir, output_dir):
         prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir)
 
 
-def load_data(path_directory, x_shape=None, label_shape=None, normalization=None):
+def load_data(path_directory, x_shape=None, label_shape=None, normalization=True):
     """:param path_directory : path to the directory (train,test or val) which contains two directory dataX and label """
-    # TODO work on a normailzation, centering of the data !!
     if x_shape is None:
         x_shape = DICT_SHAPE[XDIR]
     if label_shape is None:
@@ -92,6 +93,8 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=None
         label_shape, x_shape)
     dataX = load_from_dir(path_directory + XDIR, x_shape)
     data_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
+    if normalization:
+        dataX,data_label=rescale_on_batch(dataX,data_label)
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
     print("The shape of the data are data {} label {}".format(dataX.shape,data_label.shape))

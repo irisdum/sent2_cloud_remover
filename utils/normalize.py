@@ -125,16 +125,19 @@ def rescaling_combined_methods(array_dataX, array_label, dict_band_X, dict_band_
 
     return rescaled_arrayX,rescaled_label
 
-def rescale_on_batch(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type=None):
+def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,dict_rescale_type=None):
     """Rescale combined on a batch of images"""
     batch_size=batch_X.shape[0]
-
+    if dict_band_label is None:
+        dict_band_label=DICT_BAND_LABEL
+    if dict_band_X is None:
+        dict_band_X=DICT_BAND_X
     rescaled_batch_X=np.zeros(batch_X.shape)
     rescaled_batch_label=np.zeros(batch_label.shape)
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
-    print("FINAL DICT STAT {}".format(dict_stat))
+    #print("FINAL DICT STAT {}".format(dict_stat))
     for i in range(batch_size): #Rescale all the image on the batch
        rescaled_batch_X[i,:,:,:],rescaled_batch_label[i,:,:,:]=rescaling_combined_methods(batch_X[i,:,:,:],batch_label[i,:,:,:],dict_band_X,
                                                                                           dict_band_label,dict_rescale_type,plot=False,dict_stat=dict_stat)
@@ -147,7 +150,7 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
     batch_size = batch_X.shape[0]
     list_batch_stat = [] #list of all the dict stat of each batch
     dict_stat=dict(zip([i for i in dict_rescale_type],[(0,0) for i in range(len(dict_rescale_type))]))
-    print("dict_stat",dict_stat)
+    #print("dict_stat",dict_stat)
     for i in range(batch_size):  # go over all the tiles in the batch tile to compute the stats
         array_dataX=batch_X[i,:,:,:]
         array_label=batch_label[i,:,:,:]
@@ -160,12 +163,12 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
             stat_one_batch.update(sub_dict_stat)
         list_batch_stat+=[stat_one_batch]
     assert len(list_batch_stat)==batch_size, "Not enought stat has been computed {}".format(list_batch_stat)
-    print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
+    #print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
     #initialize dict
     for i in range(len(list_batch_stat)):
-        print(list_batch_stat[i])
+        #print(list_batch_stat[i])
         for band in list_batch_stat[i]:
-            print("band",band,dict_stat)
+            #print("band",band,dict_stat)
             stat1=dict_stat[band][0]+list_batch_stat[i][band][0]
             stat2 = dict_stat[band][1] + list_batch_stat[i][band][1]
             dict_stat.update({band:(stat1,stat2)})
@@ -174,7 +177,7 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
         stat1=dict_stat[band][0]/batch_size
         stat2 = dict_stat[band][1] / batch_size
         dict_stat.update({band:(stat1,stat2)})
-    print("THE BATCH STATISTICS ARE {}".format(dict_stat))
+    #print("THE BATCH STATISTICS ARE {}".format(dict_stat))
     return dict_stat
 
 def create_dict_bande(band, dict_bandX, dict_band_label):
