@@ -134,6 +134,7 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescal
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
+    print("FINAL DICT STAT {}".format(dict_stat))
     for i in range(batch_size): #Rescale all the image on the batch
        rescaled_batch_X[i,:,:,:],rescaled_batch_label[i,:,:,:]=rescaling_combined_methods(batch_X[i,:,:,:],batch_label[i,:,:,:],dict_band_X,
                                                                                           dict_band_label,dict_rescale_type,plot=False,dict_stat=dict_stat)
