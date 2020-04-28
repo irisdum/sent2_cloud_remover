@@ -86,6 +86,8 @@ class GAN():
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
             model.summary()
+        self.model_discri=Model(discri_input, x, name="GAN_discriminator")
+
         return x
 
     def generator(self, img_input, model_yaml, is_training=True, print_summary=True, reuse=False):
@@ -130,7 +132,12 @@ class GAN():
         if print_summary:
             model = Model(img_input, x, name='GAN_generator')
             model.summary()
+
+        self.model_gene=Model(img_input, x, name='GAN_generator')
+
         return x
+
+
 
     def build_model(self):
 
@@ -145,8 +152,13 @@ class GAN():
         print("output_g",G)
         D_input_real=tf.concat([self.gt_images,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
         D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
-        print("concat res ",D_input_fake)
-        self.d_loss=modified_discriminator_loss(D_input_real, D_input_fake, add_summaries=True)
+
+        D_output_real=self.discriminator(D_input_real,self.model_yaml)
+        D_output_fake=self.discriminator(D_input_fake,self.model_yaml)
+
+        #print("concat res ",D_input_fake)
+
+        self.d_loss=modified_discriminator_loss(D_output_real, D_output_fake, add_summaries=True)
         # THE GENERATOR LOSS
         discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
         self.g_loss=modified_generator_loss(discri_output, add_summaries=True)
@@ -168,6 +180,32 @@ class GAN():
 
         # for test
         self.fake_images = self.generator(self.g_input,self.model_yaml,print_summary=False, is_training=False, reuse=True)
+
+
+    def train2(self):
+        # graph inputs for visualize training results
+        self.sample_z = np.resize(self.data_X[0, :, :, :],
+                                  (1, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]))  # to visualize
+        # restore check-point if it exits
+        could_load, checkpoint_counter = self.load(self.checkpoint_dir)
+        if could_load:
+            start_epoch = (int)(checkpoint_counter / self.num_batches)
+            start_batch_id = checkpoint_counter - start_epoch * self.num_batches
+            counter = checkpoint_counter
+            print(" [*] Load SUCCESS")
+        else:
+            start_epoch = 0
+            start_batch_id = 0
+            counter = 1
+            print(" [!] Load failed...")
+        model_discriminator = self.model_discri()
+        for epoch in range(start_epoch, self.epoch):
+
+            # get batch data
+            print("TOTAL numebr batch".format(self.num_batches))
+            for idx in range(start_batch_id, self.num_batches):
+                print(idx * self.batch_size,(idx + 1) * self.batch_size)
+                batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
 
     def train(self):
 
@@ -204,9 +242,9 @@ class GAN():
             print("TOTAL numebr batch".format(self.num_batches))
             for idx in range(start_batch_id, self.num_batches):
                 print(idx * self.batch_size,(idx + 1) * self.batch_size)
-                batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]
+                batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size] # the input
                 #print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
-                batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]
+                batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size] #the Ground Truth images
                 #print("GT",batch_gt.shape)
                 # update D network
                 summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
