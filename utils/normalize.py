@@ -162,7 +162,9 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
     print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
     #initialize dict
     for i in range(len(list_batch_stat)):
+        print(list_batch_stat[i])
         for band in list_batch_stat[i]:
+            print("band",band,dict_stat)
             stat1=dict_stat[band][0]+list_batch_stat[i][band][0]
             stat2 = dict_stat[band][1] + list_batch_stat[i][band][1]
             dict_stat.update({band:(stat1,stat2)})
