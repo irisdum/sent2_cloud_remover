@@ -50,3 +50,4 @@ DICT_BAND_LABEL={"R":[0],"G":[1],"B":[2],"NIR":[3]}
 DICT_BAND_X={"VV":[0,2],"VH":[1,3],"R":[4],"G":[5],"B":[6],"NIR":[7]}
 DICT_RESCALE={"R":"normalization","G":"normalization","B":"normalization","NIR":"normalization","VV":"standardization",
               "VH":"standardization"}
+DICT_METHOD={"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
