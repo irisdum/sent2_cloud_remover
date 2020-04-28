@@ -154,9 +154,9 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
         for band in dict_rescale_type:
             dx, dlabel = create_dict_bande(band, dict_band_X, dict_band_label) #small dicts with only band
             rescale_type = dict_rescale_type[band]
-            dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
+            sub_dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
                                             stats=dict_method[rescale_type], plot=False)
-            stat_one_batch.update(dict_stat)
+            stat_one_batch.update(sub_dict_stat)
         list_batch_stat+=[stat_one_batch]
     assert len(list_batch_stat)==batch_size, "Not enought stat has been computed {}".format(list_batch_stat)
     print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
