@@ -7,7 +7,7 @@ from processing import create_safe_directory
 
 
 def main(path_train,path_model):
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
     config.log_device_placement = True  # to log device placement (on which device the operation ran)sess = tf.Session(config=config)
     with tf.compat.v1.Session(config=config) as sess:
