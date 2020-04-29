@@ -154,8 +154,8 @@ class GAN():
         D_input_real=tf.concat([self.gt_images,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
         D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
 
-        D_output_real=self.discriminator(D_input_real,self.model_yaml,print_summary=False)
-        D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
+        D_output_real=self.discriminator(D_input_real,self.model_yaml,print_summary=False,reuse=False)
+        D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False,reuse=True)
 
         #print("concat res ",D_input_fake)
 
