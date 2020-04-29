@@ -221,3 +221,25 @@ def L1_modified_generator_loss(discriminator_gen_outputs,
             tf.compat.v1.summary.scalar('generator_modified_loss', loss)
 
     return loss
+
+
+def generator_loss(D_output_fake):
+    g_loss=tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.ones_like(D_output_fake)))
+    return g_loss
+
+def calc_cycle_loss(real_image, fake_image, val_lambda):
+    loss1 = tf.reduce_mean(tf.abs(real_image - fake_image))
+    return val_lambda * loss1
+
+
+def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
+    return generator_loss(D_output_fake)+calc_cycle_loss(real_image,fake_image,val_lambda)
+
+
+def discriminator_loss(D_output_real,D_output_fake):
+    d_loss_real = tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=tf.ones_like(D_output_real)))
+    d_loss_fake = tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
+    return d_loss_real + d_loss_fake

@@ -5,7 +5,7 @@ train_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/train/"
 lr: 0.0002
 fact_g_lr: 1 #multiply lr in the Generator Adam optimiser
 beta1: 0.5
-
+lambda: 100 #lambda apply the constistency loss
 ## Path to the logdir tensorboard directory
 logdir: "/datastore/dum031/models/logs/"
 

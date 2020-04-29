@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
-from models.losses import modified_discriminator_loss,modified_generator_loss
+from models.losses import modified_discriminator_loss,modified_generator_loss,total_generatot_loss,discriminator_loss
 from ruamel import yaml
 import os
 
@@ -53,7 +53,7 @@ class GAN():
         # test
         self.sample_num = train_yaml["n_train_image_saved"]  # number of generated images to be saved
         self.result_dir=train_yaml["result_dir"]
-
+        self.val_lambda=train_yaml["lambda"]
 
         # ## Create the tensorboard logdir
         tensorboard_callback = keras.callbacks.TensorBoard(log_dir=train_yaml[
@@ -159,10 +159,10 @@ class GAN():
 
         #print("concat res ",D_input_fake)
 
-        self.d_loss=modified_discriminator_loss(D_output_real, D_output_fake, add_summaries=True)
+        self.d_loss=discriminator_loss(D_output_real, D_output_fake)
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
-        self.g_loss=modified_generator_loss(D_output_fake, add_summaries=True)
+        self.g_loss=total_generatot_loss(self.gt_images,G,D_output_fake,self.val_lambda)
         print("loss g",self.g_loss)
         print("loss d ",self.d_loss)
         # divide trainable variables into a group for D and a group for G
