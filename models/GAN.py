@@ -306,7 +306,7 @@ class GAN():
         g_loss=1000
         d_loss=1000
         for epoch in range(start_epoch, self.epoch):
-            for k in self.k_step:
+            for k in range(self.k_step):
                 for idx in range(start_batch_id, self.num_batches):
                     print(idx * self.batch_size, (idx + 1) * self.batch_size)
                     batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
