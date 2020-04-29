@@ -7,7 +7,7 @@ from processing import create_safe_directory
 
 
 def main(path_train,path_model):
-    
+
     with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True)) as sess:
         train_yaml=open_yaml(path_train)
         create_safe_directory(train_yaml["result_dir"])

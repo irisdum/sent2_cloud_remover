@@ -161,8 +161,8 @@ class GAN():
 
         self.d_loss=modified_discriminator_loss(D_output_real, D_output_fake, add_summaries=True)
         # THE GENERATOR LOSS
-        discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
-        self.g_loss=modified_generator_loss(discri_output, add_summaries=True)
+        #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
+        self.g_loss=modified_generator_loss(D_output_fake, add_summaries=True)
         print("loss g",self.g_loss)
         print("loss d ",self.d_loss)
         # divide trainable variables into a group for D and a group for G
