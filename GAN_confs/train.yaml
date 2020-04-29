@@ -10,7 +10,7 @@ lambda: 100 #lambda apply the constistency loss
 logdir: "/datastore/dum031/models/logs/"
 
 epoch: 50 #epoch of train of the generator
-epoch_discri: 5 #means 5 epoch for training the discriminator before one training of generator
+k_step: 5 #means 5 epoch for training the discriminator before one training of generator
 batch_size: 1
 result_dir: "/datastore/dum031/trainings/training1/image_result/"
 model_dir: "/datastore/dum031/trainings/training1/"

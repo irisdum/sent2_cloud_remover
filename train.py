@@ -14,7 +14,7 @@ def main(path_train,path_model):
 
         gan=GAN.GAN(train_yaml,open_yaml(path_model),sess)
         gan.build_model()
-        gan.train()
+        gan.train_2()
 
 def open_yaml(path_yaml):
     with open(path_yaml) as f:
