@@ -39,6 +39,7 @@ class GAN():
         self.log_dir = train_yaml["logdir"]
         self.model_name=model_yaml["model_name"]
         self.epoch = train_yaml["epoch"]
+        self.discri_epoch=train_yaml["epoch_discri"]
         self.batch_size = train_yaml["batch_size"]
         self.checkpoint_dir = train_yaml["checkpoint_dir"]
         self.sess = sess
@@ -86,7 +87,7 @@ class GAN():
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
             model.summary()
-        self.model_discri=Model(discri_input, x, name="GAN_discriminator")
+        #self.model_discri=Model(discri_input, x, name="GAN_discriminator")
 
         return x
 
@@ -237,7 +238,6 @@ class GAN():
         # loop for epoch
         start_time = time.time()
         for epoch in range(start_epoch, self.epoch):
-
             # get batch data
             print("TOTAL numebr batch".format(self.num_batches))
             for idx in range(start_batch_id, self.num_batches):
@@ -247,6 +247,7 @@ class GAN():
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size] #the Ground Truth images
                 #print("GT",batch_gt.shape)
                 # update D network
+                #TODO adapt so that the discriminator can be trained in more iteration than the generator
                 summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
                 #self.writer.add_summary(d_loss, counter)
@@ -261,7 +262,7 @@ class GAN():
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
                       % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, g_loss))
 
-                # save training results for every 300 steps
+                # save training results for every N steps
                 if np.mod(counter, self.saving_step) == 0:
                     samples = self.sess.run(self.fake_images, feed_dict={self.g_input: self.sample_z})
                     tot_num_samples = min(self.sample_num, self.batch_size)

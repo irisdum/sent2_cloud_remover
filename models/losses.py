@@ -203,3 +203,21 @@ def modified_generator_loss(
       tf.compat.v1.summary.scalar('generator_modified_loss', loss)
 
   return loss
+
+def L1_modified_generator_loss(discriminator_gen_outputs,
+    label_smoothing=0.0,
+    weights=1.0,
+    scope=None,
+    loss_collection=tf.compat.v1.GraphKeys.LOSSES,
+    reduction=tf.compat.v1.losses.Reduction.SUM_BY_NONZERO_WEIGHTS,
+    add_summaries=False):
+    with tf.compat.v1.name_scope(scope, 'generator_modified_loss',
+                                 [discriminator_gen_outputs]) as scope:
+        loss = tf.compat.v1.losses.sigmoid_cross_entropy(
+            tf.ones_like(discriminator_gen_outputs), discriminator_gen_outputs,
+            weights, label_smoothing, scope, loss_collection, reduction)
+
+        if add_summaries:
+            tf.compat.v1.summary.scalar('generator_modified_loss', loss)
+
+    return loss
