@@ -59,7 +59,7 @@ class GAN():
 
 
 
-    def discriminator(self, discri_input, model_yaml, print_summary=True, reuse=False):
+    def discriminator(self, discri_input, model_yaml, print_summary=True, reuse=False,is_training=True):
 
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.keras.activations.relu(x, alpha=model_yaml["lrelu_alpha"])
@@ -71,18 +71,23 @@ class GAN():
             x = ZeroPadding2D(
                 padding=(1, 1))(discri_input)
             x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv1")(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"],trainable=is_training,name="d_bn1")(x)
             # layer 2
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv2")(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"],trainable=is_training, name="d_bn2")(x)
             # layer 3
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(256, 4, padding="valid", activation=d_activation, strides=(2, 2),name="d_conv3")(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"],trainable=is_training, name="d_bn3")(x)
             # layer 4
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1),name="d_conv4")(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"],trainable=is_training, name="d_bn4")(x)
             # layer 3
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1),name="d_conv5")(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,name="d_bn5")(x)
 
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
