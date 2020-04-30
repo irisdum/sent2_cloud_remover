@@ -157,7 +157,8 @@ class GAN():
 
         #print("concat res ",D_input_fake)
 
-        self.d_loss=discriminator_loss(D_output_real, D_output_fake)
+        d_loss_real,d_loss_fake=discriminator_loss(D_output_real, D_output_fake)
+        self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
         self.g_loss=total_generatot_loss(self.gt_images,G,D_output_fake,self.val_lambda)
@@ -181,9 +182,8 @@ class GAN():
         # for test
         self.fake_images = self.generator(self.g_input,self.model_yaml,print_summary=False, is_training=False, reuse=True)
         """ Summary """
-        d_loss_real_sum = tf.summary.scalar("d_loss_real", 1/2*discriminator_loss(D_output_real,D_output_real))
-        d_loss_fake_sum = tf.summary.scalar("d_loss_fake", 1/2*discriminator_loss(D_output_fake,D_output_fake))
-        d_loss_tot=tf.summary.scalar("d_loss_realfake", 1/2*discriminator_loss(D_output_real,D_output_real)+1/2*discriminator_loss(D_output_fake,D_output_fake))
+        d_loss_real_sum = tf.summary.scalar("d_loss_real", d_loss_real)
+        d_loss_fake_sum = tf.summary.scalar("d_loss_fake", d_loss_fake)
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
         g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
 

@@ -242,4 +242,4 @@ def discriminator_loss(D_output_real,D_output_fake):
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=tf.ones_like(D_output_real)))
     d_loss_fake = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
-    return d_loss_real + d_loss_fake
+    return d_loss_real, d_loss_fake
