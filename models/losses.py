@@ -247,9 +247,10 @@ def discriminator_loss(D_output_real,D_output_fake):
 
 
 def noisy_discriminator_loss(D_output_real,D_output_fake):
-    noise=random.uniform(0.9,1)
+    noise_real=random.uniform(0.9,1)
+    noise_fake=random.uniform(0,0.1)
     d_loss_real = tf.reduce_mean(
-        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=noise*tf.ones_like(D_output_real)))
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=noise_real*tf.ones_like(D_output_real)))
     d_loss_fake = tf.reduce_mean(
-        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=noise_fake*tf.zeros_like(D_output_fake)))
     return d_loss_real, d_loss_fake
