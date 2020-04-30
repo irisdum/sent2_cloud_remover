@@ -183,6 +183,7 @@ class GAN():
         """ Summary """
         d_loss_real_sum = tf.summary.scalar("d_loss_real", 1/2*discriminator_loss(D_output_real,D_output_real))
         d_loss_fake_sum = tf.summary.scalar("d_loss_fake", 1/2*discriminator_loss(D_output_fake,D_output_fake))
+        d_loss_tot=tf.summary.scalar("d_loss_realfake", 1/2*discriminator_loss(D_output_real,D_output_real)+1/2*discriminator_loss(D_output_fake,D_output_fake))
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
         g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
 
