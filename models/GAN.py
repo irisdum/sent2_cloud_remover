@@ -189,7 +189,7 @@ class GAN():
 
         # final summary operations
         self.g_sum = tf.summary.merge([d_loss_fake_sum, g_loss_sum])
-        self.d_sum = tf.summary.merge([d_loss_tot,d_loss_real_sum, d_loss_sum])
+        self.d_sum = tf.summary.merge([d_loss_real_sum, d_loss_sum])
 
     def train(self):
 
@@ -231,7 +231,7 @@ class GAN():
                 #print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size] #the Ground Truth images
                 #print("GT",batch_gt.shape)
-                merge=tf.summary.merge_all()
+
                 # update D network
                 #TODO adapt so that the discriminator can be trained in more iteration than the generator
                 _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
