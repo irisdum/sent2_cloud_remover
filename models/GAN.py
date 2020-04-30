@@ -11,7 +11,8 @@ from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
-from models.losses import modified_discriminator_loss,modified_generator_loss,total_generatot_loss,discriminator_loss
+from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
+    discriminator_loss, generator_loss, calc_cycle_loss
 from ruamel import yaml
 import os
 
@@ -123,6 +124,7 @@ class GAN():
                 x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
                            padding=model_yaml["padding"],
                            activation="relu")(x)
+
             # The last layer
             x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                        padding=model_yaml["padding"],name="g_final_conv", activation=last_activ)(x)
@@ -161,7 +163,9 @@ class GAN():
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
-        self.g_loss=total_generatot_loss(self.gt_images,G,D_output_fake,self.val_lambda)
+        g_loss=generator_loss(D_output_fake)
+        cycle_loss=calc_cycle_loss(self.gt_images, G, self.val_lambda)
+        self.g_loss=g_loss+cycle_loss
         print("loss g",self.g_loss)
         print("loss d ",self.d_loss)
         # divide trainable variables into a group for D and a group for G
@@ -185,11 +189,21 @@ class GAN():
         d_loss_real_sum = tf.summary.scalar("d_loss_real", d_loss_real)
         d_loss_fake_sum = tf.summary.scalar("d_loss_fake", d_loss_fake)
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
-        g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
-
+        g_loss_sum=tf.summary.scalar("g_loss",g_loss)
+        g_cycle_loss_sum=tf.summary.scalar("g_cycle_loss",cycle_loss)
+        g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
+        g_image_summary = tf.summary.image("image_gene",self.fake_images[0, :, :,:3])
+        g_layer_one=tf.summary.histogram("g_layerone",self.g_input)
+        g_layer_last=tf.summary.histogram("g_layer_last",G)
+        d_layer_one_fake=tf.summary.histogram("d_layer_one_fake",D_input_fake)
+        d_layer_one_real=tf.summary.histogram("d_layer_one_real",D_input_real)
+        d_layer_last_real=tf.summary.histogram("d_layer_last_real",D_output_real)
+        d_layer_last_fake=tf.summary.histogram("d_layer_last_fake",D_input_fake)
+        list_g_sum=[g_loss_sum,g_cycle_loss_sum,g_loss_sum_tot,g_image_summary,g_layer_one,g_layer_last]
+        list_d_sum=[d_loss_fake_sum,d_loss_real_sum,d_loss_sum,d_layer_last_fake,d_layer_last_real,d_layer_one_fake,d_layer_one_real]
         # final summary operations
-        self.g_sum = tf.summary.merge([d_loss_fake_sum, g_loss_sum])
-        self.d_sum = tf.summary.merge([d_loss_real_sum, d_loss_sum])
+        self.g_sum = tf.summary.merge(list_g_sum)
+        self.d_sum = tf.summary.merge(list_d_sum)
 
     def train(self):
 
@@ -243,6 +257,7 @@ class GAN():
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
 
                 self.writer.add_summary(summary_str, counter)
+
                 # display training status
                 counter += 1
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
