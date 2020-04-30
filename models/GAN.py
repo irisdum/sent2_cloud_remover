@@ -234,12 +234,12 @@ class GAN():
                 merge=tf.summary.merge_all()
                 # update D network
                 #TODO adapt so that the discriminator can be trained in more iteration than the generator
-                _,summary_str, d_loss = self.sess.run([self.d_sum,self.d_optim, self.d_loss],
+                _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
                 self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
-                _,summary_str,g_loss = self.sess.run([self.g_sum,self.g_optim, self.g_loss],
+                _,summary_str,g_loss = self.sess.run([self.g_optim,self.g_sum, self.g_loss],
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
 
                 self.writer.add_summary(summary_str, counter)
