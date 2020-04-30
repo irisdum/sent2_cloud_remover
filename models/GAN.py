@@ -192,7 +192,7 @@ class GAN():
         g_loss_sum=tf.summary.scalar("g_loss",g_loss)
         g_cycle_loss_sum=tf.summary.scalar("g_cycle_loss",cycle_loss)
         g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
-        g_image_summary = tf.summary.image("image_gene",self.fake_images[0, :, :,:3])
+        g_image_summary = tf.summary.image("image_gene",self.fake_images,max_outputs=self.batch_size)
         g_layer_one=tf.summary.histogram("g_layerone",self.g_input)
         g_layer_last=tf.summary.histogram("g_layer_last",G)
         d_layer_one_fake=tf.summary.histogram("d_layer_one_fake",D_input_fake)
