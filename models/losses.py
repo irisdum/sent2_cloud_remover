@@ -1,4 +1,5 @@
 import tensorflow as tf
+import random
 #loss from https://github.com/tensorflow/gan/blob/master/tensorflow_gan/python/losses/losses_impl.py
 
 def minimax_discriminator_loss(
@@ -243,3 +244,12 @@ def discriminator_loss(D_output_real,D_output_fake):
     d_loss_fake = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
     return d_loss_real , d_loss_fake
+
+
+def noisy_discriminator_loss(D_output_real,D_output_fake):
+    noise=random.uniform(0.9,1)
+    d_loss_real = tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=noise*tf.ones_like(D_output_real)))
+    d_loss_fake = tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
+    return d_loss_real, d_loss_fake

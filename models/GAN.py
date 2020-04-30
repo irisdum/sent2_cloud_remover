@@ -12,7 +12,7 @@ from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
-    discriminator_loss, generator_loss, calc_cycle_loss
+    discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss
 from ruamel import yaml
 import os
 
@@ -159,7 +159,7 @@ class GAN():
 
         #print("concat res ",D_input_fake)
 
-        d_loss_real,d_loss_fake=discriminator_loss(D_output_real, D_output_fake)
+        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
@@ -181,6 +181,7 @@ class GAN():
                 .minimize(self.d_loss, var_list=d_vars)
             self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
                 .minimize(self.g_loss, var_list=g_vars)
+
         print("D optim",d_vars)
 
         # for test
