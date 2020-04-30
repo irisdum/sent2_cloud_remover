@@ -14,6 +14,7 @@ import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
     discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss
 from ruamel import yaml
+import random
 import os
 
 
@@ -158,8 +159,9 @@ class GAN():
         D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False,reuse=True)
 
         #print("concat res ",D_input_fake)
-
-        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake)
+        self.noise_real=tf.keras.backend.placeholder(shape=[1],name="Discriminator loss noise real")
+        self.noise_fake=tf.keras.backend.placeholder(shape=[1],name="Discriminator loss noise fake")
+        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.noise_real,self.noise_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
@@ -187,6 +189,8 @@ class GAN():
         # for test
         self.fake_images = self.generator(self.g_input,self.model_yaml,print_summary=False, is_training=False, reuse=True)
         """ Summary """
+        noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
+        noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
         d_loss_real_sum = tf.summary.scalar("d_loss_real", d_loss_real)
         d_loss_fake_sum = tf.summary.scalar("d_loss_fake", d_loss_fake)
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
@@ -194,6 +198,8 @@ class GAN():
         g_cycle_loss_sum=tf.summary.scalar("g_cycle_loss",cycle_loss)
         g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
         g_image_summary = tf.summary.image("image_gene",self.fake_images,max_outputs=self.batch_size)
+        d_fake_image_sum=tf.summary.image("d_output_fake",D_output_fake,max_outputs=self.batch_size)
+        d_real_image_sum=tf.summary.image("d_output_real",D_output_real,max_outputs=self.batch_size)
         g_layer_one=tf.summary.histogram("g_layerone",self.g_input)
         g_layer_last=tf.summary.histogram("g_layer_last",G)
         d_layer_one_fake=tf.summary.histogram("d_layer_one_fake",D_input_fake)
@@ -201,7 +207,9 @@ class GAN():
         d_layer_last_real=tf.summary.histogram("d_layer_last_real",D_output_real)
         d_layer_last_fake=tf.summary.histogram("d_layer_last_fake",D_input_fake)
         list_g_sum=[g_loss_sum,g_cycle_loss_sum,g_loss_sum_tot,g_image_summary,g_layer_one,g_layer_last]
-        list_d_sum=[d_loss_fake_sum,d_loss_real_sum,d_loss_sum,d_layer_last_fake,d_layer_last_real,d_layer_one_fake,d_layer_one_real]
+        list_d_sum=[d_loss_fake_sum,d_loss_real_sum,d_loss_sum,d_layer_last_fake,d_layer_last_real,d_layer_one_fake,
+                    d_layer_one_real,d_real_image_sum,d_fake_image_sum,noise_fake_sum,noise_real_sum]
+
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
         self.d_sum = tf.summary.merge(list_d_sum)
@@ -250,7 +258,8 @@ class GAN():
                 # update D network
                 #TODO adapt so that the discriminator can be trained in more iteration than the generator
                 _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
-                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
+                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
+                                                                  self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)})
                 self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
