@@ -55,9 +55,7 @@ class GAN():
         self.result_dir=train_yaml["result_dir"]
         self.val_lambda=train_yaml["lambda"]
 
-        # ## Create the tensorboard logdir
-        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=train_yaml[
-             "logdir"])
+
 
     def discriminator(self, discri_input, model_yaml, print_summary=True, reuse=False):
 
@@ -178,10 +176,19 @@ class GAN():
                 .minimize(self.d_loss, var_list=d_vars)
             self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
                 .minimize(self.g_loss, var_list=g_vars)
+        print("D optim",d_vars)
 
         # for test
         self.fake_images = self.generator(self.g_input,self.model_yaml,print_summary=False, is_training=False, reuse=True)
+        """ Summary """
+        d_loss_real_sum = tf.summary.scalar("d_loss_real", 1/2*discriminator_loss(D_output_real,D_output_real))
+        d_loss_fake_sum = tf.summary.scalar("d_loss_fake", 1/2*discriminator_loss(D_output_fake,D_output_fake))
+        d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
+        g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
 
+        # final summary operations
+        self.g_sum = tf.summary.merge([d_loss_fake_sum, g_loss_sum])
+        self.d_sum = tf.summary.merge([d_loss_real_sum, d_loss_sum])
 
     def train(self):
 
@@ -196,6 +203,8 @@ class GAN():
 
         # summary writer
         self.writer = tf.compat.v1.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
+        # ## Create the tensorboard logdir
+        #tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.log_dir)
 
         # restore check-point if it exits
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
@@ -221,17 +230,18 @@ class GAN():
                 #print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size] #the Ground Truth images
                 #print("GT",batch_gt.shape)
+                merge=tf.summary.merge_all()
                 # update D network
                 #TODO adapt so that the discriminator can be trained in more iteration than the generator
-                summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
+                _,summary_str, d_loss = self.sess.run([self.d_sum,self.d_optim, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
-                #self.writer.add_summary(d_loss, counter)
+                self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
-                summary_str,g_loss = self.sess.run([self.g_optim, self.g_loss],
+                _,summary_str,g_loss = self.sess.run([self.g_sum,self.g_optim, self.g_loss],
                                                        feed_dict={self.g_input: batch_input,self.gt_images:batch_gt})
 
-                #self.writer.add_summary(output_run_g, counter)
+                self.writer.add_summary(summary_str, counter)
                 # display training status
                 counter += 1
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
@@ -315,8 +325,9 @@ class GAN():
                     # print("GT",batch_gt.shape)
                     # update D network
                     # TODO adapt so that the discriminator can be trained in more iteration than the generator
-                    summary_str, d_loss = self.sess.run([self.d_optim, self.d_loss],
+                    _,summary_str, d_loss = self.sess.run([self.d_sum,self.d_optim, self.d_loss],
                                                         feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
+                    self.writer.add_summary(summary_str, counter)
                     # display training status
                     counter += 1
                     print("Epoch only discriminator : [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
@@ -334,8 +345,9 @@ class GAN():
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
-                summary_str, g_loss = self.sess.run([self.g_optim, self.g_loss],
+                _,summary_str, g_loss = self.sess.run([self.g_sum,self.g_optim, self.g_loss],
                                                     feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
+                self.writer.add_summary(summary_str, counter)
                 counter += 1
                 print("Epoch only generator : [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
                       % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, g_loss))
