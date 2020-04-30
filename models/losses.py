@@ -241,7 +241,7 @@ def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
     return generator_loss2(D_output_fake)+calc_cycle_loss(real_image,fake_image,val_lambda)
 
 def discriminator_loss2(D_output_real,D_output_fake): #TODO add sigmoid func
-    return  -tf.reduce_mean(tf.log(D_output_real)), -tf.reduce_mean(tf.log(1 - D_output_fake))
+    return  -tf.reduce_mean(tf.nn.sigmoid(tf.log(D_output_real))), -tf.reduce_mean(tf.log(1 - tf.nn.sigmoid(D_output_fake)))
 
 def discriminator_loss(D_output_real,D_output_fake):
 
