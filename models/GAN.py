@@ -12,7 +12,7 @@ from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
-    discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss
+    discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss, discriminator_loss2
 from ruamel import yaml
 import random
 import os
@@ -166,7 +166,7 @@ class GAN():
         #print("concat res ",D_input_fake)
         self.noise_real=tf.Variable(0.0)
         self.noise_fake=tf.Variable(1.0)
-        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.noise_real,self.noise_fake)
+        d_loss_real,d_loss_fake=discriminator_loss2(D_output_real, D_output_fake,self.noise_real,self.noise_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
