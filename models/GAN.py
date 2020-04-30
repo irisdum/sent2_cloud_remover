@@ -189,7 +189,7 @@ class GAN():
 
         # final summary operations
         self.g_sum = tf.summary.merge([d_loss_fake_sum, g_loss_sum])
-        self.d_sum = tf.summary.merge([d_loss_real_sum, d_loss_sum])
+        self.d_sum = tf.summary.merge([d_loss_tot,d_loss_real_sum, d_loss_sum])
 
     def train(self):
 
