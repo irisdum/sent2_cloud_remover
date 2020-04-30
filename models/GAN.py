@@ -164,8 +164,8 @@ class GAN():
         D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False,reuse=True)
 
         #print("concat res ",D_input_fake)
-        self.noise_real=tf.Variable(0.0)
-        self.noise_fake=tf.Variable(1.0)
+        #self.noise_real=tf.Variable(0.0)
+        #self.noise_fake=tf.Variable(1.0)
         d_loss_real,d_loss_fake=discriminator_loss2(D_output_real, D_output_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
@@ -194,8 +194,8 @@ class GAN():
         # for test
         self.fake_images = self.generator(self.g_input,self.model_yaml,print_summary=False, is_training=False, reuse=True)
         """ Summary """
-        noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
-        noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
+        #noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
+        #noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
         d_loss_real_sum = tf.summary.scalar("d_loss_real", d_loss_real)
         d_loss_fake_sum = tf.summary.scalar("d_loss_fake", d_loss_fake)
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
@@ -213,7 +213,7 @@ class GAN():
         d_layer_last_fake=tf.summary.histogram("d_layer_last_fake",D_input_fake)
         list_g_sum=[g_loss_sum,g_cycle_loss_sum,g_loss_sum_tot,g_image_summary,g_layer_one,g_layer_last]
         list_d_sum=[d_loss_fake_sum,d_loss_real_sum,d_loss_sum,d_layer_last_fake,d_layer_last_real,d_layer_one_fake,
-                    d_layer_one_real,d_real_image_sum,d_fake_image_sum,noise_fake_sum,noise_real_sum]
+                    d_layer_one_real,d_real_image_sum,d_fake_image_sum]
 
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
@@ -263,8 +263,7 @@ class GAN():
                 # update D network
                 #TODO adapt so that the discriminator can be trained in more iteration than the generator
                 _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
-                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
-                                                                  self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)})
+                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt}) #,self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)}
                 self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
