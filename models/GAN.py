@@ -325,7 +325,7 @@ class GAN():
                     # print("GT",batch_gt.shape)
                     # update D network
                     # TODO adapt so that the discriminator can be trained in more iteration than the generator
-                    _,summary_str, d_loss = self.sess.run([self.d_sum,self.d_optim, self.d_loss],
+                    _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
                                                         feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
                     self.writer.add_summary(summary_str, counter)
                     # display training status
@@ -345,7 +345,7 @@ class GAN():
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
-                _,summary_str, g_loss = self.sess.run([self.g_sum,self.g_optim, self.g_loss],
+                _,summary_str, g_loss = self.sess.run([self.g_optim,self.g_sum, self.g_loss],
                                                     feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
                 self.writer.add_summary(summary_str, counter)
                 counter += 1
