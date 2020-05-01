@@ -65,6 +65,7 @@ class GAN():
         self.sigma_init = train_yaml["sigma_init"]
         self.sigma_step = train_yaml['sigma_step']
         self.sigma_decay = train_yaml["sigma_decay"]
+        self.ite_train_g=train_yaml["train_g_multiple_time"]
 
     def discriminator(self, discri_input, model_yaml, print_summary=True, reuse=False, is_training=True):
 
@@ -280,6 +281,8 @@ class GAN():
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
+
+
         for epoch in range(start_epoch, self.epoch):
             # get batch data
             print("TOTAL number batch".format(self.num_batches))
@@ -294,13 +297,13 @@ class GAN():
                                               self.real_label_smoothing[1])  # Add noise on the loss
                 d_noise_fake = random.uniform(self.fake_label_smoothing[0],
                                               self.fake_label_smoothing[1])  # Add noise on the loss
-
-                _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_sum, self.d_loss],
+                if epoch not in [i for i in range(1,self.ite_train_g)]:
+                    _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_sum, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
                                                                   self.noise_real: d_noise_real,
                                                                   self.noise_fake: d_noise_fake,
                                                                   self.sigma_val: sigma_val})
-                self.writer.add_summary(summary_str, counter)
+                    self.writer.add_summary(summary_str, counter)
                 # update G network
                 # print("Before G run ", self.g_input,batch_input.shape)
                 _, summary_str, g_loss = self.sess.run([self.g_optim, self.g_sum, self.g_loss],

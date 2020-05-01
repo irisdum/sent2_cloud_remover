@@ -21,6 +21,9 @@ checkpoint_dir: null # if None no previous model is going to be downloaded
 saving_step: 30
 n_train_image_saved: 1
 
+#TRAIN THE GENERATOR MULTIPLE TIME
+train_g_multiple_time: 10
+
 ## DISCRIMINATOR PREVENT OVERFITTING
 real_label_smoothing: [0.7,1.0] #if you do not want to apply label smoothing [1,1]
 fake_label_smoothing: [0.0,0.2] #if you do not want to apply label smoothing [0,0]
