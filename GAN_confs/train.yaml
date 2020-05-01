@@ -23,7 +23,7 @@ n_train_image_saved: 1
 
 ## DISCRIMINATOR PREVENT OVERFITTING
 real_label_smoothing: [0.7,1] #if you do not want to apply label smoothing [1,1]
-discri_label_smoothin: [0,0.2] #if you do not want to apply label smoothing [0,0]
+fake_label_smoothin: [0,0.2] #if you do not want to apply label smoothing [0,0]
 
 sigma_init: 0.5
 sigma_decay: 0.5 # multiply

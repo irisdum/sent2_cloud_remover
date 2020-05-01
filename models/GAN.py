@@ -267,7 +267,7 @@ class GAN():
         sigma_val=self.sigma_init
         for epoch in range(start_epoch, self.epoch):
             # get batch data
-            print("TOTAL numebr batch".format(self.num_batches))
+            print("TOTAL number batch".format(self.num_batches))
             for idx in range(start_batch_id, self.num_batches):
                 print(idx * self.batch_size,(idx + 1) * self.batch_size)
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size] # the input
@@ -300,6 +300,7 @@ class GAN():
                     tot_num_samples = min(self.sample_num, self.batch_size)
                     manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                     manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
+                    print("save_image at {}".format(self.saving_image_path))
                     save_images(samples[:manifold_h * manifold_w, :, :, :],self.saving_image_path,ite=counter)
                 if np.mod(counter,self.sigma_step):
                     sigma_val=sigma_val*self.sigma_decay
@@ -418,7 +419,7 @@ class GAN():
         self.save(counter)
 
     def save(self, step):
-        checkpoint_dir = self.saving_image_path
+        checkpoint_dir = self.checkpoint_dir
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
         self.saver.save(self.sess, os.path.join(checkpoint_dir, self.model_name + '.model'), global_step=step)
