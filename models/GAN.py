@@ -9,6 +9,7 @@ from tensorflow.keras.layers import Input, Dense, Add, Reshape, Flatten, Dropout
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
+from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
@@ -234,7 +235,7 @@ class GAN():
         self.d_sum = tf.summary.merge(list_d_sum)
 
     def train(self):
-
+        create_safe_directory(self.saving_image_path)
         # initialize all variables
         tf.compat.v1.global_variables_initializer().run()
         # graph inputs for visualize training results
