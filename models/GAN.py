@@ -179,7 +179,7 @@ class GAN():
 
         #print("concat res ",D_input_fake)
         self.noise_real=tf.Variable(1.0)
-        self.noise_fake=tf.Variable(0)
+        self.noise_fake=tf.Variable(0.0)
         d_loss_real,d_loss_fake=self.discriminator_loss(D_output_real, D_output_fake,self.noise_real,self.noise_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
