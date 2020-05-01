@@ -176,7 +176,7 @@ class GAN():
                 new_gt=ReLU(name="d_gaussian_noise_relu".format(id))(new_gt)
         else:
             new_gt= self.gt_images
-            
+
         D_input_real=tf.concat([new_gt,self.g_input],axis=-1)  #input in the discriminator correspond to a pair of s2 images
         D_input_fake=tf.concat([G,self.g_input],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
 

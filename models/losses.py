@@ -266,9 +266,9 @@ def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
 
 
 def load_loss(loss_name):
-    assert loss_name in ["total_generator_loss","total_generator_loss"],"Loss {} undefined add it to load loss".format(loss_name)
+    assert loss_name in ["total_generator_loss","noisy_discriminator_loss"],"Loss {} undefined add it to load loss".format(loss_name)
     if loss_name=="total_generator_loss":
         return total_generatot_loss
-    elif loss_name=="total_generator_loss":
+    elif loss_name=="noisy_discriminator_loss":
         return noisy_discriminator_loss
 
