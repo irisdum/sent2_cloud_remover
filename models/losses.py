@@ -239,7 +239,7 @@ def calc_cycle_loss(real_image, fake_image, val_lambda):
 
 
 def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
-    return generator_loss(D_output_fake)+calc_cycle_loss(real_image,fake_image,val_lambda)
+    return generator_loss(D_output_fake),calc_cycle_loss(real_image,fake_image,val_lambda)
 
 
 def discriminator_loss2(D_output_real,D_output_fake): #TODO add sigmoid func
@@ -255,10 +255,17 @@ def discriminator_loss(D_output_real,D_output_fake):
     return d_loss_real , d_loss_fake
 
 
-def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real):
+def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
 
     d_loss_real = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=noise_real*tf.ones_like(D_output_real)))
     d_loss_fake = tf.reduce_mean(
-        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=noise_fake*tf.ones_like(D_output_fake)))
     return d_loss_real, d_loss_fake
+
+def load_loss(loss_name):
+    if loss_name=="total_generatot_loss":
+        return total_generatot_loss
+    elif loss_name=="noisy_discriminator_loss":
+        return noisy_discriminator_loss
+

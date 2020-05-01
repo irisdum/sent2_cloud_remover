@@ -12,7 +12,7 @@ from constant.model_constant import CHANNEL
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
-    discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss, discriminator_loss2
+    discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss, discriminator_loss2,load_loss
 from ruamel import yaml
 import random
 import os
@@ -22,28 +22,24 @@ class GAN():
     def __init__(self, train_yaml, model_yaml, sess):
         """:param train_yaml,model_yaml two dictionnaries"""
         self.k_step = train_yaml["k_step"]
-        self.model_dir = train_yaml["model_dir"]
         print(train_yaml)
         print(model_yaml)
+        #SHAPE PARAMETER
         self.img_rows = 256
         self.img_cols = 256
         self.channels = CHANNEL
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         print(type(train_yaml["lr"]))
-        optimizer = Adam(train_yaml["lr"], train_yaml["beta1"])
-        # Build and compile the discriminator
-        # self.discriminator = self.build_discriminator(model_yaml)
-        # self.discriminator.compile(loss='binary_crossentropy',
-        #                            optimizer=optimizer,
-        #                            metrics=['accuracy'])
-
-        # Build the generator
-        # self.z = self.build_generator(model_yaml,)
-        self.log_dir = train_yaml["logdir"]
+        #PATH
         self.model_name=model_yaml["model_name"]
+        self.model_dir = train_yaml["training_dir"] + self.model_name + "/"
+        self.this_training_dir = self.model_dir + "training_{}/".format(train_yaml["training_number"])
+        self.saving_image_path = self.model_dir + "saved_training_images/"
+        self.saving_logs_path = self.this_training_dir + "logs/"
+        self.checkpoint_dir = self.this_training_dir + "checkpoints/"
+        #TRAIN PARAMETER
         self.epoch = train_yaml["epoch"]
         self.batch_size = train_yaml["batch_size"]
-        self.checkpoint_dir = train_yaml["checkpoint_dir"]
         self.sess = sess
         self.learning_rate = train_yaml["lr"]
         self.fact_g_lr=train_yaml["fact_g_lr"]
@@ -52,11 +48,21 @@ class GAN():
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml=model_yaml
         self.saving_step=train_yaml["saving_step"]
+
+        #LOSSES
+        self.generator_loss=load_loss(train_yaml["generator_loss"])
+        self.discriminator_loss=load_loss(train_yaml["discriminator_loss"])
         # test
         self.sample_num = train_yaml["n_train_image_saved"]  # number of generated images to be saved
-        self.result_dir=train_yaml["result_dir"]
+
+        #REDUCE THE DISCRIMINATOR PERFORMANCE
         self.val_lambda=train_yaml["lambda"]
-        self.label_smoothing=train_yaml["label_smoothing"]
+        self.real_label_smoothing=tuple(train_yaml["real_label_smoothing"])
+        self.fake_label_smoothing=tuple(train_yaml["fake_label_smoothing"])
+        self.sigma_init=train_yaml["sigma_init"]
+        self.sigma_step=train_yaml['sigma_step']
+        self.sigma_decay=train_yaml["sigma_decay"]
+
 
 
 
@@ -159,25 +165,26 @@ class GAN():
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
         print("output_g",G)
+        self.sigma_val = tf.Variable(0.2)
         if self.model_yaml["add_discri_white_noise"]:
-            new_gt= GaussianNoise(0.2, input_shape=self.model_yaml["d_input_shape"])(self.gt_images)
+            print("We add Gaussian Noise")
+            new_gt= GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(self.gt_images)
         else:
             new_gt= self.gt_images
-        D_input_real=tf.concat([new_gt,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
-        D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
-        
+        D_input_real=tf.concat([new_gt,self.g_input],axis=-1)  #input in the discriminator correspond to a pair of s2 images
+        D_input_fake=tf.concat([G,self.g_input],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
+
         D_output_real=self.discriminator(D_input_real,self.model_yaml,print_summary=False,reuse=False)
         D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False,reuse=True)
 
         #print("concat res ",D_input_fake)
-        self.noise_real=tf.Variable(0.0)
-        #self.noise_fake=tf.Variable(1.0)
-        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.noise_real)
+        self.noise_real=tf.Variable(1.0)
+        self.noise_fake=tf.Variable(0)
+        d_loss_real,d_loss_fake=self.discriminator_loss(D_output_real, D_output_fake,self.noise_real,self.noise_fake)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
-        #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
-        g_loss=generator_loss(D_output_fake)
-        cycle_loss=calc_cycle_loss(self.gt_images, G, self.val_lambda)
+
+        g_loss,cycle_loss=self.generator_loss(self.gt_images,G,D_output_fake,self.val_lambda)
         self.g_loss=g_loss+cycle_loss
         print("loss g",self.g_loss)
         print("loss d ",self.d_loss)
@@ -217,9 +224,10 @@ class GAN():
         d_layer_one_real=tf.summary.histogram("d_layer_one_real",D_input_real)
         d_layer_last_real=tf.summary.histogram("d_layer_last_real",D_output_real)
         d_layer_last_fake=tf.summary.histogram("d_layer_last_fake",D_input_fake)
+        d_sigma_val=tf.summary.scalar("d_sigma_val",self.sigma_val)
         list_g_sum=[g_loss_sum,g_cycle_loss_sum,g_loss_sum_tot,g_image_summary,g_layer_one,g_layer_last]
         list_d_sum=[d_loss_fake_sum,d_loss_real_sum,d_loss_sum,d_layer_last_fake,d_layer_last_real,d_layer_one_fake,
-                    d_layer_one_real,d_real_image_sum,d_fake_image_sum]
+                    d_layer_one_real,d_real_image_sum,d_fake_image_sum,d_sigma_val]
 
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
@@ -237,7 +245,7 @@ class GAN():
         self.saver = tf.compat.v1.train.Saver()
 
         # summary writer
-        self.writer = tf.compat.v1.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
+        self.writer = tf.compat.v1.summary.FileWriter(self.saving_logs_path, self.sess.graph)
         # ## Create the tensorboard logdir
         #tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.log_dir)
 
@@ -256,6 +264,7 @@ class GAN():
 
         # loop for epoch
         start_time = time.time()
+        sigma_val=self.sigma_init
         for epoch in range(start_epoch, self.epoch):
             # get batch data
             print("TOTAL numebr batch".format(self.num_batches))
@@ -265,11 +274,13 @@ class GAN():
                 #print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt=self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size] #the Ground Truth images
                 #print("GT",batch_gt.shape)
-
                 # update D network
+                d_noise_real=random.uniform(self.real_label_smoothing[0],self.real_label_smoothing[1]) #Add noise on the loss
+                d_noise_fake=random.uniform(self.fake_label_smoothing[0],self.fake_label_smoothing[1]) #Add noise on the loss
 
                 _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
-                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt, self.noise_real:random.uniform(0.7,1.2)}) #,self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)}
+                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
+                                                                  self.noise_real:d_noise_real,self.noise_fake:d_noise_fake,self.sigma_val:sigma_val})
                 self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
@@ -289,8 +300,9 @@ class GAN():
                     tot_num_samples = min(self.sample_num, self.batch_size)
                     manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                     manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
-                    save_images(samples[:manifold_h * manifold_w, :, :, :],self.result_dir,ite=counter)
-
+                    save_images(samples[:manifold_h * manifold_w, :, :, :],self.saving_image_path,ite=counter)
+                if np.mod(counter,self.sigma_step):
+                    sigma_val=sigma_val*self.sigma_decay
             # After an epoch, start_batch_id is set to zero
             # non-zero value is only for the first epoch after loading pre-trained model
             start_batch_id = 0
@@ -331,7 +343,7 @@ class GAN():
         self.saver = tf.compat.v1.train.Saver()
 
         # summary writer
-        self.writer = tf.compat.v1.summary.FileWriter(self.log_dir + '/' + self.model_name, self.sess.graph)
+        self.writer = tf.compat.v1.summary.FileWriter(self.saving_logs_path, self.sess.graph)
 
         # restore check-point if it exits
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
@@ -374,7 +386,7 @@ class GAN():
                         tot_num_samples = min(self.sample_num, self.batch_size)
                         manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                         manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
-                        save_images(samples[:manifold_h * manifold_w, :, :, :], self.result_dir, ite=counter)
+                        save_images(samples[:manifold_h * manifold_w, :, :, :], self.saving_image_path, ite=counter)
                 start_batch_id = 0
             for idx in range(start_batch_id, self.num_batches):
                 print(idx * self.batch_size, (idx + 1) * self.batch_size)
@@ -394,7 +406,7 @@ class GAN():
                     tot_num_samples = min(self.sample_num, self.batch_size)
                     manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                     manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
-                    save_images(samples[:manifold_h * manifold_w, :, :, :], self.result_dir, ite=counter)
+                    save_images(samples[:manifold_h * manifold_w, :, :, :], self.saving_image_path, ite=counter)
 
             # After an epoch, start_batch_id is set to zero
             # non-zero value is only for the first epoch after loading pre-trained model
@@ -406,12 +418,11 @@ class GAN():
         self.save(counter)
 
     def save(self, step):
-        checkpoint_dir = os.path.join(self.model_dir, self.model_name)
-
+        checkpoint_dir = self.saving_image_path
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
-
         self.saver.save(self.sess, os.path.join(checkpoint_dir, self.model_name + '.model'), global_step=step)
+
 
     def visualize_results(self, epoch):
         pass
