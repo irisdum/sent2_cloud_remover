@@ -35,7 +35,7 @@ class GAN():
         self.model_name=model_yaml["model_name"]
         self.model_dir = train_yaml["training_dir"] + self.model_name + "/"
         self.this_training_dir = self.model_dir + "training_{}/".format(train_yaml["training_number"])
-        self.saving_image_path = self.model_dir + "saved_training_images/"
+        self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
         #TRAIN PARAMETER
