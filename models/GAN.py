@@ -56,6 +56,7 @@ class GAN():
         self.sample_num = train_yaml["n_train_image_saved"]  # number of generated images to be saved
         self.result_dir=train_yaml["result_dir"]
         self.val_lambda=train_yaml["lambda"]
+        self.label_smoothing=train_yaml["label_smoothing"]
 
 
 
@@ -166,7 +167,7 @@ class GAN():
         #print("concat res ",D_input_fake)
         #self.noise_real=tf.Variable(0.0)
         #self.noise_fake=tf.Variable(1.0)
-        d_loss_real,d_loss_fake=discriminator_loss2(D_output_real, D_output_fake)
+        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.label_smoothing)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)

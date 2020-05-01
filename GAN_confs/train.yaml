@@ -18,3 +18,4 @@ checkpoint_dir: null # if None no previous model is going to be downloaded
 # The model will be saved every saving step epoch
 saving_step: 30
 n_train_image_saved: 1
+label_smoothing: 0.9

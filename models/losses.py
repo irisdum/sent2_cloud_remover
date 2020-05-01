@@ -225,6 +225,7 @@ def L1_modified_generator_loss(discriminator_gen_outputs,
 
 
 def generator_loss(D_output_fake):
+    """Is equivalent to maximise log(D(G(z))"""
     g_loss=tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.ones_like(D_output_fake)))
     return g_loss
@@ -238,13 +239,15 @@ def calc_cycle_loss(real_image, fake_image, val_lambda):
 
 
 def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
-    return generator_loss2(D_output_fake)+calc_cycle_loss(real_image,fake_image,val_lambda)
+    return generator_loss(D_output_fake)+calc_cycle_loss(real_image,fake_image,val_lambda)
+
 
 def discriminator_loss2(D_output_real,D_output_fake): #TODO add sigmoid func
     return  -tf.reduce_mean(tf.log(D_output_real)), -tf.reduce_mean(tf.log(1 - D_output_fake))
 
 def discriminator_loss(D_output_real,D_output_fake):
-
+    """Is equivalent to maximise E(log(D(x,y))+ E(log(1-D(5(x,z),y))
+    """
     d_loss_real = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=tf.ones_like(D_output_real)))
     d_loss_fake = tf.reduce_mean(
@@ -252,10 +255,10 @@ def discriminator_loss(D_output_real,D_output_fake):
     return d_loss_real , d_loss_fake
 
 
-def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
+def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real):
 
     d_loss_real = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_real, labels=noise_real*tf.ones_like(D_output_real)))
     d_loss_fake = tf.reduce_mean(
-        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=noise_fake*tf.zeros_like(D_output_fake)))
+        tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=tf.zeros_like(D_output_fake)))
     return d_loss_real, d_loss_fake
