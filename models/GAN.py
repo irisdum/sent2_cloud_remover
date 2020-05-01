@@ -173,7 +173,7 @@ class GAN():
             print("We add Gaussian Noise")
             new_gt = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(self.gt_images)
             if self.model_yaml["add_relu_after_noise"]:
-                new_gt = ReLU(name="d_gaussian_noise_relu".format(id))(new_gt)
+                new_gt = tf.keras.layers.Activation(lambda x: tf.keras.activations.tanh(x))(new_gt)
         else:
             new_gt = self.gt_images
 
