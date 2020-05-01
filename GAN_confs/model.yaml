@@ -34,4 +34,5 @@ d_input_shape: [256,256,8]
 # Syntethized image_dim
 dim_gt_image: [256,256,4]
 
+add_discri_white_noise: true #boolean if True white noise is added to the input data
 

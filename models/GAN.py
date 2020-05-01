@@ -5,7 +5,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 from tensorflow.keras.layers import Input, Dense, Add, Reshape, Flatten, Dropout, BatchNormalization, Conv2D, ReLU, add, \
-    ZeroPadding2D
+    ZeroPadding2D,GaussianNoise
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
@@ -68,6 +68,7 @@ class GAN():
             d_activation = model_yaml["d_activation"]
         with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
+
             # layer 1
             x = ZeroPadding2D(
                 padding=(1, 1))(discri_input)
@@ -158,16 +159,20 @@ class GAN():
         #the loss function
         G=self.generator(self.g_input,self.model_yaml,is_training=True,print_summary=False,reuse=False)
         print("output_g",G)
-        D_input_real=tf.concat([self.gt_images,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
+        if self.model_yaml["add_discri_white_noise"]:
+            new_gt= GaussianNoise(0.2, input_shape=self.model_yaml["d_input_shape"])(self.gt_images)
+        else:
+            new_gt= self.gt_images
+        D_input_real=tf.concat([new_gt,self.gt_images],axis=-1)  #input in the discriminator correspond to a pair of s2 images
         D_input_fake=tf.concat([self.gt_images,G],axis=-1) #Input correpsond to the pair of images : Ground truth and synthetized image from the generator
-
+        
         D_output_real=self.discriminator(D_input_real,self.model_yaml,print_summary=False,reuse=False)
         D_output_fake=self.discriminator(D_input_fake,self.model_yaml,print_summary=False,reuse=True)
 
         #print("concat res ",D_input_fake)
-        #self.noise_real=tf.Variable(0.0)
+        self.noise_real=tf.Variable(0.0)
         #self.noise_fake=tf.Variable(1.0)
-        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.label_smoothing)
+        d_loss_real,d_loss_fake=noisy_discriminator_loss(D_output_real, D_output_fake,self.noise_real)
         self.d_loss=d_loss_real+d_loss_fake
         # THE GENERATOR LOSS
         #discri_output=self.discriminator(D_input_fake,self.model_yaml,print_summary=False)
@@ -262,9 +267,9 @@ class GAN():
                 #print("GT",batch_gt.shape)
 
                 # update D network
-                #TODO adapt so that the discriminator can be trained in more iteration than the generator
+
                 _,summary_str, d_loss = self.sess.run([self.d_optim,self.d_sum, self.d_loss],
-                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt}) #,self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)}
+                                                       feed_dict={self.g_input: batch_input, self.gt_images: batch_gt, self.noise_real:random.uniform(0.7,1.2)}) #,self.noise_fake:random.uniform(0, 0.1),self.noise_real:random.uniform(0.9, 1)}
                 self.writer.add_summary(summary_str, counter)
                 # update G network
                 #print("Before G run ", self.g_input,batch_input.shape)
