@@ -36,3 +36,5 @@ dim_gt_image: [256,256,4]
 
 add_discri_white_noise: false #boolean if True white noise is added to the input data
 add_relu_after_noise: true
+
+add_discri_noise: true #if set to true add_discri_white_noise should be set to false !!!!

@@ -75,7 +75,10 @@ class GAN():
             d_activation = model_yaml["d_activation"]
         with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
-
+            if model_yaml["add_discri_noise"]:
+                x=GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(discri_input)
+            else:
+                x=discri_input
             # layer 1
             x = ZeroPadding2D(
                 padding=(1, 1))(discri_input)
@@ -297,7 +300,7 @@ class GAN():
                                               self.real_label_smoothing[1])  # Add noise on the loss
                 d_noise_fake = random.uniform(self.fake_label_smoothing[0],
                                               self.fake_label_smoothing[1])  # Add noise on the loss
-                if epoch not in [i for i in range(1,self.ite_train_g)]:
+                if epoch not in [i for i in self.ite_train_g]:
                     _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_sum, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
                                                                   self.noise_real: d_noise_real,
