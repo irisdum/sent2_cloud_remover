@@ -125,6 +125,7 @@ def rescaling_combined_methods(array_dataX, array_label, dict_band_X, dict_band_
 
     return rescaled_arrayX,rescaled_label
 
+
 def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,dict_rescale_type=None):
     """Rescale combined on a batch of images"""
     batch_size=batch_X.shape[0]
@@ -196,3 +197,5 @@ def image_rescaling(data, dict_band, dict_stats, rescale_fun):
         for b_index in dict_band[band]:
             new_array[:, :, b_index] = rescale_fun(data[:, :, b_index], dict_stats[band][0], dict_stats[band][1])
     return new_array
+
+
