@@ -35,4 +35,4 @@ d_activation: "relu" #could alos be lrelu
 dim_gt_image: [256,256,4]
 
 add_discri_white_noise: false #boolean if True white noise is added to the input data
-
+add_relu_after_noise: true

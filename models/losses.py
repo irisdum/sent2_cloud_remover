@@ -245,6 +245,7 @@ def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
 def discriminator_loss2(D_output_real,D_output_fake): #TODO add sigmoid func
     return  -tf.reduce_mean(tf.log(D_output_real)), -tf.reduce_mean(tf.log(1 - D_output_fake))
 
+
 def discriminator_loss(D_output_real,D_output_fake):
     """Is equivalent to maximise E(log(D(x,y))+ E(log(1-D(5(x,z),y))
     """
@@ -263,8 +264,9 @@ def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
         tf.nn.sigmoid_cross_entropy_with_logits(logits=D_output_fake, labels=noise_fake*tf.ones_like(D_output_fake)))
     return d_loss_real, d_loss_fake
 
+
 def load_loss(loss_name):
-    if loss_name=="total_generatot_loss":
+    if loss_name=="total_generator_loss":
         return total_generatot_loss
     elif loss_name=="noisy_discriminator_loss":
         return noisy_discriminator_loss
