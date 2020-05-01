@@ -170,6 +170,7 @@ class GAN():
         if self.model_yaml["add_discri_white_noise"]:
             print("We add Gaussian Noise")
             new_gt= GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(self.gt_images)
+
         else:
             new_gt= self.gt_images
         D_input_real=tf.concat([new_gt,self.g_input],axis=-1)  #input in the discriminator correspond to a pair of s2 images
@@ -217,8 +218,8 @@ class GAN():
         g_cycle_loss_sum=tf.summary.scalar("g_cycle_loss",cycle_loss)
         g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
         g_image_summary = tf.summary.image("image_gene",self.fake_images,max_outputs=self.batch_size)
-        d_fake_image_sum=tf.summary.image("d_output_fake",D_output_fake,max_outputs=self.batch_size)
-        d_real_image_sum=tf.summary.image("d_output_real",D_output_real,max_outputs=self.batch_size)
+        d_fake_image_sum=tf.summary.image("d_output_fake",255*D_output_fake,max_outputs=self.batch_size)
+        d_real_image_sum=tf.summary.image("d_output_real",255*D_output_real,max_outputs=self.batch_size)
         g_layer_one=tf.summary.histogram("g_layerone",self.g_input)
         g_layer_last=tf.summary.histogram("g_layer_last",G)
         d_layer_one_fake=tf.summary.histogram("d_layer_one_fake",D_input_fake)
