@@ -217,8 +217,8 @@ class GAN():
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
                                           reuse=True)
         """ Summary """
-        # noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
-        # noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
+        d_noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
+        d_noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
         d_loss_real_sum = tf.summary.scalar("d_loss_real", d_loss_real)
         d_loss_fake_sum = tf.summary.scalar("d_loss_fake", d_loss_fake)
         d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
@@ -240,7 +240,7 @@ class GAN():
                       gt_image_summary]
         list_d_sum = [d_loss_fake_sum, d_loss_real_sum, d_loss_sum, d_layer_last_fake, d_layer_last_real,
                       d_layer_one_fake,
-                      d_layer_one_real, d_real_image_sum, d_fake_image_sum, d_sigma_val]
+                      d_layer_one_real, d_real_image_sum, d_fake_image_sum, d_sigma_val,d_noise_fake_sum,d_noise_real_sum]
 
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
