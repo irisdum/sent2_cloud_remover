@@ -76,7 +76,7 @@ class GAN():
         with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
             if model_yaml["add_discri_noise"]:
-                x=GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(discri_input)
+                x=GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"],name="d_GaussianNoise")(discri_input)
             else:
                 x=discri_input
             # layer 1
@@ -147,7 +147,7 @@ class GAN():
             for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
                 x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
                            padding=model_yaml["padding"],
-                           activation="relu")(x)
+                           activation="relu",name="g_conv_after_resnetblock{}".format(i))(x)
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="g_after_resnetblock{}_bn2".format(i))(x)
             # The last layer
