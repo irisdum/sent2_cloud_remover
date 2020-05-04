@@ -67,7 +67,7 @@ class GAN():
         self.sigma_decay = train_yaml["sigma_decay"]
         self.ite_train_g=train_yaml["train_g_multiple_time"]
 
-    def discriminator(self, discri_input, model_yaml, print_summary=True, reuse=False, is_training=True):
+    def discriminator(self, discri_input, model_yaml, print_summary=False, reuse=False, is_training=True):
 
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.keras.activations.relu(x, alpha=model_yaml["lrelu_alpha"])
@@ -81,23 +81,23 @@ class GAN():
                 x=discri_input
             # layer 1
             x = ZeroPadding2D(
-                padding=(1, 1))(discri_input)
+                padding=(1, 1),name="d_pad_0")(discri_input)
             x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv1")(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn1")(x)
             # layer 2
-            x = ZeroPadding2D(padding=(1, 1))(x)
+            x = ZeroPadding2D(padding=(1, 1),name="d_pad2")(x)
             x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv2")(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn2")(x)
             # layer 3
-            x = ZeroPadding2D(padding=(1, 1))(x)
-            x = Conv2D(256, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv3")(x)
+            x = ZeroPadding2D(padding=(1, 1),name="d_pad3")(x)
+            x = Conv2D(256, 4, padding="valid",activation=d_activation, strides=(2, 2), name="d_conv3")(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn3")(x)
             # layer 4
-            x = ZeroPadding2D(padding=(1, 1))(x)
+            x = ZeroPadding2D(padding=(1, 1),name="d_pad4")(x)
             x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1), name="d_conv4")(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn4")(x)
             # layer 3
-            x = ZeroPadding2D(padding=(1, 1))(x)
+            x = ZeroPadding2D(padding=(1, 1),name="d_pad5")(x)
             x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1), name="d_conv5")(x)
             #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn5")(x)
             if model_yaml["d_last_activ"]=="sigmoid":
@@ -178,9 +178,9 @@ class GAN():
         self.sigma_val = tf.Variable(0.2)
         if self.model_yaml["add_discri_white_noise"]:
             print("We add Gaussian Noise")
-            new_gt = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"])(self.gt_images)
+            new_gt = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"],name="d_inputGN")(self.gt_images)
             if self.model_yaml["add_relu_after_noise"]:
-                new_gt = tf.keras.layers.Activation(lambda x: tf.keras.activations.tanh(x))(new_gt)
+                new_gt = tf.keras.layers.Activation(lambda x: tf.keras.activations.tanh(x),name="d_before_activ")(new_gt)
         else:
             new_gt = self.gt_images
 
@@ -219,6 +219,7 @@ class GAN():
                 .minimize(self.g_loss, var_list=g_vars)
 
         print("D optim", d_vars)
+        print("G_optim",g_vars)
 
         # for test
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
