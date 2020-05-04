@@ -33,6 +33,6 @@ sigma_decay: 0.5 # multiply
 sigma_step: 10 #every sigma_step iteration sigma decrease from sigma_decay
 
 ##LOSS
-generator_loss: total_generatot_loss # corresponds to maximize log(D(G(x))+L1 loss
+generator_loss: total_generatot_loss # corresponds to maximize log(D(G(x))+L1 loss  could be wasserstein_generator_loss
 discriminator_loss: noisy_discriminator_loss  #It is more sigmoid_cross_entropy with label a random number between
-#real_label_smoothing and discri_label_smoothing
+#real_label_smoothing and discri_label_smoothing could be wasserstein_discriminator_loss
