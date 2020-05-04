@@ -51,9 +51,13 @@ class GAN():
         self.saving_step = train_yaml["saving_step"]
 
         # LOSSES
-        self.generator_loss = load_loss(train_yaml["generator_loss"])
-        print(self.generator_loss)
-        self.discriminator_loss = load_loss(train_yaml["discriminator_loss"])
+        self.wasserstein = train_yaml["wasserstein"]
+        if self.wasserstein:
+            self.generator_loss=load_loss("wasser_gene_loss")
+            self.discriminator_loss=load_loss("wasser_discri_loss")
+        else:
+            self.generator_loss = load_loss(train_yaml["generator_loss"])
+            self.discriminator_loss = load_loss(train_yaml["discriminator_loss"])
         print(self.discriminator_loss)
         # test
         self.sample_num = train_yaml["n_train_image_saved"]  # number of generated images to be saved
@@ -67,13 +71,14 @@ class GAN():
         self.sigma_decay = train_yaml["sigma_decay"]
         self.ite_train_g=train_yaml["train_g_multiple_time"]
 
+
     def discriminator(self, discri_input, model_yaml, print_summary=False, reuse=False, is_training=True):
 
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
             d_activation = model_yaml["d_activation"]
-            
+
         with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
             if model_yaml["add_discri_noise"]:
@@ -219,7 +224,9 @@ class GAN():
 
         print("D optim", d_vars)
         print("G_optim",g_vars)
-
+        if self.wasserstein:
+            #weight clipping
+            self.clip_D = [p.assign(tf.clip_by_value(p, -0.01, 0.01)) for p in d_vars]
         # for test
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
                                           reuse=True)
@@ -304,7 +311,15 @@ class GAN():
                 d_noise_fake = random.uniform(self.fake_label_smoothing[0],
                                               self.fake_label_smoothing[1])  # Add noise on the loss
                 if epoch not in [i for i in self.ite_train_g]:
-                    _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_sum, self.d_loss],
+                    if self.wasserstein:
+                        _,_, summary_str, d_loss = self.sess.run([self.d_optim,self.clip_D, self.d_sum, self.d_loss],
+                                                               feed_dict={self.g_input: batch_input,
+                                                                          self.gt_images: batch_gt,
+                                                                          self.noise_real: d_noise_real,
+                                                                          self.noise_fake: d_noise_fake,
+                                                                          self.sigma_val: sigma_val})
+                    else:
+                        _, summary_str, d_loss = self.sess.run([self.d_optim, self.d_sum, self.d_loss],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt,
                                                                   self.noise_real: d_noise_real,
                                                                   self.noise_fake: d_noise_fake,
@@ -455,3 +470,5 @@ class GAN():
 
     def visualize_results(self, epoch):
         pass
+
+

@@ -270,13 +270,18 @@ def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
 
 
 def load_loss(loss_name):
-    assert loss_name in ["total_generator_loss","noisy_discriminator_loss","wasserstein_discriminator_loss","wasserstein_generator_loss"],"Loss {} undefined add it to load loss".format(loss_name)
+    assert loss_name in ["total_generator_loss","noisy_discriminator_loss","wasserstein_discriminator_loss","wasserstein_generator_loss"
+                         ,"wasser_gene_loss","wasser_discri_loss"],"Loss {} undefined add it to load loss".format(loss_name)
     if loss_name=="total_generator_loss":
         return total_generator_loss
     if loss_name=="wasserstein_generator_loss":
         return wasserstein_generator_loss
     if loss_name=="wasserstein_discriminator_loss":
         return wasserstein_discriminator_loss
+    if loss_name=="wasser_gene_loss":
+        return wasser_gene_loss
+    if loss_name=="wasser_discri_loss":
+        return wasser_discri_loss
     elif loss_name=="noisy_discriminator_loss":
         return noisy_discriminator_loss
 
@@ -382,3 +387,13 @@ def wasserstein_discriminator_loss(
       tf.compat.v1.summary.scalar('discriminator_wass_loss', loss)
 
   return -loss_on_real,loss_on_generated
+
+def wasser_discri_loss(D_real,D_fake,noise_real=0,noise_fake=0):
+    d_loss_real = - tf.reduce_mean(D_real)
+    d_loss_fake = tf.reduce_mean(D_fake)
+    return d_loss_real,d_loss_fake
+
+def wasser_gene_loss(real_image, fake_image, D_output_fake, val_lambda):
+    d_loss_gene=-tf.reduce_mean(D_output_fake)
+    L1_loss=calc_cycle_loss(real_image, fake_image, val_lambda)
+    return d_loss_gene,L1_loss
