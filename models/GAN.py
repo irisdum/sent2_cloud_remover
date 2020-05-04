@@ -12,7 +12,7 @@ from constant.model_constant import CHANNEL
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
 import numpy as np
-from models.losses import modified_discriminator_loss, modified_generator_loss, total_generatot_loss, \
+from models.losses import modified_discriminator_loss, modified_generator_loss, total_generator_loss, \
     discriminator_loss, generator_loss, calc_cycle_loss, noisy_discriminator_loss, discriminator_loss2, load_loss
 from ruamel import yaml
 import random
@@ -99,15 +99,17 @@ class GAN():
             # layer 3
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1), name="d_conv5")(x)
-            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn5")(x)
+            #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn5")(x)
             if model_yaml["d_last_activ"]=="sigmoid":
-                x=tf.keras.layers.Activation('sigmoid')(x)
+                x_final=tf.keras.layers.Activation('sigmoid',name="d_last_activ")(x)
+            else:
+                x_final=x
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
             model.summary()
         # self.model_discri=Model(discri_input, x, name="GAN_discriminator")
 
-        return x
+        return x,x_final
 
     def generator(self, img_input, model_yaml, is_training=True, print_summary=True, reuse=False):
 
@@ -187,8 +189,8 @@ class GAN():
         D_input_fake = tf.concat([G, self.g_input],
                                  axis=-1)  # Input correpsond to the pair of images : Ground truth and synthetized image from the generator
 
-        D_output_real = self.discriminator(D_input_real, self.model_yaml, print_summary=False, reuse=False)
-        D_output_fake = self.discriminator(D_input_fake, self.model_yaml, print_summary=False, reuse=True)
+        D_output_real,D_output_real_final = self.discriminator(D_input_real, self.model_yaml, print_summary=False, reuse=False)
+        D_output_fake,D_output_fake_final = self.discriminator(D_input_fake, self.model_yaml, print_summary=False, reuse=True)
 
         # print("concat res ",D_input_fake)
         self.noise_real = tf.Variable(1.0)
@@ -233,14 +235,14 @@ class GAN():
         g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
         g_image_summary = tf.summary.image("image_gene", self.fake_images, max_outputs=self.batch_size)
         gt_image_summary = tf.summary.image("image_gt", self.gt_images, max_outputs=self.batch_size)
-        d_fake_image_sum = tf.summary.image("d_output_fake", 255 * D_output_fake, max_outputs=self.batch_size)
-        d_real_image_sum = tf.summary.image("d_output_real", 255 * D_output_real, max_outputs=self.batch_size)
+        d_fake_image_sum = tf.summary.image("d_output_fake", 255 * D_output_fake_final, max_outputs=self.batch_size)
+        d_real_image_sum = tf.summary.image("d_output_real", 255 * D_output_real_final, max_outputs=self.batch_size)
         g_layer_one = tf.summary.histogram("g_layerone", self.g_input)
         g_layer_last = tf.summary.histogram("g_layer_last", G)
         d_layer_one_fake = tf.summary.histogram("d_layer_one_fake", D_input_fake)
         d_layer_one_real = tf.summary.histogram("d_layer_one_real", D_input_real)
-        d_layer_last_real = tf.summary.histogram("d_layer_last_real", D_output_real)
-        d_layer_last_fake = tf.summary.histogram("d_layer_last_fake", D_input_fake)
+        d_layer_last_real = tf.summary.histogram("d_layer_last_real", D_output_real_final)
+        d_layer_last_fake = tf.summary.histogram("d_layer_last_fake", D_output_fake_final)
         d_sigma_val = tf.summary.scalar("d_sigma_val", self.sigma_val)
         list_g_sum = [g_loss_sum, g_cycle_loss_sum, g_loss_sum_tot, g_image_summary, g_layer_one, g_layer_last,
                       gt_image_summary]

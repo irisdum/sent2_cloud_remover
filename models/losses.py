@@ -242,7 +242,7 @@ def calc_cycle_loss(real_image, fake_image, val_lambda):
     return val_lambda * loss1
 
 
-def total_generatot_loss(real_image,fake_image,D_output_fake,val_lambda):
+def total_generator_loss(real_image, fake_image, D_output_fake, val_lambda):
     return generator_loss(D_output_fake),calc_cycle_loss(real_image,fake_image,val_lambda)
 
 
@@ -272,7 +272,7 @@ def noisy_discriminator_loss(D_output_real,D_output_fake,noise_real,noise_fake):
 def load_loss(loss_name):
     assert loss_name in ["total_generator_loss","noisy_discriminator_loss","wasserstein_discriminator_loss","wasserstein_generator_loss"],"Loss {} undefined add it to load loss".format(loss_name)
     if loss_name=="total_generator_loss":
-        return total_generatot_loss
+        return total_generator_loss
     if loss_name=="wasserstein_generator_loss":
         return wasserstein_generator_loss
     if loss_name=="wasserstein_discriminator_loss":
