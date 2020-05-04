@@ -29,7 +29,7 @@ do_rate: 0.5
 
 lrelu_alpha: 0.1 #useful only if lrelu
 d_activation: "relu" #could alos be lrelu
-
+d_last_activ: sigmoid
 
 # Syntethized image_dim
 dim_gt_image: [256,256,4]

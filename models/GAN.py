@@ -100,7 +100,8 @@ class GAN():
             x = ZeroPadding2D(padding=(1, 1))(x)
             x = Conv2D(1, 4, padding="valid", activation=d_activation, strides=(1, 1), name="d_conv5")(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn5")(x)
-
+            if model_yaml["d_last_activ"]=="sigmoid":
+                x=tf.keras.layers.Activation('sigmoid')(x)
         if print_summary:
             model = Model(discri_input, x, name="GAN_discriminator")
             model.summary()
