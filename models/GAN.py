@@ -70,9 +70,10 @@ class GAN():
     def discriminator(self, discri_input, model_yaml, print_summary=False, reuse=False, is_training=True):
 
         if model_yaml["d_activation"] == "lrelu":
-            d_activation = lambda x: tf.keras.activations.relu(x, alpha=model_yaml["lrelu_alpha"])
+            d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
             d_activation = model_yaml["d_activation"]
+            
         with tf.compat.v1.variable_scope("discriminator", reuse=reuse):
             # discri_input=tf.keras.Input(shape=tuple(model_yaml["d_input_shape"]))
             if model_yaml["add_discri_noise"]:
