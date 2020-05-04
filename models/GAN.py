@@ -145,9 +145,7 @@ class GAN():
             for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
                 x = build_resnet_block(x, id=j)
             for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
-                x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                           padding=model_yaml["padding"],
-                           activation="relu",name="g_conv_after_resnetblock{}".format(i))(x)
+                x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),padding=model_yaml["padding"],activation="relu",name="g_conv_after_resnetblock{}".format(i))(x)
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="g_after_resnetblock{}_bn2".format(i))(x)
             # The last layer
