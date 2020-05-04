@@ -381,4 +381,4 @@ def wasserstein_discriminator_loss(
       tf.compat.v1.summary.scalar('discriminator_real_wass_loss', loss_on_real)
       tf.compat.v1.summary.scalar('discriminator_wass_loss', loss)
 
-  return loss_on_generated,-loss_on_real
+  return -loss_on_real,loss_on_generated
