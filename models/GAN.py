@@ -241,6 +241,7 @@ class GAN():
         g_cycle_loss_sum = tf.summary.scalar("g_cycle_loss", cycle_loss)
         g_loss_sum_tot = tf.summary.scalar("g_loss_tot", self.g_loss)
         g_image_summary = tf.summary.image("image_gene", self.fake_images, max_outputs=self.batch_size)
+        G_summary = tf.summary.image("G",G, max_outputs=self.batch_size)
         gt_image_summary = tf.summary.image("image_gt", self.gt_images, max_outputs=self.batch_size)
         d_fake_image_sum = tf.summary.image("d_output_fake", 255 * D_output_fake_final, max_outputs=self.batch_size)
         d_real_image_sum = tf.summary.image("d_output_real", 255 * D_output_real_final, max_outputs=self.batch_size)
@@ -252,7 +253,7 @@ class GAN():
         d_layer_last_fake = tf.summary.histogram("d_layer_last_fake", D_output_fake_final)
         d_sigma_val = tf.summary.scalar("d_sigma_val", self.sigma_val)
         list_g_sum = [g_loss_sum, g_cycle_loss_sum, g_loss_sum_tot, g_image_summary, g_layer_one, g_layer_last,
-                      gt_image_summary]
+                      gt_image_summary,G_summary]
         list_d_sum = [d_loss_fake_sum, d_loss_real_sum, d_loss_sum, d_layer_last_fake, d_layer_last_real,
                       d_layer_one_fake,
                       d_layer_one_real, d_real_image_sum, d_fake_image_sum, d_sigma_val,d_noise_fake_sum,d_noise_real_sum,
