@@ -79,12 +79,12 @@ class GAN():
 
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
-
+        D_input=tf.concat([G, self.g_input],axis=-1)
         # The discriminator takes generated images as input and determines validity
-        D_output_fake= self.discriminator(G)
+        D_output= self.discriminator(D_input)
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model(self.g_input, D_output_fake)
+        self.combined = Model(self.g_input, D_output)
         self.combined.compile(loss='binary_crossentropy', optimizer=self.g_optimizer)
 
 
@@ -131,8 +131,8 @@ class GAN():
         x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
         model_gene=Model(img_input,x)
-        model_gene.summary()
-        return print(model_gene)
+        print(model_gene.summary())
+        return model_gene
 
     def build_discriminator(self,model_yaml,discri_input,is_training=True):
         if model_yaml["d_activation"] == "lrelu":
@@ -198,12 +198,10 @@ class GAN():
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input)
-                D_input_real = tf.concat([batch_gt, self.g_input],
-                                         axis=-1)
-                D_input_fake = tf.concat([gen_imgs, self.g_input], axis=-1)
-                print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
-                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real*valid)
-                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
+
+                #print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
+                d_loss_real = self.discriminator.train_on_batch(batch_gt, d_noise_real*valid)
+                d_loss_fake = self.discriminator.train_on_batch(gen_imgs, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, valid)
