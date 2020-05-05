@@ -12,7 +12,7 @@ def main(path_train,path_model):
         train_yaml=open_yaml(path_train)
 
         gan=GAN.GAN(train_yaml,open_yaml(path_model),sess)
-        gan.build_model2()
+        gan.build_model()
         model_dir=gan.model_dir
         training_dir=gan.this_training_dir
         saving_yaml(path_model,model_dir)
