@@ -4,7 +4,7 @@ import random
 import time
 from ruamel import yaml
 import tensorflow as tf
-import tensorflow.python.keras as keras
+import tensorflow.keras as keras
 from tensorflow.keras.layers import Input, Dense, Reshape, Flatten, Dropout,Add
 from tensorflow.keras.layers import BatchNormalization, Activation, ZeroPadding2D,ReLU, GaussianNoise
 from tensorflow.keras.layers.advanced_activations import LeakyReLU
