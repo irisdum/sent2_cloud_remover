@@ -132,7 +132,7 @@ class GAN():
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
         model_gene=Model(img_input,x)
         model_gene.summary()
-        return model_gene
+        return print(model_gene)
 
     def build_discriminator(self,model_yaml,discri_input,is_training=True):
         if model_yaml["d_activation"] == "lrelu":
@@ -171,7 +171,7 @@ class GAN():
         else:
             x_final = x
         model_discri=Model(discri_input,x_final)
-        model_discri.summary()
+        print(model_discri.summary())
         return model_discri
 
 
@@ -186,7 +186,7 @@ class GAN():
         sigma_val = self.sigma_init
         start_batch_id = 0
         for epoch in range(0, self.epoch):
-
+            print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
                 d_noise_real = random.uniform(self.real_label_smoothing[0],
                                               self.real_label_smoothing[1])  # Add noise on the loss
@@ -201,7 +201,7 @@ class GAN():
                 D_input_real = tf.concat([batch_gt, self.g_input],
                                          axis=-1)
                 D_input_fake = tf.concat([gen_imgs, self.g_input], axis=-1)
-                print(D_input_real.shape, D_input_fake.shape)
+                print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real*valid)
                 d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
