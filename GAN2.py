@@ -65,10 +65,10 @@ class GAN():
             shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
             name="Input_data")  # the input of the label of the generator
 
-        discri_input = tf.keras.backend.placeholder(shape=tuple([self.batch_size] + [256,256,8]),
+        discri_input = tf.keras.backend.placeholder(shape=tuple([self.batch_size]+[256,256,8]),
                                                      name="GT_image") #TODO implement more general
-
         # Build and compile the discriminator
+        print("discri input ",discri_input)
         self.discriminator = self.build_discriminator(self.model_yaml,discri_input)
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=self.d_optimizer,
