@@ -281,11 +281,7 @@ class GAN():
         self.g_sum = tf.summary.merge(list_g_sum)
         self.d_sum = tf.summary.merge(list_d_sum)
 
-    def train(self):
-        create_safe_directory(self.saving_image_path)
-        # initialize all variables
-        tf.compat.v1.global_variables_initializer().run()
-        # graph inputs for visualize training results
+        # SAVING KEYS
         self.sample_z = np.resize(self.data_X[1, :, :, :],
                                   (1, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]))  # to visualize
 
@@ -294,6 +290,14 @@ class GAN():
 
         # summary writer
         self.writer = tf.compat.v1.summary.FileWriter(self.saving_logs_path, self.sess.graph)
+
+
+    def train(self):
+        create_safe_directory(self.saving_image_path)
+        # initialize all variables
+        tf.compat.v1.global_variables_initializer().run()
+        # graph inputs for visualize training results
+
         # ## Create the tensorboard logdir
         # tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.log_dir)
 
