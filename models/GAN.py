@@ -212,29 +212,29 @@ class GAN():
         d_vars = [var for var in t_vars if 'd_' in var.name]
         g_vars = [var for var in t_vars if 'g_' in var.name]
         # print(d_vars,g_vars)
-
+        #d_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1)
+        #g_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate*self.fact_g_lr, beta1=self.beta1)
         # optimizers
-        with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
-            self.d_gradient=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
-            self.d_loss, var_list=d_vars)
-            self.d_optim=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).apply_gradients(self.d_gradient, name="apply_gradient")
-            self.g_gradient=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
-            self.g_loss, var_list=g_vars)
-            self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).apply_gradients(self.g_gradient,name="g_apply_gradient")
-            print("G gradient",self.g_gradient)
+        # with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
+        #     self.d_gradient=d_optimizer.compute_gradients(
+        #     self.d_loss, var_list=d_vars)
+        #     self.d_optim=d_optimizer.apply_gradients(self.d_gradient, name="apply_gradient")
+        #     self.g_gradient=g_optimizer.compute_gradients(self.g_loss, var_list=g_vars)
+        #     self.g_optim = g_optimizer.apply_gradients(self.g_gradient,name="g_apply_gradient")
+        #     print("G gradient",self.g_gradient)
 
             #self.d_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
              #   .minimize(self.d_loss, var_list=d_vars)
             #self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
              #   .minimize(self.g_loss, var_list=g_vars)
         ##TO TES DEMAIN
-        # with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-        #     gradients_of_generator = gen_tape.gradient(self.d_loss, d_vars)
-        #     gradients_of_discriminator = disc_tape.gradient(self.g_loss, g_vars)
-        #     discriminator_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1)
-        #     generator_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1)
-        #     generator_optimizer.apply_gradients(zip(gradients_of_generator, g_vars))
-        #     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator,d_vars))
+        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+             gradients_of_generator = gen_tape.gradient(self.g_loss, g_vars)
+             gradients_of_discriminator = disc_tape.gradient(self.d_loss, d_vars)
+             d_optimizer = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1)
+             g_optimizer = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1)
+             self.g_optim=g_optimizer.apply_gradients(zip(gradients_of_generator, g_vars))
+             self.d_optim=d_optimizer.apply_gradients(zip(gradients_of_discriminator,d_vars))
 
         print("D vars", d_vars)
         print("G_vars",g_vars)
