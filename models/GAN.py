@@ -466,7 +466,8 @@ class GAN():
 
                 # save training results for every N steps
                 if np.mod(counter, self.saving_step) == 0:
-                    samples = self.sess.run(self.fake_images, feed_dict={self.g_input: self.sample_z})
+                    #samples = self.sess.run(self.fake_images, feed_dict={self.g_input: self.sample_z})
+                    samples=self.fake_images
                     tot_num_samples = min(self.sample_num, self.batch_size)
                     manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                     manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
