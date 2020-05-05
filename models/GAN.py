@@ -215,12 +215,12 @@ class GAN():
 
         # optimizers
         with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
-            self.d_gradient= tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
+            self.d_gradient=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
             self.d_loss, var_list=d_vars)
-            self.d_optim=tf.compat.v1.train.AdamOptimizer.apply_gradients(self.d_gradient, name="apply_gradient")
+            self.d_optim=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).apply_gradients(self.d_gradient, name="apply_gradient")
             self.g_gradient=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
             self.g_loss, var_list=g_vars)
-            self.g_optim = tf.compat.v1.train.AdamOptimizer.apply_gradients(self.g_gradient,name="g_apply_gradient")
+            self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).apply_gradients(self.g_gradient,name="g_apply_gradient")
             #self.d_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
              #   .minimize(self.d_loss, var_list=d_vars)
             #self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
