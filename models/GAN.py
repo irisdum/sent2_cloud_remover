@@ -245,10 +245,10 @@ class GAN():
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
                                           reuse=True)
         """ Summary """
-        g_grad0=tf.summary.histogram("g_gradient_init".format(self.g_gradient[0][1]),self.g_gradient[0][0])
-        g_grad_final=tf.summary.histogram("g_gradient_fin".format(self.g_gradient[0][1]),self.g_gradient[-1][0])
-        d_grad0 = tf.summary.histogram("d_gradient_init".format(self.d_gradient[0][1]), self.d_gradient[0][0])
-        d_grad_final = tf.summary.histogram("d_gradient_fin".format(self.d_gradient[-1][1]), self.d_gradient[-1][0])
+        #g_grad0=tf.summary.histogram("g_gradient_init".format(self.g_gradient[0][1]),self.g_gradient[0][0])
+        #g_grad_final=tf.summary.histogram("g_gradient_fin".format(self.g_gradient[0][1]),self.g_gradient[-1][0])
+        #d_grad0 = tf.summary.histogram("d_gradient_init".format(self.d_gradient[0][1]), self.d_gradient[0][0])
+        #d_grad_final = tf.summary.histogram("d_gradient_fin".format(self.d_gradient[-1][1]), self.d_gradient[-1][0])
         d_gt_sum=tf.summary.histogram("d_input_gt",new_gt)
         d_noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
         d_noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
@@ -271,11 +271,11 @@ class GAN():
         d_layer_last_fake = tf.summary.histogram("d_layer_last_fake", D_output_fake_final)
         d_sigma_val = tf.summary.scalar("d_sigma_val", self.sigma_val)
         list_g_sum = [g_loss_sum, g_cycle_loss_sum, g_loss_sum_tot, g_image_summary, g_layer_one, g_layer_last,
-                      gt_image_summary,G_summary,g_grad0,g_grad_final]
+                      gt_image_summary,G_summary]
         list_d_sum = [d_loss_fake_sum, d_loss_real_sum, d_loss_sum, d_layer_last_fake, d_layer_last_real,
                       d_layer_one_fake,
                       d_layer_one_real, d_real_image_sum, d_fake_image_sum, d_sigma_val,d_noise_fake_sum,d_noise_real_sum,
-                      d_gt_sum,d_grad0,d_grad_final]
+                      d_gt_sum]
 
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
