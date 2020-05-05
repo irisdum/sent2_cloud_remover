@@ -331,7 +331,7 @@ class GAN():
                                               self.fake_label_smoothing[1])  # Add noise on the loss
                 if epoch not in [i for i in self.ite_train_g]:
                     if self.wasserstein:
-                        _,_, summary_str, d_loss = self.sess.run([self.d_optim,self.clip_D, self.d_sum, self.d_loss],
+                        _,_, summary_str, d_loss= self.sess.run([self.d_optim,self.clip_D, self.d_sum, self.d_loss],
                                                                feed_dict={self.g_input: batch_input,
                                                                           self.gt_images: batch_gt,
                                                                           self.noise_real: d_noise_real,
@@ -346,7 +346,7 @@ class GAN():
                     self.writer.add_summary(summary_str, counter)
                 # update G network
                 # print("Before G run ", self.g_input,batch_input.shape)
-                _, summary_str, g_loss = self.sess.run([self.g_optim, self.g_sum, self.g_loss],
+                _, summary_str, g_loss,fake_im = self.sess.run([self.g_optim, self.g_sum, self.g_loss,self.fake_images],
                                                        feed_dict={self.g_input: batch_input, self.gt_images: batch_gt})
 
                 self.writer.add_summary(summary_str, counter)
@@ -358,7 +358,8 @@ class GAN():
 
                 # save training results for every N steps
                 if np.mod(counter, self.saving_step) == 0:
-                    samples = self.sess.run(self.fake_images, feed_dict={self.g_input: self.sample_z})
+                    #samples = self.sess.run(self.fake_images, feed_dict={self.g_input: self.sample_z})
+                    samples=fake_im
                     tot_num_samples = min(self.sample_num, self.batch_size)
                     manifold_h = int(np.floor(np.sqrt(tot_num_samples)))
                     manifold_w = int(np.floor(np.sqrt(tot_num_samples)))
