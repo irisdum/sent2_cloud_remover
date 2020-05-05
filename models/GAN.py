@@ -286,7 +286,7 @@ class GAN():
         # initialize all variables
         tf.compat.v1.global_variables_initializer().run()
         # graph inputs for visualize training results
-        self.sample_z = np.resize(self.data_X[0, :, :, :],
+        self.sample_z = np.resize(self.data_X[1, :, :, :],
                                   (1, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]))  # to visualize
 
         # saver to save model
