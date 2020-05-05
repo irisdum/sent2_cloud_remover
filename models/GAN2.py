@@ -1,7 +1,8 @@
 # Keras Implementation of GAN
+import os
 import random
 import time
-
+from ruamel import yaml
 import tensorflow as tf
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout,Add
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D,ReLU, GaussianNoise
@@ -209,9 +210,18 @@ class GAN():
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path,ite=epoch)
 
+def saving_yaml(path_yaml,output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    os.system("cp {} {}".format(path_yaml,output_dir))
+
+def open_yaml(path_yaml):
+    with open(path_yaml) as f:
+        return yaml.load(f)
+
 if __name__ == '__main__':
     path_train="./GAN_confs/train.yaml"
     path_model="./GAN_confs/model.yaml"
-    gan = GAN(path_model,path_train)
+    gan = GAN(open_yaml(path_model),open_yaml(path_train))
     gan.build_model()
     gan.train()
