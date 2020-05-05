@@ -243,10 +243,10 @@ class GAN():
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
                                           reuse=True)
         """ Summary """
-        g_grad0=tf.summary.histogram("g_grad0",self.g_gradient[0][0],"g_gradient_".format(self.g_gradient[0][1]))
-        g_grad_final=tf.summary.histogram("g_grad_fin",self.g_gradient[-1][0],"g_gradient_".format(self.g_gradient[-1][1]))
-        d_grad0 = tf.summary.histogram("d_grad0", self.d_gradient[0][0], "d_gradient_".format(self.d_gradient[0][1]))
-        d_grad_final = tf.summary.histogram("d_grad_fin", self.d_gradient[-1][0],"d_gradient_".format(self.d_gradient[-1][1]))
+        g_grad0=tf.summary.histogram("g_gradient_".format(self.g_gradient[0][1]),self.g_gradient[0][0])
+        g_grad_final=tf.summary.histogram("g_gradient_".format(self.g_gradient[0][1]),self.g_gradient[-1][0])
+        d_grad0 = tf.summary.histogram("d_gradient_".format(self.d_gradient[0][1]), self.d_gradient[0][0])
+        d_grad_final = tf.summary.histogram("d_gradient_".format(self.d_gradient[-1][1]), self.d_gradient[-1][0])
         d_gt_sum=tf.summary.histogram("d_input_gt",new_gt)
         d_noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
         d_noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
