@@ -5,11 +5,11 @@ import time
 from ruamel import yaml
 import tensorflow as tf
 import tensorflow.keras as keras
-from tensorflow.keras.layers import Input, Dense, Reshape, Flatten, Dropout,Add
-from tensorflow.keras.layers import BatchNormalization, Activation, ZeroPadding2D,ReLU, GaussianNoise
-from tensorflow.keras.layers.advanced_activations import LeakyReLU
-from tensorflow.keras.layers.convolutional import UpSampling2D, Conv2D
-from tensorflow.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout,Add
+from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D,ReLU, GaussianNoise
+#from tensorflow.keras.layers.advanced_activations import LeakyReLU
+from tensorflow.python.keras.layers.convolutional import UpSampling2D, Conv2D
+from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 
 from processing import create_safe_directory
