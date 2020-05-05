@@ -382,7 +382,7 @@ class GAN():
 
         import re
         print(" [*] Reading checkpoints...")
-        checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir, self.model_name)  # TODO modify that
+        #checkpoint_dir = os.path.join(checkpoint_dir)  # TODO modify that
 
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
