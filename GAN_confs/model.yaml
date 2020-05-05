@@ -27,7 +27,7 @@ do_rate: 0.5
 
 ## last layer activation leaky relu alpha_param
 
-lrelu_alpha: 0.1 #useful only if lrelu
+lrelu_alpha: 0.2 #useful only if lrelu
 d_activation: "relu" #could alos be lrelu
 d_last_activ: sigmoid
 

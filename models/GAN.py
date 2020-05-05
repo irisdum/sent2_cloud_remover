@@ -19,6 +19,7 @@ import random
 import os
 
 
+
 class GAN():
     def __init__(self, train_yaml, model_yaml, sess):
         """:param train_yaml,model_yaml two dictionnaries"""
