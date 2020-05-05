@@ -4,7 +4,7 @@ from ruamel import yaml
 import tensorflow as tf
 import os
 from processing import create_safe_directory
-
+import argparse
 
 def main(path_train,path_model):
 
@@ -28,7 +28,17 @@ def open_yaml(path_yaml):
     with open(path_yaml) as f:
         return yaml.load(f)
 
+def _argparser():
+    parser = argparse.ArgumentParser(description="Argument GAN train")
+    parser.add_argument('--model_path', type=str, default="./GAN_confs/model.yaml",
+                        help="path to yaml model ")
+    parser.add_argument("--train_path",type=str,default="./GAN_confs/train.yaml")
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    path_train="./GAN_confs/train.yaml"
-    path_model="./GAN_confs/model.yaml"
-    main(path_train,path_model)
+    parser=_argparser()
+    #path_train="./GAN_confs/train.yaml"
+    #path_model="./GAN_confs/model.yaml"
+    main(parser.train_path,parser.model_path)

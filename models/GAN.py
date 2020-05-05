@@ -191,11 +191,10 @@ class GAN():
         D_input_real = tf.concat([new_gt, self.g_input],
                                  axis=-1)  # input in the discriminator correspond to a pair of s2 images
         D_input_fake = tf.concat([G, self.g_input],
-                                 axis=-1)  # Input correpsond to the pair of images : Ground truth and synthetized image from the generator
-
+                                 axis=-1)  # Input correpsond to the pair of images : Ground truth and synthetized
+        # image from the generator
         D_output_real,D_output_real_final = self.discriminator(D_input_real, self.model_yaml, print_summary=False, reuse=False)
         D_output_fake,D_output_fake_final = self.discriminator(D_input_fake, self.model_yaml, print_summary=False, reuse=True)
-
         # print("concat res ",D_input_fake)
         self.noise_real = tf.Variable(1.0)
         self.noise_fake = tf.Variable(0.0)
@@ -203,7 +202,6 @@ class GAN():
                                                            self.noise_fake)
         self.d_loss = d_loss_real + d_loss_fake
         # THE GENERATOR LOSS
-
         g_loss, cycle_loss = self.generator_loss(self.gt_images, G, D_output_fake, self.val_lambda)
         self.g_loss = g_loss + cycle_loss
         print("loss g", self.g_loss)
@@ -217,13 +215,27 @@ class GAN():
 
         # optimizers
         with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
-            self.d_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
-                .minimize(self.d_loss, var_list=d_vars)
-            self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
-                .minimize(self.g_loss, var_list=g_vars)
+            self.d_gradient= tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
+            self.d_loss, var_list=d_vars)
+            self.d_optim=tf.compat.v1.train.AdamOptimizer.apply_gradients(self.d_gradient, name="apply_gradient")
+            self.g_gradient=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1).compute_gradients(
+            self.g_loss, var_list=g_vars)
+            self.g_optim = tf.compat.v1.train.AdamOptimizer.apply_gradients(self.g_gradient,name="g_apply_gradient")
+            #self.d_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1) \
+             #   .minimize(self.d_loss, var_list=d_vars)
+            #self.g_optim = tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1) \
+             #   .minimize(self.g_loss, var_list=g_vars)
+        ##TO TES DEMAIN
+        # with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+        #     gradients_of_generator = gen_tape.gradient(self.d_loss, d_vars)
+        #     gradients_of_discriminator = disc_tape.gradient(self.g_loss, g_vars)
+        #     discriminator_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate, beta1=self.beta1)
+        #     generator_optimizer=tf.compat.v1.train.AdamOptimizer(self.learning_rate * self.fact_g_lr, beta1=self.beta1)
+        #     generator_optimizer.apply_gradients(zip(gradients_of_generator, g_vars))
+        #     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator,d_vars))
 
-        print("D optim", d_vars)
-        print("G_optim",g_vars)
+        print("D vars", d_vars)
+        print("G_vars",g_vars)
         if self.wasserstein:
             #weight clipping
             self.clip_D = [p.assign(tf.clip_by_value(p, -0.01, 0.01)) for p in d_vars]
@@ -231,6 +243,10 @@ class GAN():
         self.fake_images = self.generator(self.g_input, self.model_yaml, print_summary=False, is_training=False,
                                           reuse=True)
         """ Summary """
+        g_grad0=tf.summary.histogram("g_grad0",self.g_gradient[0][0],"g_gradient_".format(self.g_gradient[0][1]))
+        g_grad_final=tf.summary.histogram("g_grad_fin",self.g_gradient[-1][0],"g_gradient_".format(self.g_gradient[-1][1]))
+        d_grad0 = tf.summary.histogram("d_grad0", self.d_gradient[0][0], "d_gradient_".format(self.d_gradient[0][1]))
+        d_grad_final = tf.summary.histogram("d_grad_fin", self.d_gradient[-1][0],"d_gradient_".format(self.d_gradient[-1][1]))
         d_gt_sum=tf.summary.histogram("d_input_gt",new_gt)
         d_noise_real_sum=tf.summary.scalar("d_loss_noise_real",self.noise_real)
         d_noise_fake_sum=tf.summary.scalar("d_loss_noise_fake",self.noise_fake)
@@ -253,11 +269,11 @@ class GAN():
         d_layer_last_fake = tf.summary.histogram("d_layer_last_fake", D_output_fake_final)
         d_sigma_val = tf.summary.scalar("d_sigma_val", self.sigma_val)
         list_g_sum = [g_loss_sum, g_cycle_loss_sum, g_loss_sum_tot, g_image_summary, g_layer_one, g_layer_last,
-                      gt_image_summary,G_summary]
+                      gt_image_summary,G_summary,g_grad0,g_grad_final]
         list_d_sum = [d_loss_fake_sum, d_loss_real_sum, d_loss_sum, d_layer_last_fake, d_layer_last_real,
                       d_layer_one_fake,
                       d_layer_one_real, d_real_image_sum, d_fake_image_sum, d_sigma_val,d_noise_fake_sum,d_noise_real_sum,
-                      d_gt_sum]
+                      d_gt_sum,d_grad0,d_grad_final]
 
         # final summary operations
         self.g_sum = tf.summary.merge(list_g_sum)
