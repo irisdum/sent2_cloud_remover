@@ -58,6 +58,7 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer=Adam(self.learning_rate,self.beta1)
         self.g_optimizer=Adam(self.learning_rate*self.fact_g_lr,self.beta1)
+
     def build_model(self):
         # Load the data
         self.g_input = tf.keras.backend.placeholder(
@@ -195,12 +196,12 @@ class GAN():
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
-
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input)
                 D_input_real = tf.concat([batch_gt, self.g_input],
                                          axis=-1)
                 D_input_fake = tf.concat([gen_imgs, self.g_input], axis=-1)
+                print(D_input_real.shape, D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real*valid)
                 d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
