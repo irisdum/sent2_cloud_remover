@@ -76,12 +76,14 @@ class GAN():
         self.generator=self.build_generator(self.model_yaml,self.g_input,is_training=True)
 
         G=self.generator(self.g_input)
-
+        print("G",G)
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
         D_input=tf.concat([G, self.g_input],axis=-1)
+        print("INPUT DISCRI ",D_input)
         # The discriminator takes generated images as input and determines validity
         D_output= self.discriminator(D_input)
+        print(D_output)
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         self.combined = Model(self.g_input, D_output)
