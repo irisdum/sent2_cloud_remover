@@ -8,7 +8,7 @@ import tensorflow.keras as keras
 from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout,Add
 from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D,ReLU, GaussianNoise
 #from tensorflow.keras.layers.advanced_activations import LeakyReLU
-from tensorflow.python.keras.layers.convolutional import UpSampling2D, Conv2D
+from tensorflow.python.keras.layers.convolutional import  Conv2D
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 
@@ -195,10 +195,14 @@ class GAN():
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
+
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input)
-                d_loss_real = self.discriminator.train_on_batch(batch_gt, d_noise_real*valid)
-                d_loss_fake = self.discriminator.train_on_batch(gen_imgs, d_noise_fake*fake)
+                D_input_real = tf.concat([batch_gt, self.g_input],
+                                         axis=-1)
+                D_input_fake = tf.concat([gen_imgs, self.g_input], axis=-1)
+                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real*valid)
+                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, valid)
