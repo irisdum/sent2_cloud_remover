@@ -216,17 +216,17 @@ class GAN():
 
                     D_output_fake=self.discriminator.predict(D_input_fake,steps=1)
                     D_output_real=self.discriminator.predict(D_input_real,steps=1)
-                    sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
-                    sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
-                    sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
-                    sum_g_loss=tf.summary.scalar("g_loss",g_loss)
-                    sum_G=tf.summary.image("G",gen_imgs)
-                    sum_h_G=tf.summary.histogramm("image_gene",gen_imgs)
-                    sum_do_fake=tf.summary.histogramm("d_output_fake",D_output_fake)
-                    sum_do_real=tf.summary.histogramm("d_output_real",D_output_real)
-                    sum_im_do_fake=tf.summary.image("D_output_fake",D_output_fake)
-                    sum_im_do_real=tf.summary.image("D_output_real",D_output_real)
-                    sum_tf=tf.summary.scalar("accuracy",d_loss[1])
+                    sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0])
+                    sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0])
+                    sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0])
+                    sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss)
+                    sum_G=tf.compat.v2.summary.image("G",gen_imgs)
+                    sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs)
+                    sum_do_fake=tf.compat.v2.summary.histogramm("d_output_fake",D_output_fake)
+                    sum_do_real=tf.compat.v2.summary.histogramm("d_output_real",D_output_real)
+                    sum_im_do_fake=tf.compat.v2.summary.image("D_output_fake",D_output_fake)
+                    sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real)
+                    sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1])
 
 
                 # If at save interval => save generated image samples
