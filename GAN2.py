@@ -65,7 +65,7 @@ class GAN():
                                                                 # write_graph=True, write_images=False,update_freq='epoch')
 
         self.build_model()
-        self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
+        #self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
     def build_model(self):
 
@@ -93,7 +93,8 @@ class GAN():
         self.combined = Model(g_input, [D_output_fake,G])
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
 
-        self.t_callback = TensorBoard(self.saving_logs_path)
+        self.t_callback = TensorBoard(log_dir=self.saving_logs_path,histogram_freq=0,batch_size=self.batch_size,
+                                      write_graph=True,write_grads=True)
         self.t_callback.set_model(self.combined)
 
 
