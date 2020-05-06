@@ -4,7 +4,7 @@ import tensorflow as tf
 
 def write_log(callback, names, logs, batch_no):
     for name, value in zip(names, logs):
-        summary = tf.compat.v2.Summary()
+        summary = tf.summary()
         summary_value = summary.value.add()
         summary_value.simple_value = value
         summary_value.tag = name
