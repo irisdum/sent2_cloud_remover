@@ -214,19 +214,19 @@ class GAN():
                 # Plot on tensorboard
             with self.writer.as_default():
 
-                D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
-                D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
-                sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0],steps=epoch)
-                sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0],steps=epoch)
-                sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0],steps=epoch)
-                sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,steps=epoch)
-                sum_G=tf.compat.v2.summary.image("G",gen_imgs,steps=epoch)
-                sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,steps=epoch)
-                sum_do_fake=tf.compat.v2.summary.histogramm("d_output_fake",D_output_fake,steps=epoch)
-                sum_do_real=tf.compat.v2.summary.histogramm("d_output_real",D_output_real,steps=epoch)
-                sum_im_do_fake=tf.compat.v2.summary.image("D_output_fake",D_output_fake,steps=epoch)
-                sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real,steps=epoch)
-                sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1],steps=epoch)
+                D_output_fake=self.discriminator.predict(D_input_fake,step=epoch)
+                D_output_real=self.discriminator.predict(D_input_real,step=epoch)
+                sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0],step=epoch)
+                sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0],step=epoch)
+                sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0],step=epoch)
+                sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
+                sum_G=tf.compat.v2.summary.image("G",gen_imgs,step=epoch)
+                sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,step=epoch)
+                sum_do_fake=tf.compat.v2.summary.histogramm("d_output_fake",D_output_fake,step=epoch)
+                sum_do_real=tf.compat.v2.summary.histogramm("d_output_real",D_output_real,step=epoch)
+                sum_im_do_fake=tf.compat.v2.summary.image("D_output_fake",D_output_fake,step=epoch)
+                sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real,step=epoch)
+                sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1],step=epoch)
 
 
                 # If at save interval => save generated image samples
@@ -247,5 +247,5 @@ if __name__ == '__main__':
     path_train="./GAN_confs/train.yaml"
     path_model="./GAN_confs/model.yaml"
     gan = GAN(open_yaml(path_model),open_yaml(path_train))
-    gan.build_model()
+
     gan.train()
