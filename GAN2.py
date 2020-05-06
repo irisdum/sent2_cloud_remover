@@ -11,7 +11,9 @@ from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroP
 from tensorflow.python.keras.layers.convolutional import  Conv2D
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
+from keras.callbacks import TensorBoard
 
+from models.callbacks import write_log
 from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
@@ -59,6 +61,9 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer=Adam(self.learning_rate,self.beta1)
         self.g_optimizer=Adam(self.learning_rate*self.fact_g_lr,self.beta1)
+        self.tensorboard_callback=tf.keras.callbacks.TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
+                                                                 write_graph=True, write_images=False,update_freq='epoch')
+
         self.build_model()
 
     def build_model(self):
@@ -86,9 +91,9 @@ class GAN():
         # Trains the generator to fool the discriminator
         self.combined = Model(g_input, [D_output_fake,G])
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
-        #The summary !
-        self.writer = tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
+        callback = TensorBoard(self.saving_logs_path)
+        callback.set_model(self.combined)
 
 
     def build_generator(self,model_yaml,is_training=True):
@@ -199,17 +204,14 @@ class GAN():
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size].astype(np.float32)  # the Ground Truth images
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input) #.astype(np.float32)
-                print("gen_img",gen_imgs.dtype)
-                print("batch_input",batch_input.dtype)
                 D_input_real = tf.concat([batch_gt, batch_input], axis=-1)
                 D_input_fake=  tf.concat([gen_imgs, batch_input], axis=-1)
-                #print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real*valid)
                 d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
-
+                write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
 
