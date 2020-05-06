@@ -85,7 +85,7 @@ class GAN():
         self.combined = Model(g_input, D_output_fake)
         self.combined.compile(loss='binary_crossentropy', optimizer=self.g_optimizer)
         #The summary !
-        self.writer = tf.summary.create_file_writer(self.saving_logs_path)
+        self.writer = tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
 
 
@@ -227,7 +227,7 @@ class GAN():
                     sum_im_do_fake=tf.summary.image("D_output_fake",D_output_fake)
                     sum_im_do_real=tf.summary.image("D_output_real",D_output_real)
                     sum_tf=tf.summary.scalar("accuracy",d_loss[1])
-                
+
 
                 # If at save interval => save generated image samples
                 if epoch % self.saving_step == 0:
