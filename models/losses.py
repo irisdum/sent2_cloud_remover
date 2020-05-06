@@ -399,10 +399,6 @@ def wasser_gene_loss(real_image, fake_image, D_output_fake, val_lambda):
     return d_loss_gene,L1_loss
 
 
-def L1_loss():
-    # Create a loss function that adds the MSE loss to the mean of all squared activations of a specific layer
-    def loss(y_true, y_pred):
-        return tf.reduce_mean(tf.abs(y_true - y_pred))
+def L1_loss(y_true, y_pred):
 
-    # Return a function
-    return loss
+    return tf.reduce_mean(tf.abs(y_true - y_pred))
