@@ -67,7 +67,7 @@ class GAN():
                                    optimizer=self.d_optimizer,
                                    metrics=['accuracy'])
         self.generator=self.build_generator(self.model_yaml,is_training=True)
-        g_input= Input(shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+        g_input= Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_build_model_input_data")
         G=self.generator(g_input)
         print("G",G)
@@ -132,7 +132,7 @@ class GAN():
         return model_gene
 
     def build_discriminator(self,model_yaml,is_training=True):
-        discri_input=Input(shape=tuple([self.batch_size]+[256,256,8]),name="d_input")
+        discri_input=Input(shape=tuple([256,256,8]),name="d_input")
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
@@ -204,6 +204,9 @@ class GAN():
 
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
+
+                # Plot on tensorboa
+
 
                 # If at save interval => save generated image samples
                 if epoch % self.saving_step == 0:
