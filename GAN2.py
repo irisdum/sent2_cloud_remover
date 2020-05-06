@@ -67,6 +67,7 @@ class GAN():
                                    optimizer=self.d_optimizer,
                                    metrics=['accuracy'])
         self.generator=self.build_generator(self.model_yaml,is_training=True)
+        print("Input G")
         g_input= Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_build_model_input_data")
         G=self.generator(g_input)
@@ -87,7 +88,7 @@ class GAN():
 
 
     def build_generator(self,model_yaml,is_training=True):
-        img_input = Input(shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+        img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_input_data")
         def build_resnet_block(input, id=0):
             """Define the ResNet block"""
@@ -128,7 +129,7 @@ class GAN():
         x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
         model_gene=Model(img_input,x)
-        print(model_gene.summary())
+        model_gene.summary()
         return model_gene
 
     def build_discriminator(self,model_yaml,is_training=True):
@@ -169,7 +170,7 @@ class GAN():
         else:
             x_final = x
         model_discri=Model(discri_input,x_final)
-        print(model_discri.summary())
+        model_discri.summary()
         return model_discri
 
 
@@ -205,7 +206,7 @@ class GAN():
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
 
-                # Plot on tensorboa
+                # Plot on tensorboard
 
 
                 # If at save interval => save generated image samples
