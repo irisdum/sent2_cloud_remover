@@ -211,7 +211,7 @@ class GAN():
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
 
                 # Plot the progress
-                print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
+                print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
 
                 # Plot on tensorboard
             #with self.writer.as_default():
