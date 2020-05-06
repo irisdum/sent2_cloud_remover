@@ -58,42 +58,37 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer=Adam(self.learning_rate,self.beta1)
         self.g_optimizer=Adam(self.learning_rate*self.fact_g_lr,self.beta1)
-
+        self.build_model()
     def build_model(self):
-        # Load the data
-        self.g_input = tf.keras.backend.placeholder(
-            shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
-            name="Input_data")  # the input of the label of the generator
 
-        discri_input = tf.keras.backend.placeholder(shape=tuple([self.batch_size]+[256,256,8]),
-                                                     name="GT_image") #TODO implement more general
-        # Build and compile the discriminator
-        print("discri input ",discri_input)
-        self.discriminator = self.build_discriminator(self.model_yaml,discri_input)
+        # We use the discriminator
+        self.discriminator = self.build_discriminator(self.model_yaml)
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=self.d_optimizer,
                                    metrics=['accuracy'])
-        self.generator=self.build_generator(self.model_yaml,self.g_input,is_training=True)
-
-        G=self.generator(self.g_input)
+        self.generator=self.build_generator(self.model_yaml,is_training=True)
+        g_input= Input(shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                          name="g_build_model_input_data")
+        G=self.generator(g_input)
         print("G",G)
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
-        D_input=tf.concat([G, self.g_input],axis=-1)
+        D_input=tf.concat([G, g_input],axis=-1)
         print("INPUT DISCRI ",D_input)
         # The discriminator takes generated images as input and determines validity
-        D_output= self.discriminator(D_input)
-        print(D_output)
+        D_output_fake= self.discriminator(D_input)
+        #print(D_output)
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model(self.g_input, D_output)
+        self.combined = Model(g_input, D_output_fake)
         self.combined.compile(loss='binary_crossentropy', optimizer=self.g_optimizer)
 
 
 
 
-    def build_generator(self,model_yaml,img_input,is_training=True):
-
+    def build_generator(self,model_yaml,is_training=True):
+        img_input = Input(shape=(self.batch_size, self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                          name="g_input_data")
         def build_resnet_block(input, id=0):
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
@@ -136,7 +131,8 @@ class GAN():
         print(model_gene.summary())
         return model_gene
 
-    def build_discriminator(self,model_yaml,discri_input,is_training=True):
+    def build_discriminator(self,model_yaml,is_training=True):
+        discri_input=Input(shape=tuple([self.batch_size]+[256,256,8]),name="d_input")
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
@@ -178,7 +174,7 @@ class GAN():
 
 
     def train(self):
-
+        #self.build_model()
         create_safe_directory(self.saving_image_path)
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 1))
@@ -190,11 +186,9 @@ class GAN():
         for epoch in range(0, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
-                d_noise_real = random.uniform(self.real_label_smoothing[0],
-                                              self.real_label_smoothing[1])  # Add noise on the loss
-                d_noise_fake = random.uniform(self.fake_label_smoothing[0],
-                                              self.fake_label_smoothing[1])  # Add noise on the loss
-                print(idx * self.batch_size, (idx + 1) * self.batch_size)
+                d_noise_real = random.uniform(self.real_label_smoothing[0],self.real_label_smoothing[1])  # Add noise on the loss
+                d_noise_fake = random.uniform(self.fake_label_smoothing[0],self.fake_label_smoothing[1])  # Add noise on the loss
+                #print(idx * self.batch_size, (idx + 1) * self.batch_size)
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
