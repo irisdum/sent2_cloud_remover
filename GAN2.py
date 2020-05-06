@@ -194,8 +194,8 @@ class GAN():
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size]  # the Ground Truth images
                 # Generate a batch of new images
-                gen_imgs = self.generator.predict(batch_input)
-                print("gen_img",gen_imgs)
+                gen_imgs = self.generator.predict(batch_input) #.astype(np.float32)
+                print("gen_img",gen_imgs.dtype)
                 D_input_real = tf.concat([batch_gt, batch_input], axis=-1)
                 D_input_fake=  tf.concat([gen_imgs, batch_input], axis=-1)
                 #print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
