@@ -13,7 +13,7 @@ from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from keras.callbacks import TensorBoard
 
-from models.callbacks import write_log
+#from models.callbacks import write_log
 from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
@@ -61,8 +61,8 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer=Adam(self.learning_rate,self.beta1)
         self.g_optimizer=Adam(self.learning_rate*self.fact_g_lr,self.beta1)
-        self.tensorboard_callback=tf.keras.callbacks.TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
-                                                                 write_graph=True, write_images=False,update_freq='epoch')
+        #self.tensorboard_callback=tf.keras.callbacks.TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
+                                                                # write_graph=True, write_images=False,update_freq='epoch')
 
         self.build_model()
         self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
