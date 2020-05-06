@@ -133,7 +133,7 @@ class GAN():
         return model_gene
 
     def build_discriminator(self,model_yaml,is_training=True):
-        discri_input=Input(shape=tuple([256,256,8]),name="d_input")
+        discri_input=Input(shape=tuple([256,256,12]),name="d_input")
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
         else:
