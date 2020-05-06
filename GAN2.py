@@ -84,7 +84,8 @@ class GAN():
         # Trains the generator to fool the discriminator
         self.combined = Model(g_input, D_output_fake)
         self.combined.compile(loss='binary_crossentropy', optimizer=self.g_optimizer)
-
+        #The summary !
+        self.writer = tf.summary.create_file_writer(self.saving_logs_path)
 
 
 
@@ -211,7 +212,22 @@ class GAN():
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
 
                 # Plot on tensorboard
+                with self.writer.as_default():
 
+                    D_output_fake=self.discriminator.predict(D_input_fake)
+                    D_output_real=self.discriminator.predict(D_input_real)
+                    sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
+                    sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
+                    sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
+                    sum_g_loss=tf.summary.scalar("g_loss",g_loss)
+                    sum_G=tf.summary.image("G",gen_imgs)
+                    sum_h_G=tf.summary.histogramm("image_gene",gen_imgs)
+                    sum_do_fake=tf.summary.histogramm("d_output_fake",D_output_fake)
+                    sum_do_real=tf.summary.histogramm("d_output_real",D_output_real)
+                    sum_im_do_fake=tf.summary.image("D_output_fake",D_output_fake)
+                    sum_im_do_real=tf.summary.image("D_output_real",D_output_real)
+                    sum_tf=tf.summary.scalar("accuracy",d_loss[1])
+                
 
                 # If at save interval => save generated image samples
                 if epoch % self.saving_step == 0:

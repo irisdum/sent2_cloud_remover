@@ -275,9 +275,12 @@ class GAN():
 
         # saver to save model
         self.saver = tf.compat.v1.train.Saver()
-
+        self.cp_callback = tf.keras.callbacks.ModelCheckpoint(self.checkpoint_dir,
+                                                         save_weights_only=True,
+                                                         verbose=1)
         # summary writer
-        self.writer = tf.compat.v1.summary.FileWriter(self.saving_logs_path, self.sess.graph)
+
+        writer = tf.summary.create_file_writer(self.saving_logs_path)
 
     def train(self):
         create_safe_directory(self.saving_image_path)
