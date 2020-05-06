@@ -187,8 +187,8 @@ class GAN():
         for epoch in range(0, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
-                d_noise_real = random.uniform(self.real_label_smoothing[0],self.real_label_smoothing[1])  # Add noise on the loss
-                d_noise_fake = random.uniform(self.fake_label_smoothing[0],self.fake_label_smoothing[1])  # Add noise on the loss
+                d_noise_real = np.float32(random.uniform(self.real_label_smoothing[0],self.real_label_smoothing[1]))  # Add noise on the loss
+                d_noise_fake = np.float32(random.uniform(self.fake_label_smoothing[0],self.fake_label_smoothing[1]))  # Add noise on the loss
                 #print(idx * self.batch_size, (idx + 1) * self.batch_size)
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size]  # the input
                 # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
@@ -196,6 +196,7 @@ class GAN():
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input) #.astype(np.float32)
                 print("gen_img",gen_imgs.dtype)
+                print("batch_input",batch_input.dtype)
                 D_input_real = tf.concat([batch_gt, batch_input], axis=-1)
                 D_input_fake=  tf.concat([gen_imgs, batch_input], axis=-1)
                 #print("SHAPE DISCRI INPUT",D_input_real.shape, D_input_fake.shape)
