@@ -65,6 +65,7 @@ class GAN():
                                                                  write_graph=True, write_images=False,update_freq='epoch')
 
         self.build_model()
+        self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
     def build_model(self):
 
@@ -211,18 +212,18 @@ class GAN():
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
-                write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
+
+                #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
 
                 # Plot on tensorboard
-            #with self.writer.as_default():
-
-                # D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
-                # D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
-                # sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0],step=epoch)
-                # sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0],step=epoch)
-                # sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0],step=epoch)
+                with self.writer.as_default():
+                    D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
+                    D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
+                    sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
+                    sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
+                    sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
                 # sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
                 # sum_G=tf.compat.v2.summary.image("G",gen_imgs,step=epoch)
                 # sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,step=epoch)
