@@ -225,7 +225,8 @@ class GAN():
                     sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
                     sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
                     self.writer.flush()
-
+                    summary_str=tf.summary.merge([sum_d_loss,sum_d_loss_fake,sum_d_loss_real])
+                self.writer.add_summary(summary_str)
                 # sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
                 # sum_G=tf.compat.v2.summary.image("G",gen_imgs,step=epoch)
                 # sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,step=epoch)
