@@ -12,6 +12,7 @@ from tensorflow.python.keras.layers.convolutional import  Conv2D
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 
+from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
 import matplotlib.pyplot as plt
@@ -71,6 +72,7 @@ class GAN():
         print("Input G")
         g_input= Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_build_model_input_data")
+
         G=self.generator(g_input)
         print("G",G)
         # For the combined model we will only train the generator
@@ -82,8 +84,8 @@ class GAN():
         #print(D_output)
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model(g_input, D_output_fake)
-        self.combined.compile(loss='binary_crossentropy', optimizer=self.g_optimizer)
+        self.combined = Model(g_input, [D_output_fake,G])
+        self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
         #The summary !
         self.writer = tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
@@ -212,22 +214,22 @@ class GAN():
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
 
                 # Plot on tensorboard
-            with self.writer.as_default():
+            #with self.writer.as_default():
 
-                D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
-                D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
-                sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0],step=epoch)
-                sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0],step=epoch)
-                sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0],step=epoch)
-                sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
-                sum_G=tf.compat.v2.summary.image("G",gen_imgs,step=epoch)
-                sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,step=epoch)
-                sum_do_fake=tf.compat.v2.summary.histogramm("d_output_fake",D_output_fake,step=epoch)
-                sum_do_real=tf.compat.v2.summary.histogramm("d_output_real",D_output_real,step=epoch)
-                sum_im_do_fake=tf.compat.v2.summary.image("D_output_fake",D_output_fake,step=epoch)
-                sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real,step=epoch)
-                sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1],step=epoch)
-
+                # D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
+                # D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
+                # sum_d_loss_real=tf.compat.v2.summary.scalar("d_loss_real",d_loss_real[0],step=epoch)
+                # sum_d_loss_fake=tf.compat.v2.summary.scalar("d_loss_fake",d_loss_fake[0],step=epoch)
+                # sum_d_loss=tf.compat.v2.summary.scalar("d_loss",d_loss[0],step=epoch)
+                # sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
+                # sum_G=tf.compat.v2.summary.image("G",gen_imgs,step=epoch)
+                # sum_h_G=tf.compat.v2.summary.histogramm("image_gene",gen_imgs,step=epoch)
+                # sum_do_fake=tf.compat.v2.summary.histogramm("d_output_fake",D_output_fake,step=epoch)
+                # sum_do_real=tf.compat.v2.summary.histogramm("d_output_real",D_output_real,step=epoch)
+                # sum_im_do_fake=tf.compat.v2.summary.image("D_output_fake",D_output_fake,step=epoch)
+                # sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real,step=epoch)
+                # sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1],step=epoch)
+                #
 
                 # If at save interval => save generated image samples
                 if epoch % self.saving_step == 0:
