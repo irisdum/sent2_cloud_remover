@@ -12,11 +12,8 @@ logdir: "/datastore/dum031/models/logs/"
 epoch: 50 #epoch of train of the generator
 k_step: 5 #means 5 epoch for training the discriminator before one training of generator
 batch_size: 1
-result_dir: "/datastore/dum031/trainings/training1/image_result/"
-model_dir: "/datastore/dum031/trainings/training1/"
 training_number: 1
 training_dir: "/datastore/dum031/trainings/"
-checkpoint_dir: null # if None no previous model is going to be downloaded
 # The model will be saved every saving step epoch
 saving_step: 30
 n_train_image_saved: 1

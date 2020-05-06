@@ -289,7 +289,7 @@ class GAN():
         # graph inputs for visualize training results
 
         # ## Create the tensorboard logdir
-        # tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.log_dir)
+        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.log_dir)
 
         # restore check-point if it exits
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
