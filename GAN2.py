@@ -208,7 +208,7 @@ class GAN():
                 d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake*fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
-                g_loss = self.combined.train_on_batch(batch_input, valid)
+                g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
 
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss))
