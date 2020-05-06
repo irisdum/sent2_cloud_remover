@@ -214,8 +214,8 @@ class GAN():
                 # Plot on tensorboard
                 with self.writer.as_default():
 
-                    D_output_fake=self.discriminator.predict(D_input_fake)
-                    D_output_real=self.discriminator.predict(D_input_real)
+                    D_output_fake=self.discriminator.predict(D_input_fake,steps=1)
+                    D_output_real=self.discriminator.predict(D_input_real,steps=1)
                     sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
                     sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
                     sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
