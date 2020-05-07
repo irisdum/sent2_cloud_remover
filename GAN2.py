@@ -39,6 +39,7 @@ class GAN():
         self.this_training_dir = self.model_dir + "training_{}/".format(train_yaml["training_number"])
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
+        #create_safe_directory(self.saving_logs_path)
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
         # TRAIN PARAMETER
         self.epoch = train_yaml["epoch"]
@@ -93,7 +94,7 @@ class GAN():
         # Trains the generator to fool the discriminator
         self.combined = Model(g_input, [D_output_fake,G],name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
-        create_safe_directory(self.saving_logs_path)
+
         self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0, batch_size=self.batch_size,
                                                   write_graph=True, write_grads=True)
         self.g_tensorboard_callback.set_model(self.combined)
