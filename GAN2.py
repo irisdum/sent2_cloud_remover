@@ -61,8 +61,6 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer=Adam(self.learning_rate,self.beta1)
         self.g_optimizer=Adam(self.learning_rate*self.fact_g_lr,self.beta1)
-        #self.tensorboard_callback=tf.keras.callbacks.TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
-                                                                # write_graph=True, write_images=False,update_freq='epoch')
 
         self.build_model()
         #self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
@@ -94,8 +92,8 @@ class GAN():
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
 
         self.t_callback = TensorBoard(log_dir=self.saving_logs_path,histogram_freq=0,batch_size=self.batch_size,
-                                      write_graph=True,write_grads=True)
-        self.t_callback.set_model(self.combined)
+                                      write_graph=True,write_grads=True,update_freq="epoch")
+        #self.t_callback.set_model(self.combined)
 
 
     def build_generator(self,model_yaml,is_training=True):
@@ -195,6 +193,7 @@ class GAN():
         start_time = time.time()
         sigma_val = self.sigma_init
         start_batch_id = 0
+        #dict_metric={"epoch":[],"d_loss_real":[],"d_loss_fake":[],"d_loss":[],"g_loss":[]}
         for epoch in range(0, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
@@ -217,15 +216,17 @@ class GAN():
                 #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
-                self.t_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
+                self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=self.t_callback)
+
+                #self.t_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
                 # # Plot on tensorboard
                 # with self.writer.as_default():
-                #     D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
-                #     D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
-                #     sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
-                #     sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
-                #     sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
-                #     #self.writer.flush()
+                #      D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
+                #      D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
+                #      sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
+                #      sum_d_loss_fake=tf.summary.scalar("d_loss_fake",d_loss_fake[0])
+                #      sum_d_loss=tf.summary.scalar("d_loss",d_loss[0])
+                #      self.writer.flush()
                 #     summary_str=tf.summary.merge([sum_d_loss,sum_d_loss_fake,sum_d_loss_real])
                 # self.writer.add_summary(summary_str)
                 # # sum_g_loss=tf.compat.v2.summary.scalar("g_loss",g_loss,step=epoch)
@@ -237,12 +238,13 @@ class GAN():
                 # # sum_im_do_real=tf.compat.v2.summary.image("D_output_real",D_output_real,step=epoch)
                 # # sum_tf=tf.compat.v2.summary.scalar("accuracy",d_loss[1],step=epoch)
                 # #
-
                 # If at save interval => save generated image samples
                 if epoch % self.saving_step == 0:
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path,ite=epoch)
-            self.t_callback.on_train_end(None)
+
+            #self.t_callback.on_train_end(None)
+           # self.writer.close()
 def saving_yaml(path_yaml,output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
