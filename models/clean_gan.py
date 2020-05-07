@@ -218,6 +218,9 @@ class GAN():
         sigma_val = self.sigma_init
         start_batch_id = 0
         # dict_metric={"epoch":[],"d_loss_real":[],"d_loss_fake":[],"d_loss":[],"g_loss":[]}
+        d_loss_real=[100,100] #init losses
+        d_loss_fake=[100,100]
+        d_loss=[100,100]
         for epoch in range(0, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
@@ -241,10 +244,10 @@ class GAN():
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
-
-                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
-                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
-                d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+                if epoch not in [i for i in self.ite_train_g]:
+                    d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
+                    d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
+                    d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
                 name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
