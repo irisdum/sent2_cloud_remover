@@ -94,10 +94,11 @@ class GAN():
         self.combined = Model(g_input, [D_output_fake,G])
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
 
-        self.t_callback = TensorBoard(log_dir=self.saving_logs_path,histogram_freq=0,batch_size=self.batch_size,
-                                       write_graph=True,write_grads=True)
-        self.t_callback.set_model(self.combined)
-        #self.t_callback.set_model(self.combined)
+        self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0, batch_size=self.batch_size,
+                                                  write_graph=True, write_grads=True)
+        self.g_tensorboard_callback.set_model(self.combined)
+
+        #self.g_tensorboard_callback.set_model(self.combined)
 
 
     def build_generator(self,model_yaml,is_training=True):
@@ -217,15 +218,17 @@ class GAN():
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
-                write_log(self.t_callback, ["g_crossentropy_loss","g_l1_loss"],g_loss,self.num_batches*epoch+idx)
+                name_logs=["g_crossentropy_loss", "g_l1_loss", "g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot"]
+                val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real,d_loss_fake,d_loss]
+                write_log(self.g_tensorboard_callback, name_logs,val_logs, self.num_batches * epoch + idx)
 
                 #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch,self.num_batches*epoch+idx,
                                                                                  d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
-                #self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=[self.t_callback])
+                #self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=[self.g_tensorboard_callback])
 
-                #self.t_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
+                #self.g_tensorboard_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
                 # # Plot on tensorboard
 
                 # with self.writer.as_default():
@@ -253,7 +256,7 @@ class GAN():
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path,ite=epoch)
 
-            #self.t_callback.on_train_end(None)
+            #self.g_tensorboard_callback.on_train_end(None)
            # self.writer.close()
 def saving_yaml(path_yaml,output_dir):
     if not os.path.exists(output_dir):
