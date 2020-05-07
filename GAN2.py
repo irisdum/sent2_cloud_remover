@@ -96,6 +96,7 @@ class GAN():
 
         self.t_callback = TensorBoard(log_dir=self.saving_logs_path,histogram_freq=0,batch_size=self.batch_size,
                                        write_graph=True,write_grads=True)
+        self.t_callback.set_model(self.combined)
         #self.t_callback.set_model(self.combined)
 
 
