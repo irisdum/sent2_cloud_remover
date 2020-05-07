@@ -51,3 +51,8 @@ DICT_BAND_X={"VV":[0,2],"VH":[1,3],"R":[4],"G":[5],"B":[6],"NIR":[7]}
 DICT_RESCALE={"R":"normalization","G":"normalization","B":"normalization","NIR":"normalization","VV":"standardization",
               "VH":"standardization"}
 DICT_METHOD={"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
+
+#TRAINING CONSTANT
+NAME_LOGS=[]
+PREFIX_IM="im"
+PREFIX_HIST="hist"
