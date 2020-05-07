@@ -14,6 +14,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
 #from models.callbacks import write_log
+from models.callbacks import write_log
 from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
@@ -65,6 +66,8 @@ class GAN():
         self.build_model()
         #self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
 
+
+
     def build_model(self):
 
         # We use the discriminator
@@ -92,7 +95,7 @@ class GAN():
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
 
         self.t_callback = TensorBoard(log_dir=self.saving_logs_path,histogram_freq=0,batch_size=self.batch_size,
-                                      write_graph=True,write_grads=True,update_freq="epoch")
+                                       write_graph=True,write_grads=True)
         #self.t_callback.set_model(self.combined)
 
 
@@ -184,6 +187,7 @@ class GAN():
 
 
     def train(self):
+
         #self.build_model()
         create_safe_directory(self.saving_image_path)
         # Adversarial ground truths
@@ -212,15 +216,20 @@ class GAN():
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
+                write_log(self.t_callback, ["g_crossentropy_loss","g_l1_loss"],g_loss,self.num_batches*epoch+idx)
 
                 #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
-                print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
-                self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=[self.t_callback])
+                print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch,self.num_batches*epoch+idx,
+                                                                                 d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
+                #self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=[self.t_callback])
 
                 #self.t_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
                 # # Plot on tensorboard
+
                 # with self.writer.as_default():
+                #     tf.compat.v2.summary.trace_export(name="model_combined", step=self.num_batches*epoch+idx, profiler_outdir=self.saving_logs_path)
+
                 #      D_output_fake=self.discriminator.predict(D_input_fake,steps=epoch)
                 #      D_output_real=self.discriminator.predict(D_input_real,steps=epoch)
                 #      sum_d_loss_real=tf.summary.scalar("d_loss_real",d_loss_real[0])
