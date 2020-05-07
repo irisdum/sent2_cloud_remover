@@ -11,7 +11,7 @@ from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroP
 from tensorflow.python.keras.layers.convolutional import  Conv2D
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
-from keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import TensorBoard
 
 #from models.callbacks import write_log
 from models.losses import L1_loss
