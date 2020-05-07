@@ -216,7 +216,7 @@ class GAN():
                 #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
                 # Plot the progress
                 print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0],g_loss[1]))
-                self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=self.t_callback)
+                self.combined.evaluate(x=batch_input,y=[valid,batch_gt],batch_size=self.batch_size,callbacks=[self.t_callback])
 
                 #self.t_callback.on_epoch_end(self.num_batches*epoch+idx,dict(zip(["g_loss_gan","g_loss_L1"],g_loss)))
                 # # Plot on tensorboard
