@@ -19,7 +19,8 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
         n_images = len(dict_bandX[band])
         if band in dictlabel:
             n_images += len(dictlabel[band])
-        fig, ax = plt.subplots(1, n_images, figsize=(20, 20))
+        if plot:
+            fig, ax = plt.subplots(1, n_images, figsize=(20, 20))
         for i, b_index in enumerate(dict_bandX[band]):
             if i == 0:
                 band_array = arrayX[:, :, b_index]
@@ -35,12 +36,31 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
             print("{} is also in label".format(band))
             for i, index in enumerate(dictlabel[band]):
                 band_array = np.append(band_array, arraylabel[:, :, index])
-                plot_one_band(arraylabel[:, :, index], fig, ax[i + len(dict_bandX[band]) - 1],
+                if plot:
+                    plot_one_band(arraylabel[:, :, index], fig, ax[i + len(dict_bandX[band]) - 1],
                               title="LABEL {}".format(band))
-        plt.show()
+        if plot:
+            plt.show()
         band_stat1, band_stat2 = compute_band_stats(band_array, stats)
         dict_stats.update({band: (band_stat1, band_stat2)})
     return dict_stats
+
+
+def compute_one_image_stat(array_image,dict_band,stats):
+    dict_stat={}
+    for band in dict_band:
+        band_array=array_image[:,:,dict_band[band]]
+        band_stat1,band_stat2=compute_band_stats(band_array,stats)
+        dict_stat.update({band:(band_stat1,band_stat2)})
+    return dict_stat
+
+
+def normalize_one_image(array_image,dict_band,rescale_type="normalization",dict_method=None):
+    if dict_method is None:
+        dict_method=DICT_METHOD
+    dict_stat = compute_one_image_stat(array_image,dict_band=dict_band,stats=dict_method[rescale_type])
+    rescaled_image=image_rescaling(array_image, dict_band, dict_stat, rescaling_function(rescale_type))
+    return rescaled_image
 
 
 def compute_band_stats(band_array, stats):

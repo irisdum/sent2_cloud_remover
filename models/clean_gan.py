@@ -9,7 +9,7 @@ from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropo
 from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D, ReLU, GaussianNoise
 # from tensorflow.keras.layers.advanced_activations import LeakyReLU
 from tensorflow.python.keras.layers.convolutional import Conv2D
-from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
@@ -282,6 +282,17 @@ class GAN():
             with open("{}model_generator.yaml".format(self.checkpoint_dir),"w") as yaml_file:
                 yaml_file.write(gene_yaml)
         self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
+
+    def load_generator(self,path_yaml,path_weight):
+        # load YAML and create model
+        yaml_file = open(path_yaml, 'r')
+        loaded_model_yaml = yaml_file.read()
+        yaml_file.close()
+        loaded_model = model_from_yaml(loaded_model_yaml)
+        # load weights into new model
+        loaded_model.load_weights(path_weight)
+        print("Loaded model from disk")
+        return loaded_model
 
 
 

@@ -112,7 +112,7 @@ def load_from_dir(path_dir, image_shape):
 
 
 def save_images(images, dir_path,ite=0):
-    print(images.shape)
+    #print(images.shape)
     if len(images.shape) >3:
         for i in range(images.shape[0]):
             np.save( "{}image_{}_ite{}.npy".format(dir_path, i,ite),images[i, :, :, :])
