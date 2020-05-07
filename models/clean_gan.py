@@ -40,7 +40,6 @@ class GAN():
         self.this_training_dir = self.model_dir + "training_{}/".format(train_yaml["training_number"])
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
-        # create_safe_directory(self.saving_logs_path)
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
 
         # TRAIN PARAMETER
@@ -67,7 +66,7 @@ class GAN():
         self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
 
         self.build_model()
-        # self.writer=tf.compat.v2.summary.create_file_writer(self.saving_logs_path)
+
 
     def build_model(self):
 
@@ -96,12 +95,8 @@ class GAN():
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
         print("[INFO] combiend model loss are : ".format(self.combined.metrics_names))
-        self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
-                                                  batch_size=self.batch_size,
-                                                  write_graph=True, write_grads=True)
-        self.g_tensorboard_callback.set_model(self.combined)
 
-        # self.g_tensorboard_callback.set_model(self.combined)
+
 
     def build_generator(self, model_yaml, is_training=True):
         img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
@@ -194,7 +189,7 @@ class GAN():
     def produce_noisy_input(self, input, sigma_val):
         if self.model_yaml["add_discri_white_noise"]:
             #print("[INFO] On each batch GT label we add Gaussian Noise before training discri on labelled image")
-            new_gt = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"], name="d_inputGN")(
+            new_gt = GaussianNoise(sigma_val, input_shape=self.model_yaml["dim_gt_image"], name="d_inputGN")(
                 input)
             if self.model_yaml["add_relu_after_noise"]:
                 new_gt = tf.keras.layers.Activation(lambda x: tf.keras.activations.tanh(x), name="d_before_activ")(
@@ -203,8 +198,16 @@ class GAN():
             new_gt = input
         return new_gt
 
-    def train(self):
+    def define_callback(self):
+        # Define Tensorboard callbacks
+        self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
+                                                  batch_size=self.batch_size,
+                                                  write_graph=True, write_grads=True)
+        self.g_tensorboard_callback.set_model(self.combined)
 
+    def train(self):
+        create_safe_directory(self.saving_logs_path)
+        self.define_callback()
         # self.build_model()
         create_safe_directory(self.saving_image_path)
         # Adversarial ground truths
@@ -225,14 +228,13 @@ class GAN():
                 batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
                     np.float32)  # the Ground Truth images
 
-                ################################
-                ##  TRAIN THE DISCRIMINATOR ##
-                ###############################
+                ##  TRAIN THE DISCRIMINATOR
+
                 d_noise_real = random.uniform(self.real_label_smoothing[0],
                                               self.real_label_smoothing[1])  # Add noise on the loss
                 d_noise_fake = random.uniform(self.fake_label_smoothing[0],
                                               self.fake_label_smoothing[1])  # Add noise on the loss
-                # print(idx * self.batch_size, (idx + 1) * self.batch_size)
+
                 #Create a noisy gt images
                 batch_new_gt=self.produce_noisy_input(batch_input,sigma_val)
                 # Generate a batch of new images
@@ -280,5 +282,4 @@ if __name__ == '__main__':
     path_train = "./GAN_confs/train.yaml"
     path_model = "./GAN_confs/model.yaml"
     gan = GAN(open_yaml(path_model), open_yaml(path_train))
-
     gan.train()
