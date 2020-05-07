@@ -15,8 +15,8 @@ batch_size: 1
 training_number: 1
 training_dir: "/datastore/dum031/trainings/"
 # The model will be saved every saving step epoch
-im_saving_step: 30
-weights_saving_step: 50
+saving_step: 30
+n_train_image_saved: 1
 
 #TRAIN THE GENERATOR MULTIPLE TIME
 train_g_multiple_time: [3,4,5,6,7,20,21,22,23]
@@ -29,7 +29,7 @@ sigma_init: 0.5
 sigma_decay: 0.5 # multiply
 sigma_step: 10 #every sigma_step iteration sigma decrease from sigma_decay
 
-##LOSS NOT USED WITH CLEAN_GAN
+##LOSS
 wasserstein: true
 generator_loss: total_generatot_loss # corresponds to maximize log(D(G(x))+L1 loss  could be wasserstein_generator_loss
 discriminator_loss: noisy_discriminator_loss  #It is more sigmoid_cross_entropy with label a random number between

@@ -49,7 +49,7 @@ class GAN():
         self.data_X, self.data_y = load_data(train_yaml["train_directory"])
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
-        self.saving_step = train_yaml["saving_step"]
+        self.saving_step = train_yaml["im_saving_step"]
 
         # LOSSES
         self.wasserstein = train_yaml["wasserstein"]

@@ -52,8 +52,8 @@ class GAN():
         self.data_X, self.data_y = load_data(train_yaml["train_directory"])
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
-        self.saving_step = train_yaml["saving_step"]
-
+        self.im_saving_step = train_yaml["im_saving_step"]
+        self.w_saving_step=train_yaml["weights_saving_step"]
         # REDUCE THE DISCRIMINATOR PERFORMANCE
         self.val_lambda = train_yaml["lambda"]
         self.real_label_smoothing = tuple(train_yaml["real_label_smoothing"])
@@ -263,11 +263,26 @@ class GAN():
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
                                                                                  d_loss[0], 100 * d_loss[1], g_loss[0],
                                                                                  g_loss[1]))
-                if epoch%self.sigma_step==0:
-                    sigma_val=sigma_val*self.sigma_decay
-                if epoch % self.saving_step == 0:
+
+                if epoch % self.im_saving_step == 0: #to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
+
+            if epoch % self.sigma_step == 0:
+                sigma_val = sigma_val * self.sigma_decay
+            if epoch%self.w_saving_step==0:
+                self.save_model(epoch)
+
+    def save_model(self, step):
+        checkpoint_dir = self.checkpoint_dir
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
+        if not os.path.isfile("{}model_generator.yaml".format(self.checkpoint_dir)):
+            gene_yaml = self.generator.to_yaml()
+            with open("{}model_generator.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+                yaml_file.write(gene_yaml)
+        self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
+
 
 
 def saving_yaml(path_yaml, output_dir):
