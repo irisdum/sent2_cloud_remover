@@ -267,7 +267,7 @@ class GAN():
                     sigma_val=sigma_val*self.sigma_decay
                 if epoch % self.saving_step == 0:
                     gen_imgs = self.generator.predict(batch_input)
-                    save_images(gen_imgs, self.saving_image_path, ite=epoch)
+                    save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
 
 
 def saving_yaml(path_yaml, output_dir):
