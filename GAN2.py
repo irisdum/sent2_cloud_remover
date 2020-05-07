@@ -192,6 +192,7 @@ class GAN():
 
         #self.build_model()
         create_safe_directory(self.saving_image_path)
+        create_safe_directory(self.saving_logs_path)
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30,30,1))
         fake = np.zeros((self.batch_size, 30,30,1))
