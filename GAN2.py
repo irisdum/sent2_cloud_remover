@@ -93,7 +93,7 @@ class GAN():
         # Trains the generator to fool the discriminator
         self.combined = Model(g_input, [D_output_fake,G],name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
-
+        create_safe_directory(self.saving_logs_path)
         self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0, batch_size=self.batch_size,
                                                   write_graph=True, write_grads=True)
         self.g_tensorboard_callback.set_model(self.combined)
@@ -192,7 +192,7 @@ class GAN():
 
         #self.build_model()
         create_safe_directory(self.saving_image_path)
-        create_safe_directory(self.saving_logs_path)
+
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30,30,1))
         fake = np.zeros((self.batch_size, 30,30,1))
