@@ -91,7 +91,7 @@ class GAN():
         #print(D_output)
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model(g_input, [D_output_fake,G])
+        self.combined = Model(g_input, [D_output_fake,G],name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy',L1_loss],loss_weights=[1,self.val_lambda], optimizer=self.g_optimizer)
 
         self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0, batch_size=self.batch_size,
@@ -142,7 +142,7 @@ class GAN():
         # The last layer
         x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
-        model_gene=Model(img_input,x)
+        model_gene=Model(img_input,x,name="Generator")
         model_gene.summary()
         return model_gene
 
@@ -183,7 +183,7 @@ class GAN():
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
         else:
             x_final = x
-        model_discri=Model(discri_input,x_final)
+        model_discri=Model(discri_input,x_final,name="discriminator")
         model_discri.summary()
         return model_discri
 
@@ -218,8 +218,8 @@ class GAN():
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
-                name_logs= self.combined.metrics_names+["g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot","d_acc_real","d_acc_fake","d_acc_tot"]
-                val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real[0],d_loss_fake[0],d_loss[0],d_loss_real[1],d_loss_fake[1],d_loss[1]]
+                name_logs= self.combined.metrics_names+["g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot","d_acc_real","d_acc_fake","d_acc_tot","im_g"]
+                val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real[0],d_loss_fake[0],d_loss[0],d_loss_real[1],d_loss_fake[1],d_loss[1],gen_imgs]
                 assert len(val_logs)==len(name_logs),"The name and value list of logs does not have the same lenght {} vs {}".format(name_logs,val_logs)
                 write_log(self.g_tensorboard_callback, name_logs,val_logs, self.num_batches * epoch + idx)
 
