@@ -239,7 +239,7 @@ class GAN():
                                               self.fake_label_smoothing[1])  # Add noise on the loss
 
                 #Create a noisy gt images
-                batch_new_gt=self.produce_noisy_input(batch_input,sigma_val)
+                batch_new_gt=self.produce_noisy_input(batch_gt,sigma_val)
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
