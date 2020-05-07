@@ -218,8 +218,8 @@ class GAN():
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
-                name_logs= self.combined.metrics_names+["g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot","d_acc_real","d_acc_fake","d_acc_tot","im_g"]
-                val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real[0],d_loss_fake[0],d_loss[0],d_loss_real[1],d_loss_fake[1],d_loss[1],gen_imgs]
+                name_logs= self.combined.metrics_names+["g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot","d_acc_real","d_acc_fake","d_acc_tot"]
+                val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real[0],d_loss_fake[0],d_loss[0],d_loss_real[1],d_loss_fake[1],d_loss[1]]
                 assert len(val_logs)==len(name_logs),"The name and value list of logs does not have the same lenght {} vs {}".format(name_logs,val_logs)
                 write_log(self.g_tensorboard_callback, name_logs,val_logs, self.num_batches * epoch + idx)
 
