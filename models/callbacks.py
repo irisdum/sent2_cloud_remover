@@ -8,9 +8,10 @@ def write_log(callback, names, logs, batch_no):
         summary_value = summary.value.add()
         if PREFIX_IM in name: #FOR AN IMAGE:
             summary_value.image=value
-        if PREFIX_HIST in name:
+        elif PREFIX_HIST in name:
             summary_value.histo=value
-        summary_value.simple_value = value
+        else:
+            summary_value.simple_value = value
         summary_value.tag = name
         callback.writer.add_summary(summary, batch_no)
         callback.writer.flush()

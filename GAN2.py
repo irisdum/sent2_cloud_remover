@@ -220,7 +220,7 @@ class GAN():
                 g_loss = self.combined.train_on_batch(batch_input, [valid,batch_gt])
                 name_logs=["g_crossentropy_loss", "g_l1_loss", "g_loss_tot","d_loss_real","d_loss_fake","d_loss_tot","d_acc_real","d_acc_fake","d_acc_tot"]
                 val_logs=g_loss + [g_loss[0] + 100 * g_loss[1],d_loss_real[0],d_loss_fake[0],d_loss[0],d_loss_real[1],d_loss_fake[1],d_loss[1]]
-                assert len(val_logs)==len(name_logs),"The name and value list of logs does not have the same lenght {} vs {}".format(len(name_logs),len(val_logs))
+                assert len(val_logs)==len(name_logs),"The name and value list of logs does not have the same lenght {} vs {}".format(name_logs,val_logs)
                 write_log(self.g_tensorboard_callback, name_logs,val_logs, self.num_batches * epoch + idx)
 
                 #write_log(self.tensorboard_callback,["g_loss_gan","g_loss_L1"],g_loss,self.num_batches*epoch+idx)
