@@ -26,7 +26,7 @@ def psnr_by_band(im1, im2, max_value):
 
 def batch_psnr(batch1, batch2, max_value=1):
     """Compute the psnr value on a batch of images"""
-    assert batch1.shape == batch2, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
+    assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
                                                                                                 batch2.shape)
     assert len(batch1.shape) == 4, "Wrong batch dim should be (num_batch,n,n,nchannel)"
     psnr_batch = []
@@ -37,7 +37,7 @@ def batch_psnr(batch1, batch2, max_value=1):
     return psnr_batch, np.mean(psnr_batch)
 
 def ssim_batch(batch1,batch2):
-    assert batch1.shape == batch2, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
+    assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
                                                                                                 batch2.shape)
     assert len(batch1.shape) == 4, "Wrong batch dim should be (num_batch,n,n,nchannel)"
     psnr_batch = []
