@@ -47,6 +47,7 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"])
+
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.saving_step = train_yaml["im_saving_step"]
@@ -370,6 +371,9 @@ class GAN():
 
         # save model for final step
         self.save(counter)
+
+
+
 
     def load(self, checkpoint_dir):
         if checkpoint_dir is None:

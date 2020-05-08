@@ -3,6 +3,7 @@
 import numpy as np
 from skimage.measure import compare_ssim as ssim
 
+
 def calculate_psnr(img1, img2, max_value=255):
     """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
     mse = np.mean((np.array(img1, dtype=np.float32) - np.array(img2, dtype=np.float32)) ** 2)
@@ -22,12 +23,10 @@ def psnr_by_band(im1, im2, max_value):
     return l, np.mean(l)
 
 
-
-
 def batch_psnr(batch1, batch2, max_value=1):
     """Compute the psnr value on a batch of images"""
     assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
-                                                                                                batch2.shape)
+                                                                                                      batch2.shape)
     assert len(batch1.shape) == 4, "Wrong batch dim should be (num_batch,n,n,nchannel)"
     psnr_batch = []
     for i in range(batch1.shape[0]):  # go over all the images in the batch
@@ -36,12 +35,20 @@ def batch_psnr(batch1, batch2, max_value=1):
 
     return psnr_batch, np.mean(psnr_batch)
 
-def ssim_batch(batch1,batch2):
+
+def ssim_batch(batch1, batch2):
     assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
-                                                                                                batch2.shape)
+                                                                                                      batch2.shape)
     assert len(batch1.shape) == 4, "Wrong batch dim should be (num_batch,n,n,nchannel)"
     psnr_batch = []
     for i in range(batch1.shape[0]):  # go over all the images in the batch
-        psnr_batch=ssim(batch1[i,:,:,:],batch2[i,:,:,:],multichannel=True)
-    return psnr_batch,np.mean(psnr_batch)
+        psnr_batch += [ssim(batch1[i, :, :, :], batch2[i, :, :, :], multichannel=True)]
+    return psnr_batch, np.mean(psnr_batch)
 
+
+def compute_metric(gt, gen_img):
+    _, psnr = batch_psnr(gt, gen_img)
+    _, ssim = ssim_batch(gt, gen_img)
+    l_name=["psnr", "ssim"]
+    l_val=[psnr, ssim]
+    return l_name,l_val

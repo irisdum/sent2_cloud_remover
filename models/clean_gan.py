@@ -17,7 +17,7 @@ from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
 from utils.open_yaml import open_yaml, saving_yaml
-
+from utils.metrics import batch_psnr, ssim_batch, compute_metric
 
 import numpy as np
 
@@ -47,10 +47,12 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"])
+        self.val_X, self.val_Y = load_data(train_yaml["val_directory"])
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
         self.w_saving_step=train_yaml["weights_saving_step"]
+        self.val_metric_step=train_yaml["metric_step"]
         # REDUCE THE DISCRIMINATOR PERFORMANCE
         self.val_lambda = train_yaml["lambda"]
         self.real_label_smoothing = tuple(train_yaml["real_label_smoothing"])
@@ -218,6 +220,7 @@ class GAN():
         d_loss_real=[100,100] #init losses
         d_loss_fake=[100,100]
         d_loss=[100,100]
+        l_val_name_metrics, l_val_value_metrics=[],[]
         for epoch in range(0, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
@@ -247,14 +250,6 @@ class GAN():
                     d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
                 g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
-                name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
-                                                           "d_acc_real", "d_acc_fake", "d_acc_tot"]
-                val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
-                                     d_loss_real[1], d_loss_fake[1], d_loss[1]]
-                assert len(val_logs) == len(
-                    name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
-                    name_logs, val_logs)
-                write_log(self.g_tensorboard_callback, name_logs, val_logs, self.num_batches * epoch + idx)
 
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
@@ -264,9 +259,28 @@ class GAN():
                 if epoch % self.im_saving_step == 0: #to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
+                # LOGS to print in Tensorboard
+                if epoch % self.val_metric_step==0:
+                    l_val_name_metrics,l_val_value_metrics=self.val_metric()
+                name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
 
-            if epoch % self.sigma_step == 0:
+                name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
+                                                           "d_acc_real", "d_acc_fake", "d_acc_tot"]
+                val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
+                                     d_loss_real[1], d_loss_fake[1], d_loss[1]]
+                # The metrics
+                l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
+                assert len(val_logs) == len(
+                    name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
+                    name_logs, val_logs)
+
+                write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
+                          val_logs + l_value_metrics+l_val_value_metrics,
+                          self.num_batches * epoch + idx)
+
+            if epoch % self.sigma_step == 0: #update simga
                 sigma_val = sigma_val * self.sigma_decay
+            #save the models
             if epoch%self.w_saving_step==0:
                 self.save_model(epoch)
 
@@ -291,6 +305,9 @@ class GAN():
         print("Loaded model from disk")
         return loaded_model
 
+    def val_metric(self):
+        val_pred=self.generator.predict(self.val_X)
+        return compute_metric(self.val_Y,val_pred)
 
 
 
