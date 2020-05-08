@@ -2,25 +2,22 @@
 import os
 import random
 import time
-from ruamel import yaml
 import tensorflow as tf
-import tensorflow.keras as keras
+
 from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Add
 from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D, ReLU, GaussianNoise
-# from tensorflow.keras.layers.advanced_activations import LeakyReLU
+
 from tensorflow.python.keras.layers.convolutional import Conv2D
 from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-# from models.callbacks import write_log
 from models.callbacks import write_log
 from models.losses import L1_loss
 from processing import create_safe_directory
 from utils.load_dataset import load_data, save_images
-import matplotlib.pyplot as plt
+from utils.open_yaml import open_yaml, saving_yaml
 
-import sys
 
 import numpy as np
 
@@ -296,15 +293,6 @@ class GAN():
 
 
 
-def saving_yaml(path_yaml, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    os.system("cp {} {}".format(path_yaml, output_dir))
-
-
-def open_yaml(path_yaml):
-    with open(path_yaml) as f:
-        return yaml.load(f)
 
 
 if __name__ == '__main__':
