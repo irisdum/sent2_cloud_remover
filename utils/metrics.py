@@ -1,7 +1,7 @@
 # File where the metrics to compare the simulated image quality are implemented
 
 import numpy as np
-from skimage.measure import structural_similarity as ssim
+from skimage.measure import compare_ssim as ssim
 
 def calculate_psnr(img1, img2, max_value=255):
     """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
@@ -24,7 +24,7 @@ def psnr_by_band(im1, im2, max_value):
 
 
 
-def batch_psnr(batch1, batch2, max_value):
+def batch_psnr(batch1, batch2, max_value=1):
     """Compute the psnr value on a batch of images"""
     assert batch1.shape == batch2, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
                                                                                                 batch2.shape)
