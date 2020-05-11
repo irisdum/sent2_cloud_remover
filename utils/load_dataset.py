@@ -41,15 +41,18 @@ def modify_array(raster_array):
     return convert_array(raster_array)
 
 
-def create_input(image_id, input_dir, output_dir):
+def create_input(image_id, input_dir, output_dir,normalization=True):
     """
 
+    :param normalization:
     :param image_id: id str looks like 01_02.tif
     :param input_dir: path to the dir which contains XDIR and LabelDir
     :param output_dir: path where the npy tiles are going to be stored
     :param info_output_shape: None or a dictionnary which contains the info of the shape of the tiles
     :return:
     """
+    data_x=None
+    label=None
     assert input_dir[-1] == "/", "Wrong path should end with / not {}".format(input_dir)
     for name_dir in DICT_ORGA:  # there will be one tile created one for x one for y (label)
         final_array = np.zeros(DICT_SHAPE[name_dir])
@@ -63,24 +66,32 @@ def create_input(image_id, input_dir, output_dir):
             final_array[:, :,
             count_dim:count_dim + raster_array.shape[-1]] = raster_array  # we add the array into the final_array
             count_dim += raster_array.shape[-1]
-        np.save("{}{}.npy".format(output_dir + name_dir, image_id[:-4]), final_array)
+        if name_dir==XDIR:
+            data_x=final_array
+        else:
+            label=final_array
+    if normalization:
+        rescale_x,rescale_label=rescale_on_batch(data_x,label)
+    else:
+        rescale_x,rescale_label=data_x,label
+    np.save("{}{}.npy".format(output_dir + XDIR, image_id[:-4]), rescale_x)
+    np.save("{}{}.npy".format(output_dir + LABEL_DIR, image_id[:-4]), rescale_label)
 
-
-def prepare_tiles_from_id(list_id, input_dir, output_dir):
+def prepare_tiles_from_id(list_id, input_dir, output_dir, norm=True):
     """Given a list of id and a directory create and save 2 npy array with corresponds to tile on the input of the model and its label
     :param input_dir is the path to the directory which contains dataX dan label directory"""
     for image_id in list_id:
-        create_input(image_id, input_dir, output_dir)
+        create_input(image_id, input_dir, output_dir,normalization=norm)
 
 
-def create_input_dataset(dict_tiles, input_dir, output_dir):
+def create_input_dataset(dict_tiles, input_dir, output_dir,norm=True):
     """dict tiles is type {"train/": ["01_02.tif",...],"val/":[list of id],"test/":[list of id] }
     input_dir should contains label/ and DataX
     output_dir will contains the npy tile created"""
     make_dataset_hierarchy(output_dir)
     for sub_dir in dict_tiles:
         assert sub_dir in TRAINING_DIR, "Issue name directory is {} but should be in {}".format(sub_dir, TRAINING_DIR)
-        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir)
+        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir,norm=norm)
 
 
 def load_data(path_directory, x_shape=None, label_shape=None, normalization=True):

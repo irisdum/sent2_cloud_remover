@@ -2,6 +2,7 @@
 
 train_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/train/"
 val_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/val/"
+normalization: true
 ## Parameter for the Adam optimizer
 lr: 0.0002
 fact_g_lr: 1 #multiply lr in the Generator Adam optimiser

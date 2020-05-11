@@ -40,14 +40,15 @@ class GAN():
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
 
         # TRAIN PARAMETER
+        self.normalization=train_yaml["normalization"]
         self.epoch = train_yaml["epoch"]
         self.batch_size = train_yaml["batch_size"]
         # self.sess = sess
         self.learning_rate = train_yaml["lr"]
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
-        self.data_X, self.data_y = load_data(train_yaml["train_directory"])
-        self.val_X, self.val_Y = load_data(train_yaml["val_directory"])
+        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization)
+        self.val_X, self.val_Y = load_data(train_yaml["val_directory"],normalization=self.normalization)
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
@@ -63,9 +64,12 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer = Adam(self.learning_rate, self.beta1)
         self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-
-        self.build_model()
-
+        self.strategy= tf.distribute.MirroredStrategy()
+        print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
+        with self.strategy.scope():
+            self.build_model()
+            self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
+            self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
     def build_model(self):
 
