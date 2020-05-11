@@ -4,8 +4,9 @@ import argparse
 from osgeo import gdal
 import numpy as np
 import os
-from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR
+from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR, TOT_ZERO_PIXEL
 import random
+from sklearn.model_selection import train_test_split
 
 def is_no_data(raster, sent):
     """Given a raster check if there are no data:
@@ -40,7 +41,12 @@ def is_wrong_size(raster_array):
 
 
 def is_no_signal(raster_array):
-    if np.count_nonzero(raster_array) == 0:
+    dim=1
+    for k in raster_array.shape:
+        dim=dim*k
+    if np.count_nonzero(raster_array)==0:
+        return True
+    elif np.count_nonzero(raster_array)<TOT_ZERO_PIXEL*dim:
         return True
     else:
         return False
@@ -79,7 +85,8 @@ def get_all_tiles_path(path_sent_dir):
 
 def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
     random.seed(seed)
-
+    if nb_sample>len(list_all_tiles):
+        nb_sample=len(list_all_tiles)
     assert len(list_all_tiles) > 0, "No tiles found in {}".format(list_all_tiles)
     sample_path = random.sample(list_all_tiles, nb_sample)
     return [extract_tile_id(path) for path in sample_path]
@@ -97,6 +104,18 @@ def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/")
         l_all_id.remove(id_tile)
     print("Final dataset size {}".format(len(l_all_id)))
     return l_all_id
+
+def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
+    assert ptrain+ptest+pval==1,"The tiles repartition is not correct, it should be equal to one ptrain {}, ptest{},pval{}".format(ptrain,ptest,pval)
+    lid_test,l_idtot = train_test_split(l_path_id, test_size = ptest, random_state = random_state)
+    print("[INFO] the test images contains {} images : \n {}".format(len(lid_test),lid_test))
+    new_probval=pval/(pval+ptrain)
+    lid_val,lid_train=train_test_split(l_idtot,test_size=new_probval,random_state=random_state)
+    print("[INFO] The train images contans {} images : \n {}".format(len(lid_train),lid_train))
+    print("[INFO] The train images contans {} images : \n {}".format(len(lid_val),lid_val))
+    tot=len(lid_val)+len(lid_train)+len(lid_test)
+    print("[INFO] total {} split train : {} test {} val {}".format(tot,len(lid_train)/tot,len(lid_test)/tot,len(lid_val)/tot))
+    return {"train":lid_train,"val":lid_val,"test":"lidtest"}
 
 def find_path(sent_dir, image_id):
     """:returns a string which is the path of the image with the id image_id
