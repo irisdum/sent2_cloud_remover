@@ -112,18 +112,20 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
     new_probval=pval/(pval+ptrain)
     lid_train,lid_val=train_test_split(l_idtot,test_size=new_probval,random_state=random_state)
     print("[INFO] The train images contans {} images : \n {}".format(len(lid_train),lid_train))
-    print("[INFO] The train images contans {} images : \n {}".format(len(lid_val),lid_val))
-    tot=len(lid_val)+len(lid_train)+len(l_idtot)
+    print("[INFO] The val images contans {} images : \n {}".format(len(lid_val),lid_val))
+    tot=len(lid_val)+len(lid_train)+len(lid_test)
     print("[INFO] total {} split train : {} test {} val {}".format(tot,len(lid_train)/tot,len(lid_test)/tot,len(lid_val)/tot))
-    return {"train":lid_train,"val":lid_val,"test":"lidtest"}
+    return {"train/":lid_train,"val/":lid_val,"test/":"lidtest"}
 
 def find_path(sent_dir, image_id):
     """:returns a string which is the path of the image with the id image_id
     """
     assert os.path.isdir(sent_dir),"Wrong path to dir, path  {} does not exist ".format(sent_dir)
     print(sent_dir + "**/*{}".format(image_id))
+    assert ".tif" in image_id, "The id {} is not an image ".format(image_id)
     l = glob.glob(sent_dir + "**/*{}".format(image_id), recursive=True)
     assert len(l) > 0, "No image found with id {} at {}".format(image_id, sent_dir)
+    assert os.path.isfile(l[0]), "No file found at {}".format(l[0])
     return l[0]
 
 
