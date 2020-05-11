@@ -64,6 +64,7 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer = Adam(self.learning_rate, self.beta1)
         self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+        self.max_im=10
         self.build_model()
             # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
             # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
@@ -262,7 +263,7 @@ class GAN():
                                                                                  d_loss[0], 100 * d_loss[1], g_loss[0],
                                                                                  g_loss[1]))
 
-                if epoch % self.im_saving_step == 0: #to save some generated_images
+                if epoch % self.im_saving_step == 0 and idx<self.max_im: #to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
