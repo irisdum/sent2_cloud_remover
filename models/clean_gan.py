@@ -245,14 +245,19 @@ class GAN():
                 #Create a noisy gt images
                 batch_new_gt=self.produce_noisy_input(batch_gt,sigma_val)
                 # Generate a batch of new images
+                print("Make a prediction")
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
+                
                 if epoch not in [i for i in self.ite_train_g]:
+                    print("Train the driscriminator real")
                     d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
+                    print("Train the discri fake")
                     d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
                     d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
+                print("Train combined")
                 g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
 
                 # Plot the progress
