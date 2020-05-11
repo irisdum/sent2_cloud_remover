@@ -17,9 +17,10 @@ batch_size: 1
 training_number: 1
 training_dir: "/datastore/dum031/trainings/"
 # The model will be saved every saving step epoch
+
 im_saving_step: 30
 weights_saving_step: 50
-metric_step: 10 #steps when the validation metrics are computed
+metric_step: 50 #steps when the validation metrics are computed
 #TRAIN THE GENERATOR MULTIPLE TIME
 train_g_multiple_time: [3,4,5,6,7,20,21,22,23]
 

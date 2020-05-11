@@ -268,21 +268,21 @@ class GAN():
                 # LOGS to print in Tensorboard
                 if epoch % self.val_metric_step==0:
                     l_val_name_metrics,l_val_value_metrics=self.val_metric()
-                name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
+                    name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
 
-                name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
-                                                           "d_acc_real", "d_acc_fake", "d_acc_tot"]
-                val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
-                                     d_loss_real[1], d_loss_fake[1], d_loss[1]]
-                # The metrics
-                l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
-                assert len(val_logs) == len(
-                    name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
-                    name_logs, val_logs)
+                    name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
+                                                               "d_acc_real", "d_acc_fake", "d_acc_tot"]
+                    val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
+                                         d_loss_real[1], d_loss_fake[1], d_loss[1]]
+                    # The metrics
+                    l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
+                    assert len(val_logs) == len(
+                        name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
+                        name_logs, val_logs)
 
-                write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
-                          val_logs + l_value_metrics+l_val_value_metrics,
-                          self.num_batches * epoch + idx)
+                    write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
+                              val_logs + l_value_metrics+l_val_value_metrics,
+                              self.num_batches * epoch + idx)
 
             if epoch % self.sigma_step == 0: #update simga
                 sigma_val = sigma_val * self.sigma_decay

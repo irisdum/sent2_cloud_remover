@@ -84,7 +84,7 @@ def prepare_tiles_from_id(list_id, input_dir, output_dir, norm=True):
         create_input(image_id, input_dir, output_dir,normalization=norm)
 
 
-def create_input_dataset(dict_tiles, input_dir, output_dir,norm=True):
+def create_input_dataset(dict_tiles, input_dir, output_dir,norm=False):
     """dict tiles is type {"train/": ["01_02.tif",...],"val/":[list of id],"test/":[list of id] }
     input_dir should contains label/ and DataX
     output_dir will contains the npy tile created"""
