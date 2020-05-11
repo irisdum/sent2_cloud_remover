@@ -107,7 +107,7 @@ def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/")
 
 def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
     assert ptrain+ptest+pval==1,"The tiles repartition is not correct, it should be equal to one ptrain {}, ptest{},pval{}".format(ptrain,ptest,pval)
-    l_idtot,l_idtest = train_test_split(l_path_id, test_size = ptest, random_state = random_state)
+    l_idtot,lid_test = train_test_split(l_path_id, test_size = ptest, random_state = random_state)
     print("[INFO] the test images contains {} images : \n {}".format(len(lid_test),lid_test))
     new_probval=pval/(pval+ptrain)
     lid_train,lid_val=train_test_split(l_idtot,test_size=new_probval,random_state=random_state)
