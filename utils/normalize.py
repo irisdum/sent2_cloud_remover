@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plot=True, stats="mean_std"):
+def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plot=False, stats="mean_std"):
     """Compute the statistics using the X array and its label. Statistics are computed for each band descried in dict_band"""
     assert stats in ["mean_std", "min_max"], "Stats function {} undefined".format(stats)
     if dict_bandX is None:
@@ -33,7 +33,7 @@ def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plo
                     plot_one_band(arrayX[:, :, b_index], fig, ax[i],
                                   title="DATA X band {} index {}".format(band, b_index))
         if band in dictlabel:
-            print("{} is also in label".format(band))
+            #print("{} is also in label".format(band))
             for i, index in enumerate(dictlabel[band]):
                 band_array = np.append(band_array, arraylabel[:, :, index])
                 if plot:
@@ -107,7 +107,7 @@ def rescaling_function(methode):
     return method
 
 
-def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization", plot=True):
+def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization", plot=False):
     dict_method = {"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
     assert rescale_type in dict_method, "Rescaling undefined {} not in ".format(rescale_type, dict_method)
     dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dict_band_X, dictlabel=dict_band_label,
@@ -124,7 +124,7 @@ def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_ty
 
 
 def rescaling_combined_methods(array_dataX, array_label, dict_band_X, dict_band_label, dict_rescale_type=None,
-                               plot=True,dict_stat=None):
+                               plot=False,dict_stat=None):
     """Rescale combiend on an image"""
     rescaled_arrayX = np.zeros(array_dataX.shape)
     rescaled_label = np.zeros(array_label.shape)
