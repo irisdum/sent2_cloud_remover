@@ -115,7 +115,7 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
     print("[INFO] The val images contans {} images : \n {}".format(len(lid_val),lid_val))
     tot=len(lid_val)+len(lid_train)+len(lid_test)
     print("[INFO] total {} split train : {} test {} val {}".format(tot,len(lid_train)/tot,len(lid_test)/tot,len(lid_val)/tot))
-    return {"train/":lid_train,"val/":lid_val,"test/":"lidtest"}
+    return {"train/":lid_train,"val/":lid_val,"test/":lid_test}
 
 def find_path(sent_dir, image_id):
     """:returns a string which is the path of the image with the id image_id
