@@ -68,8 +68,8 @@ class GAN():
         print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
         with self.strategy.scope():
             self.build_model()
-            self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
-            self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
+            # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
+            # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
     def build_model(self):
 
@@ -225,73 +225,74 @@ class GAN():
         d_loss_fake=[100,100]
         d_loss=[100,100]
         l_val_name_metrics, l_val_value_metrics=[],[]
-        for epoch in range(0, self.epoch):
-            print("starting epoch {}".format(epoch))
-            for idx in range(start_batch_id, self.num_batches):
-                ###   THE INPUTS ##
-                batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
-                    np.float32)  # the input
-                # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
-                batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
-                    np.float32)  # the Ground Truth images
+        with self.strategy.scope():
+            for epoch in range(0, self.epoch):
+                print("starting epoch {}".format(epoch))
+                for idx in range(start_batch_id, self.num_batches):
+                    ###   THE INPUTS ##
+                    batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
+                        np.float32)  # the input
+                    # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
+                    batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
+                        np.float32)  # the Ground Truth images
 
-                ##  TRAIN THE DISCRIMINATOR
+                    ##  TRAIN THE DISCRIMINATOR
 
-                d_noise_real = random.uniform(self.real_label_smoothing[0],
-                                              self.real_label_smoothing[1])  # Add noise on the loss
-                d_noise_fake = random.uniform(self.fake_label_smoothing[0],
-                                              self.fake_label_smoothing[1])  # Add noise on the loss
+                    d_noise_real = random.uniform(self.real_label_smoothing[0],
+                                                  self.real_label_smoothing[1])  # Add noise on the loss
+                    d_noise_fake = random.uniform(self.fake_label_smoothing[0],
+                                                  self.fake_label_smoothing[1])  # Add noise on the loss
 
-                #Create a noisy gt images
-                batch_new_gt=self.produce_noisy_input(batch_gt,sigma_val)
-                # Generate a batch of new images
-                print("Make a prediction")
-                gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
-                D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
-                D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
-                
-                if epoch not in [i for i in self.ite_train_g]:
-                    print("Train the driscriminator real")
-                    d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
-                    print("Train the discri fake")
-                    d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
-                    d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
-                # Train the generator (to have the discriminator label samples as valid)
-                print("Train combined")
-                g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
+                    #Create a noisy gt images
+                    batch_new_gt=self.produce_noisy_input(batch_gt,sigma_val)
+                    # Generate a batch of new images
+                    print("Make a prediction")
+                    gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
+                    D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
+                    D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
 
-                # Plot the progress
-                print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
-                                                                                 d_loss[0], 100 * d_loss[1], g_loss[0],
-                                                                                 g_loss[1]))
+                    if epoch not in [i for i in self.ite_train_g]:
+                        print("Train the driscriminator real")
+                        d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
+                        print("Train the discri fake")
+                        d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
+                        d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+                    # Train the generator (to have the discriminator label samples as valid)
+                    print("Train combined")
+                    g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
 
-                if epoch % self.im_saving_step == 0: #to save some generated_images
-                    gen_imgs = self.generator.predict(batch_input)
-                    save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
-                # LOGS to print in Tensorboard
-                if epoch % self.val_metric_step==0:
-                    l_val_name_metrics,l_val_value_metrics=self.val_metric()
-                name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
+                    # Plot the progress
+                    print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
+                                                                                     d_loss[0], 100 * d_loss[1], g_loss[0],
+                                                                                     g_loss[1]))
 
-                name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
-                                                           "d_acc_real", "d_acc_fake", "d_acc_tot"]
-                val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
-                                     d_loss_real[1], d_loss_fake[1], d_loss[1]]
-                # The metrics
-                l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
-                assert len(val_logs) == len(
-                    name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
-                    name_logs, val_logs)
+                    if epoch % self.im_saving_step == 0: #to save some generated_images
+                        gen_imgs = self.generator.predict(batch_input)
+                        save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
+                    # LOGS to print in Tensorboard
+                    if epoch % self.val_metric_step==0:
+                        l_val_name_metrics,l_val_value_metrics=self.val_metric()
+                    name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
 
-                write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
-                          val_logs + l_value_metrics+l_val_value_metrics,
-                          self.num_batches * epoch + idx)
+                    name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
+                                                               "d_acc_real", "d_acc_fake", "d_acc_tot"]
+                    val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
+                                         d_loss_real[1], d_loss_fake[1], d_loss[1]]
+                    # The metrics
+                    l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
+                    assert len(val_logs) == len(
+                        name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
+                        name_logs, val_logs)
 
-            if epoch % self.sigma_step == 0: #update simga
-                sigma_val = sigma_val * self.sigma_decay
-            #save the models
-            if epoch%self.w_saving_step==0:
-                self.save_model(epoch)
+                    write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
+                              val_logs + l_value_metrics+l_val_value_metrics,
+                              self.num_batches * epoch + idx)
+
+                if epoch % self.sigma_step == 0: #update simga
+                    sigma_val = sigma_val * self.sigma_decay
+                #save the models
+                if epoch%self.w_saving_step==0:
+                    self.save_model(epoch)
 
     def save_model(self, step):
         checkpoint_dir = self.checkpoint_dir
