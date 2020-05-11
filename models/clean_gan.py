@@ -266,10 +266,9 @@ class GAN():
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
-                if epoch % self.val_metric_step==0:
+                if idx % self.val_metric_step==0:
                     l_val_name_metrics,l_val_value_metrics=self.val_metric()
                     name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
-
                     name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
                                                                "d_acc_real", "d_acc_fake", "d_acc_tot"]
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
