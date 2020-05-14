@@ -1,6 +1,6 @@
 geojson_file=confs/train_kangaroo.geojson
 wkt_file=confs/train_kangaroo_wkt2.txt
-grah_xml_sent1=snap-confs/calibrate_sent1_v2.xml
+graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
 source_directory=/datastore/data/dataset2/
 target_directory={source_directory}/prepro2/
 
