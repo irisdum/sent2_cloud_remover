@@ -8,7 +8,8 @@
 
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
-export PATH=/home/dum031/snap/bin:$PATH
+export PATH=$PATH:/datastore/dum031/code/snap/bin
+
 gptPath="gpt -e"
 export JAVA_OPTS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"
 export _JAVA_OPTIONS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"

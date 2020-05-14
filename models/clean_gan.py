@@ -207,7 +207,6 @@ class GAN():
         self.g_tensorboard_callback.set_model(self.combined)
 
     def train(self):
-
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30, 30, 1))
         fake = np.zeros((self.batch_size, 30, 30, 1))

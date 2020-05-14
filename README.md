@@ -55,8 +55,8 @@ The functions used are in `store_data.py`
 ### Requirements
 - The area geojson `confs/train_kangaroo.geojson`
 - The directory with Sentinel 1 and Sentinel 2 images.  
-- - For Sentinel 1 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent2.xml`  
-   - For Sentinel 2 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent1.xml`
+- - For Sentinel 1 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent1.xml` or `snap-confs/calibrate_sent1_v2.xml`   
+   - For Sentinel 2 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent2.xml`
 
 First the geojson needs to be converted in .txt file, where the area is written as WKT format. If there are many polygons 
 in the geojson, in the .txt file one line = one polygon in WKT format.  
@@ -71,6 +71,7 @@ the location of snap/bin
 The pipeline of the preprocessing is in the .xml files. 
 
 For Sentinel 1 : 
+
 - Apply Orbit File
 - Subset 
 - Calibration
@@ -78,6 +79,16 @@ For Sentinel 1 :
 - Terrain Correction
 - Write as TIFF
 
+xml v2 : 
+- Apply Orbit File
+- Subset 
+- Thermal Noise
+- Remove GRD Noise
+- Calibration
+- Speckle (Refined Lee)
+- Terrain Correction
+-Linear from db
+- Write as TIFF
 For Sentinel 2 : 
 - Resample at 10 meters
 - Subset 
