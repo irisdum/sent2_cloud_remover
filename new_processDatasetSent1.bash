@@ -1,6 +1,6 @@
 #!/bin/bash
 # enable next line for debugging purpose
-# set -x 
+# set -x
 
 ############################################
 # User Configuration
@@ -31,7 +31,7 @@ targetDirectory="$4"
 
 #the sixth parameter is the path to the WKT subset .txt file
 wktFile="$5"
-   
+
 ############################################
 # Helper functions
 ############################################

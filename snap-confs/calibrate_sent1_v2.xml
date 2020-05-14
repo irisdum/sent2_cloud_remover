@@ -17,7 +17,7 @@
       <sourceProduct refid="Apply-Orbit-File"/>
     </sources>
     <parameters>
-      <sourceBands>${sourceBand}</sourceBands>
+      <sourceBands/>
       <geoRegion>${geometry}</geoRegion>
       <copyMetadata>true</copyMetadata>
     </parameters>
@@ -108,7 +108,7 @@
       <sourceProduct refid="Terrain-Correction"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
+      <sourceBands>${sourceBand}</sourceBands>
     </parameters>
   </node>
   <node id="WriteTIFF">
