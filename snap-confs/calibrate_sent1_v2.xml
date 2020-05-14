@@ -17,7 +17,7 @@
       <sourceProduct refid="Apply-Orbit-File"/>
     </sources>
     <parameters>
-      <sourceBands/>
+      <sourceBands>${sourceBand}</sourceBands>
       <geoRegion>${geometry}</geoRegion>
       <copyMetadata>true</copyMetadata>
     </parameters>
@@ -50,7 +50,7 @@
       <sourceProduct refid="Remove-GRD-Border-Noise"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>${sourceBand}</sourceBands>
+      <sourceBands/>
       <auxFile>Product Auxiliary File</auxFile>
       <externalAuxFile/>
       <outputImageInComplex>false</outputImageInComplex>
