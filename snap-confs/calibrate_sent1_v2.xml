@@ -28,7 +28,7 @@
       <sourceProduct refid="SUbset"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations>${polarization}</selectedPolarisations>
+      <selectedPolarisations/>
       <removeThermalNoise>true</removeThermalNoise>
       <reIntroduceThermalNoise>false</reIntroduceThermalNoise>
     </parameters>
@@ -108,7 +108,7 @@
       <sourceProduct refid="Terrain-Correction"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>${sourceBand}</sourceBands>
+      <sourceBands/>
     </parameters>
   </node>
   <node id="WriteTIFF">
