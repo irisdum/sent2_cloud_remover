@@ -207,7 +207,7 @@ class GAN():
         self.g_tensorboard_callback.set_model(self.combined)
 
     def train(self):
-        self.define_callback()
+
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30, 30, 1))
         fake = np.zeros((self.batch_size, 30, 30, 1))
@@ -220,6 +220,7 @@ class GAN():
             create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch=0
+        self.define_callback()
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
