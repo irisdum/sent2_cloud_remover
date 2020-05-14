@@ -28,7 +28,7 @@
       <sourceProduct refid="SUbset"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
+      <selectedPolarisations>${polarization}</selectedPolarisations>
       <removeThermalNoise>true</removeThermalNoise>
       <reIntroduceThermalNoise>false</reIntroduceThermalNoise>
     </parameters>
