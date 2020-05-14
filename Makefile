@@ -2,7 +2,7 @@ geojson_file=confs/train_kangaroo.geojson
 wkt_file=confs/train_kangaroo_wkt2.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
 source_directory=/datastore/dum031/data/dataset2/
-target_directory={source_directory}/prepro2/
+target_directory=${source_directory}/prepro2/
 
 geojson_2_wkt: ${wkt_file}
 		@echo "We convert ${geojson_file} into ${wkt_file}"
