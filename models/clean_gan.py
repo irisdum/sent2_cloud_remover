@@ -38,7 +38,7 @@ class GAN():
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
-
+        self.previous_checkpoint=train_yaml["load_model"]
         # TRAIN PARAMETER
         self.normalization=train_yaml["normalization"]
         self.epoch = train_yaml["epoch"]
@@ -207,13 +207,19 @@ class GAN():
         self.g_tensorboard_callback.set_model(self.combined)
 
     def train(self):
-        create_safe_directory(self.saving_logs_path)
         self.define_callback()
-        # self.build_model()
-        create_safe_directory(self.saving_image_path)
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30, 30, 1))
         fake = np.zeros((self.batch_size, 30, 30, 1))
+        if self.previous_checkpoint is not None:
+            print("LOADING the model from step {}".format(self.previous_checkpoint))
+            #TODO LOAD WEIGHTS FOR DISCRI COMBINED AND GENE
+            start_epoch=int(self.previous_checkpoint)+1
+            self.load_from_checkpoint(self.previous_checkpoint)
+        else:
+            create_safe_directory(self.saving_logs_path)
+            create_safe_directory(self.saving_image_path)
+            start_epoch=0
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -223,7 +229,7 @@ class GAN():
         d_loss_fake=[100,100]
         d_loss=[100,100]
         l_val_name_metrics, l_val_value_metrics=[],[]
-        for epoch in range(0, self.epoch):
+        for epoch in range(start_epoch, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
                 ###   THE INPUTS ##
@@ -298,7 +304,23 @@ class GAN():
             gene_yaml = self.generator.to_yaml()
             with open("{}model_generator.yaml".format(self.checkpoint_dir),"w") as yaml_file:
                 yaml_file.write(gene_yaml)
+        if not os.path.isfile("{}model_combined.yaml".format(self.checkpoint_dir)):
+            comb_yaml = self.combined.to_yaml()
+            with open("{}model_combined.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+                yaml_file.write(comb_yaml)
+        if not os.path.isfile("{}model_discri.yaml".format(self.checkpoint_dir)):
+            discri_yaml = self.discriminator.to_yaml()
+            with open("{}model_discri.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+                yaml_file.write(discri_yaml)
         self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
+        self.discriminator.save_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
+        self.combined.save_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
+
+    def load_from_checkpoint(self,step):
+        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir,step)),"No file at {}".format("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
+        self.discriminator=self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
+        self.generator=self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
+        self.combined=self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
 
     def load_generator(self,path_yaml,path_weight):
         # load YAML and create model

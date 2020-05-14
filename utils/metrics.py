@@ -40,10 +40,10 @@ def ssim_batch(batch1, batch2):
     assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
                                                                                                       batch2.shape)
     assert len(batch1.shape) == 4, "Wrong batch dim should be (num_batch,n,n,nchannel)"
-    psnr_batch = []
+    lssim_batch = []
     for i in range(batch1.shape[0]):  # go over all the images in the batch
-        psnr_batch += [ssim(batch1[i, :, :, :], batch2[i, :, :, :], multichannel=True)]
-    return psnr_batch, np.mean(psnr_batch)
+        lssim_batch += [ssim(batch1[i, :, :, :], batch2[i, :, :, :], multichannel=True)]
+    return lssim_batch, np.mean(lssim_batch)
 
 
 def compute_metric(gt, gen_img):

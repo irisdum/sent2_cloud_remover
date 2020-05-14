@@ -11,6 +11,8 @@ lambda: 100 #lambda apply the constistency loss
 ## Path to the logdir tensorboard directory
 logdir: "/datastore/dum031/models/logs/"
 
+
+load_model: null #if not null is the iteration where we load our model, the training will start over at ite+1
 epoch: 50 #epoch of train of the generator
 k_step: 5 #means 5 epoch for training the discriminator before one training of generator
 batch_size: 1
