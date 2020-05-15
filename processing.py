@@ -211,9 +211,9 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
     """Given these parameters construct VRT format image For each bands create a mosaic if needed"""
     list_band_vrt = []
     if list_band is None and sent == 2:
-        #list_band = [b.lower().replace("0", "") for b in
-                   #  LISTE_BANDE[1]]  # liste band of sentinel 2, convert it from B02->b2
-        list_band= LISTE_BANDE[1]
+        list_band = [b.lower().replace("0", "") for b in
+                     LISTE_BANDE[1]]  # liste band of sentinel 2, convert it from B02->b2
+        #list_band= LISTE_BANDE[1]
     if list_band is None and sent == 1:
         list_band = LISTE_BANDE[0]
     for b in list_band:
