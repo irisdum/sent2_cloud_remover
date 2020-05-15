@@ -1,8 +1,6 @@
 import numpy as np
-from scanning_dataset import list_all_conformed_tiles,select_rdtiles,find_path,split_train_test_val
+from scanning_dataset import list_all_conformed_tiles,split_train_test_val
 from utils.load_dataset import create_input_dataset
-import sent2_cloud_remover.constant.gee_constant as cst
-import sent2_cloud_remover.utils.display_image as d
 import argparse
 
 def _argparser():
