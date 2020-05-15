@@ -132,7 +132,7 @@ def find_path(sent_dir, image_id):
 def is_conform(path_tile):
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
-    assert raster_array.shape[0] in [len(LISTE_BANDE[0]),
+    assert raster_array.shape[0] in [2,
                                      len(LISTE_BANDE[1])], "Wrong tile shape {} should be {} or {} bands" \
         .format(raster.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
 

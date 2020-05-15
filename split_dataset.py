@@ -14,7 +14,7 @@ def _argparser():
     return parser.parse_args()
 
 def main(input_dir,output_dir_name,ptrain,pval,ptest,rd_state):
-    path_output_dir="/".join(input_dir.split("/")[-2]+[output_dir_name,""])
+    path_output_dir="/".join(input_dir.split("/")[:-2]+[output_dir_name,""])
     l_tiles_tot = list_all_conformed_tiles(input_dir)
     dict_data_selected = split_train_test_val(l_tiles_tot, ptrain,pval,ptest, random_state=rd_state)
     create_input_dataset(dict_data_selected,input_dir, path_output_dir)
