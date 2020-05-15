@@ -18,6 +18,9 @@ split_val=0.05
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
 
+find_image:
+	@echo "Fin image not implemented yet"
+
 download_image:
 		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp"
 
@@ -38,6 +41,7 @@ start_env_processing:
 	@conda activate myenv
 quit_env_processing:
 	@conda deactivate
+
 create_env_processing:
 	@conda config --add channels conda-forge
 	@conda config --set channel_priority strict

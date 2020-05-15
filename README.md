@@ -1,24 +1,35 @@
 # sent2-cloud-remover
-IN PROGRESS, this code is not finished  
+IN PROGRESS, this code is not finished and change regularly !!!!!
+This project aim at first using the method of conditional Generative adversial Network on Sentinel 1 and Sentinel 2 
+in order to be able to recreate Sentinel 2 images from previous Sentinel2 and 1 and current Sentinel 1. Then assessing the quality of the
+image produced studying the burned area maps. 
+This project is thus divided in different steps : 
+- Creation of the dataset (done, some clean of the code required)
+- Training of the conditional Generative Adversial Network (done, some clean of the code required)
+- Assessing  the results of the simulated image (in progress)  
 
-Use of multi-temporal SAR data and optical image with the use of cGAN to create synthetise cloud free optical image
-This repesitory describe all the scripts used to find the cloud free sentinel 2 images and their corresponding sentinel 1,
-download the data, preprocess them using SNAP, creating the tiles (256*256) for the data and for the label.
-
+Many of the different computation steps are easily available from the Makefile. 
 
 ## Installation requirements : 
+
  - Google earth engine
  - Esa SNAP (command gpt will be used)
  - GDAL 
+ -Fmask 
  Exemple of a docker image with GDAL : 
  To build the docker image
 `docker build -t thinkwhere/gdal-python:3.7-ubuntu . `  
 To run the docker image
 ` docker run -p 8888:8888  `
+One of the final aim would be to create a docker with all the installation required
 
 ## Downloading the data
 
+## LOOKING AT THE AREA OF INTEREST
+ TODO : include the Google earth engine scripts
+ 
 ### Finding cloud free images
+
 
 Input : 
 - an area (geojson you can use QGIS to create it)
@@ -97,7 +108,7 @@ For Sentinel 2 :
 ### bash script
 
 If there are numerous geometry in the .txt file For each geometry, the preprocessing of is done for each bands 
-(B2,B3,B4,B8) and (VV,VH).
+(B2,B3,B4,B8) of Sentinel 2 and on both bands of Sentinel 1 VV,VH
 
 ## Build dataset 
 ### Requirements
