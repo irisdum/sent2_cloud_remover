@@ -13,7 +13,8 @@ TILING_DIR="tiling_dir/"
 XDIR="dataX/"
 LABEL_DIR="label/"
 SENT_FORMAT=["tiff", "jp2"]
-LISTE_BANDE=[["vh","vv"],["B04", "B03", "B02","B08","cm"]]
+LISTE_BANDE=[["S1"],["S2,cm"]]
+    #[["vh","vv"],["B04", "B03", "B02","B08","cm"]]
 
 
 

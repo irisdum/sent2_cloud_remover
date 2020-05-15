@@ -163,7 +163,7 @@ def _argparser():
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
-    parser.add_argument("--shp", default="./confs/train_kangaroo.shp", help="path to the esri shapefile")
+
     return parser.parse_args()
 
 
