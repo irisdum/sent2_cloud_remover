@@ -134,7 +134,7 @@ def is_conform(path_tile):
     raster_array = raster.ReadAsArray()
     assert raster_array.shape[0] in [2,
                                      len(LISTE_BANDE[1])], "Wrong tile shape {} should be {} or {} bands" \
-        .format(raster.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
+        .format(raster_array.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
 
     if is_wrong_size(raster_array):
         print("Image {} wrong size ".format(path_tile.split("/")[-1]))
