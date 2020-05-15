@@ -197,8 +197,11 @@ def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_g
 
 def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     create_safe_directory(output_dir)
-
-    total_image = combine_band(list_image, output_dir)
+    if sent==2:
+        total_image = combine_band(list_image, output_dir) #for Sentinel 2 combien the images
+    else:
+        assert len(list_image)==1, "More than One image of S1 is found {}".format(list_image)
+        total_image=list_image[0]
     # print("BEFORE CROP")
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
