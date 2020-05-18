@@ -6,6 +6,7 @@ import numpy as np
 from osgeo import gdal
 #from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
+from utils.vi import  compute_vi,diff_metric,diff_relative_metric
 
 def plot_allbands_hist(path_tif,ax):
     raster=gdal.Open(path_tif)
@@ -197,3 +198,30 @@ def plot_one_band(raster_array,fig,ax,title=""):
     fig.colorbar(im, ax=ax, orientation='vertical')
     if ax is None:
         plt.show()
+
+def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None):
+    raster_vi=compute_vi(raster_array,vi,dict_band)
+    if ax is None:
+        fig,ax=plt.subplots()
+    if title is None:
+        title=vi
+    im=ax.imshow(raster_vi,cmap="RdYlGn")
+    fig.colorbar(im,ax=ax,orientation="vertical")
+    ax.set_title(title)
+    if ax is None:
+        plt.show()
+
+def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post,relative=False):
+    if ax is None:
+        fig,ax=plt.subplots(1,4)
+    display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi))
+    display_one_image_vi(image_pre, fig, ax[1], vi, dict_band_pre, title="vi {} image post".format(vi))
+    d_vi=diff_relative_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
+    dr_vi=diff_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
+    d_im=ax[2].imshow(d_vi,cmap="RdYlGn")
+    ax[2].set_title("differenced {}".format(vi))
+    fig.colorbar(d_im, ax=ax[2], orientation="vertical")
+    dr_im=ax[3].imshow(dr_vi,cmap="RdYlGn")
+    ax[3].set_title("relative differenced {}".format(vi))
+    fig.colorbar(dr_im, ax=ax[3], orientation="vertical")
+    plt.show()

@@ -21,7 +21,7 @@ Many of the different computation steps are easily available from the Makefile.
 `docker build -t thinkwhere/gdal-python:3.7-ubuntu . `  
 To run the docker image
 ` docker run -p 8888:8888  `
-One of the final aim would be to create a docker with all the installation required
+One of the final aim would be to create a docker with all the installation required or more easily a conda env ?
 
 ## Downloading the data
 

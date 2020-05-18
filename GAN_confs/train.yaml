@@ -1,15 +1,13 @@
 ### YAML TO THE TRAIN PARAMETERS
 
-train_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/train/"
-val_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/val/"
-normalization: true
+train_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/train/" #path to the dataset where the train data are stored
+val_directory: "/datastore/dum031/data/dataset2/prepro1/input_dataset/val/"  #path where the validation data are stored
+normalization: true #id set to true normalization to the data is apllied, the norm implemented is standardization for SAR data and normalization for RGBNIR
 ## Parameter for the Adam optimizer
-lr: 0.0002
+lr: 0.0002 #learning rate
 fact_g_lr: 1 #multiply lr in the Generator Adam optimiser
 beta1: 0.5
-lambda: 100 #lambda apply the constistency loss
-## Path to the logdir tensorboard directory
-logdir: "/datastore/dum031/models/logs/" #UNUSED
+lambda: 100 #lambda is the factor applied to the L1 loss abs(||G(z)-y||)
 
 
 load_model: null #if not null is the iteration where we load our model, the training will start over at ite+1
@@ -17,25 +15,20 @@ epoch: 50 #epoch of train of the generator
 k_step: 5 #UNUSED
 batch_size: 1
 training_number: 1
-training_dir: "/datastore/dum031/trainings/"
+training_dir: "/datastore/dum031/trainings/" #the model images and checkpoint will be stored at training_dir/trainining_number
 # The model will be saved every saving step epoch
 
-im_saving_step: 30
-weights_saving_step: 50
-metric_step: 50 #steps when the validation metrics are computed
+im_saving_step: 30 #every n epochs image from the training set are saved
+weights_saving_step: 50 # every n epochs the model is saved
+metric_step: 50 #every n iterations when the validation metrics are computed. An iteration is the number of batches that goes into the Network
 #TRAIN THE GENERATOR MULTIPLE TIME
-train_g_multiple_time: [3,4,5,6,7,20,21,22,23]
+train_g_multiple_time: [] #[3,4,5,6,7,20,21,22,23]
 
 ## DISCRIMINATOR PREVENT OVERFITTING
 real_label_smoothing: [0.7,1.0] #if you do not want to apply label smoothing [1,1]
 fake_label_smoothing: [0.0,0.2] #if you do not want to apply label smoothing [0,0]
 
-sigma_init: 0.5
+sigma_init: 0.5 #used only if Gaussian noise used in the model definition
 sigma_decay: 0.5 # multiply
 sigma_step: 10 #every sigma_step iteration sigma decrease from sigma_decay
 
-##LOSS NOT USED WITH CLEAN_GAN
-wasserstein: true
-generator_loss: total_generatot_loss # corresponds to maximize log(D(G(x))+L1 loss  could be wasserstein_generator_loss
-discriminator_loss: noisy_discriminator_loss  #It is more sigmoid_cross_entropy with label a random number between
-#real_label_smoothing and discri_label_smoothing could be wasserstein_discriminator_loss
