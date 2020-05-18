@@ -3,8 +3,9 @@ from constant.gee_constant import DICT_BAND_LABEL,DICT_BAND_X
 import numpy as np
 
 def extract_red_nir(image,dict_band):
-    band_red = image[:, :, dict_band["R"]]
-    band_nir = image[:, :, dict_band["NIR"]]
+    band_red = image[:, :, dict_band["R"][0]]
+    band_nir = image[:, :, dict_band["NIR"][0]]
+
     return band_red,band_nir
 
 def compute_ndvi(image,dict_band=None):

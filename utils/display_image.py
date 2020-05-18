@@ -211,7 +211,7 @@ def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None):
     if ax is None:
         plt.show()
 
-def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post,relative=False):
+def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post):
     if ax is None:
         fig,ax=plt.subplots(1,4)
     display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi))
