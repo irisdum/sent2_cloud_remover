@@ -58,6 +58,7 @@ class GAN():
         self.beta1 = train_yaml["beta1"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label,dict_rescale_type=dict_rescale_type)
         self.val_X, self.val_Y = load_data(train_yaml["val_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label,dict_rescale_type=dict_rescale_type)
+        print("Loading the data done dataX {} dataY ".format(self.data_X.shape,self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
