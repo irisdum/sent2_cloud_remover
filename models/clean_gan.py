@@ -38,7 +38,7 @@ class GAN():
             dict_band_X=train_yaml["dict_band_x"]
             dict_band_label=train_yaml["dict_band_label"]
             dict_rescale_type=train_yaml["dict_rescale_type"]
-        assert type(dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(dict_band_label,type(dict_band_label))
+            assert type(dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(dict_band_label,type(dict_band_label))
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
