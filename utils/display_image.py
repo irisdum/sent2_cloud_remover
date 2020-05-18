@@ -199,13 +199,15 @@ def plot_one_band(raster_array,fig,ax,title=""):
     if ax is None:
         plt.show()
 
-def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None):
+def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None,cmap=None):
     raster_vi=compute_vi(raster_array,vi,dict_band)
+    if cmap is None:
+        cmap="RdYlGn"
     if ax is None:
         fig,ax=plt.subplots()
     if title is None:
         title=vi
-    im=ax.imshow(raster_vi,cmap="RdYlGn")
+    im=ax.imshow(raster_vi,cmap=cmap)
     fig.colorbar(im,ax=ax,orientation="vertical")
     ax.set_title(title)
     if ax is None:
