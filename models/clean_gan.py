@@ -30,6 +30,15 @@ class GAN():
         self.img_cols = 28
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
+        if "dict_band_x" not in train_yaml:
+            dict_band_X=None
+            dict_band_label=None
+            dict_rescale_type=None
+        else:
+            dict_band_X=train_yaml["dict_band_x"]
+            dict_band_label=train_yaml["dict_band_label"]
+            dict_rescale_type=train_yaml["dict_rescale_type"]
+        assert type(dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(dict_band_label,type(dict_band_label))
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
@@ -47,8 +56,8 @@ class GAN():
         self.learning_rate = train_yaml["lr"]
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
-        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization)
-        self.val_X, self.val_Y = load_data(train_yaml["val_directory"],normalization=self.normalization)
+        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label)
+        self.val_X, self.val_Y = load_data(train_yaml["val_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label)
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
@@ -318,9 +327,9 @@ class GAN():
 
     def load_from_checkpoint(self,step):
         assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir,step)),"No file at {}".format("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
-        self.discriminator=self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
-        self.generator=self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
-        self.combined=self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
+        self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
+        self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
+        self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
 
     def load_generator(self,path_yaml,path_weight):
         # load YAML and create model

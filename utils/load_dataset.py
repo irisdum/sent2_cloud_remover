@@ -48,7 +48,6 @@ def create_input(image_id, input_dir, output_dir,normalization=True):
     :param image_id: id str looks like 01_02.tif
     :param input_dir: path to the dir which contains XDIR and LabelDir
     :param output_dir: path where the npy tiles are going to be stored
-    :param info_output_shape: None or a dictionnary which contains the info of the shape of the tiles
     :return:
     """
     data_x=None
@@ -94,7 +93,7 @@ def create_input_dataset(dict_tiles, input_dir, output_dir,norm=False):
         prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir,norm=norm)
 
 
-def load_data(path_directory, x_shape=None, label_shape=None, normalization=True):
+def load_data(path_directory, x_shape=None, label_shape=None, normalization=True,dict_band_X=None,dict_band_label=None,dict_rescale_type=None):
     """:param path_directory : path to the directory (train,test or val) which contains two directory dataX and label """
     if x_shape is None:
         x_shape = DICT_SHAPE[XDIR]
@@ -105,7 +104,8 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
     dataX = load_from_dir(path_directory + XDIR, x_shape)
     data_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
     if normalization:
-        dataX,data_label=rescale_on_batch(dataX,data_label)
+        dataX,data_label=rescale_on_batch(dataX,data_label,dict_band_X=dict_band_X,dict_band_label=dict_band_label,
+                                          dict_rescale_type=dict_rescale_type)
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
     print("The shape of the data are data {} label {}".format(dataX.shape,data_label.shape))
