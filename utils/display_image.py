@@ -217,7 +217,7 @@ def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_po
     if ax is None:
         fig,ax=plt.subplots(1,4,figsize=figuresize)
     display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi))
-    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_pre, title="vi {} image post".format(vi))
+    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi))
     d_vi=diff_relative_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
     dr_vi=diff_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
     d_im=ax[2].imshow(d_vi,cmap="RdYlGn")
