@@ -32,6 +32,7 @@ def plot_allbands_hist(path_tif,ax):
 
 
 
+
 def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
     if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
         return uin16_2_float32(raster_array)
@@ -199,7 +200,7 @@ def plot_one_band(raster_array,fig,ax,title=""):
     if ax is None:
         plt.show()
 
-def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None,cmap=None):
+def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None,cmap=None,vminmax=(0,1)):
     raster_vi=compute_vi(raster_array,vi,dict_band)
     if cmap is None:
         cmap="RdYlGn"
@@ -207,25 +208,26 @@ def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None,cmap=N
         fig,ax=plt.subplots()
     if title is None:
         title=vi
-    im=ax.imshow(raster_vi,cmap=cmap)
+    im=ax.imshow(raster_vi,cmap=cmap,vmin=vminmax[0], vmax=vminmax[1])
     fig.colorbar(im,ax=ax,orientation="vertical")
     ax.set_title(title)
     if ax is None:
         plt.show()
 
-def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post,figuresize=None):
+
+def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post,figuresize=None,vminmax=(0,1)):
     if figuresize is None:
         figuresize=(20,20)
     if ax is None:
         fig,ax=plt.subplots(1,4,figsize=figuresize)
-    display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi))
-    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi))
-    d_vi=diff_relative_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
-    dr_vi=diff_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
-    d_im=ax[2].imshow(d_vi,cmap="bwr")
+    display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi),vminmax=vminmax)
+    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi),vminmax=vminmax)
+    dr_vi=diff_relative_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
+    d_vi=diff_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
+    d_im=ax[2].imshow(d_vi,cmap="bwr",vmin=vminmax[0],vmax=vminmax[1])
     ax[2].set_title("differenced {}".format(vi))
     fig.colorbar(d_im, ax=ax[2], orientation="vertical")
-    dr_im=ax[3].imshow(dr_vi,cmap="bwr")
+    dr_im=ax[3].imshow(dr_vi,cmap="bwr",vmin=vminmax[0],vmax=vminmax[1])
     ax[3].set_title("relative differenced {}".format(vi))
     fig.colorbar(dr_im, ax=ax[3], orientation="vertical")
     plt.show()
