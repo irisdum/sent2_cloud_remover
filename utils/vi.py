@@ -12,7 +12,7 @@ def compute_ndvi(image,dict_band=None):
     if dict_band is None:
         print("We consider it is a predicted image with R G B NIR only ")
         dict_band=DICT_BAND_LABEL
-    assert len(image.shape)==3,"Wrong dimension of the image should be 3 not {}".format(image)
+    assert len(image.shape)==3,"Wrong dimension of the image should be 3 not {}".format(image.shape)
     assert image.shape[-1]<image.shape[0],"Check the dimension of the image should be channel last. {}".format(image.shape)
     band_red,band_nir=extract_red_nir(image,dict_band)
     return np.divide(band_nir-band_red,band_nir+band_red)
@@ -39,13 +39,15 @@ def compute_vi(image,vi,dict_band=None):
     if dict_band is None:
         print("We consider it is a predicted image with R G B NIR only ")
         dict_band=DICT_BAND_LABEL
-    assert vi in ["msavi","bai","ndvi"], "The vegetation index {} has no function defined. please define a function in utils.vi".format(vi)
+    assert vi in ["msavi","bai","ndvi","identity"], "The vegetation index {} has no function defined. please define a function in utils.vi".format(vi)
     if vi=="ndvi":
         return compute_ndvi(image,dict_band)
     if vi=="bai":
         return compute_bai(image,dict_band)
     if vi=="msavi":
         return compute_msavi(image,dict_band)
+    if vi=="identity":
+        return image
 
 def diff_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):
     """:param image_pre the image before the event
