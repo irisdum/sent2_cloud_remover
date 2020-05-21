@@ -126,7 +126,7 @@ def clip_on_geometry(geometry):
 def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
     """ Given a ee.ImageCollection returns the name of the image with cloud pixel coverage below than ccp and that fit
      sent2criteria
-     :param zone: """
+     :param zone: """ #TODO check the use of this function, used the new one which claculate the ccp on the area !!!
     print("before clipping length collection = {}".format(collection.toList(100).length().getInfo()))
 
     collection_zone = collection.map(clip_on_geometry(zone))

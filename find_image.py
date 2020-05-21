@@ -3,6 +3,7 @@ from constant.gee_constant import DICT_COLLECTION
 import argparse
 from datetime import date, timedelta
 import json
+from utils.cloud_filters import filter_clouds
 ee.Initialize()
 
 
@@ -39,6 +40,7 @@ def datetime_2_string(ex_date):
     return "-".join([convert_int(ex_date.year),convert_int(ex_date.month), convert_int(ex_date.day)])
 
 
+
 def next_day(str_date, add=1):
     str_day = str_date.split("-")[-1]
     str_next_day = str(int(str_day) + add)
@@ -72,7 +74,8 @@ def display_search(begin_date, ending_date, zone, collection):
 
 
 def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
-    """:param collection sent1 or sent2 collections
+    """    :param opt_param:
+:param collection sent1 or sent2 collections
     :param zone : an ee.Geometry
     :return an Image collection"""
     # print("begin {} ending {}".format(begin_date,ending_date))
@@ -82,8 +85,9 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
     collection = ee.ImageCollection(DICT_COLLECTION[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
     print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
+    print(type(collection))
     if sent == 2:
-        return collection
+        return filter_clouds(collection,zone)
     else:
         return opt_filter(collection, opt_param, sent)
 
@@ -137,7 +141,9 @@ def list_image_name(image_collection, sent):
     :param image_collection : an ee image collection
     :returns a list of the name of the image collection"""
     # get the len of the image collection
-    n = image_collection.toList(1000).length().getInfo()
+    print(type(image_collection))
+    n=image_collection.toList(1000).length().getInfo()
+
     list_name = []
     list_image_collection = image_collection.toList(n)
     for i in range(n):
@@ -151,8 +157,13 @@ def list_image_name(image_collection, sent):
 
 
 def main(begin_date, ending_date, path_zone, sent):
-    collection = get_filter_collection(begin_date, ending_date, path_zone, sent)
-    # print(list_image_name(collection, sent))
+    zone=gjson_2_eegeom(path_zone)
+    collection = get_filter_collection(begin_date, ending_date, zone, sent)
+    print("get the collection")
+    #name = ee.Image(collection.first()).get("PRODUCT_ID")
+        #.getInfo()
+    #print(ee.String(name).getInfo())
+    print(list_image_name(collection, sent))
 
 
 if __name__ == '__main__':

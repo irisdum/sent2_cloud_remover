@@ -59,3 +59,13 @@ DICT_METHOD={"standardization": "mean_std", "centering": "mean_std", "normalizat
 NAME_LOGS=[]
 PREFIX_IM="im"
 PREFIX_HIST="hist"
+
+
+#CLOUD THR VAL
+
+cloudThresh = 0.2
+dilationPixels = 3
+erodePixels = 1.5
+ndviThresh = -0.1
+irSumThresh = 0.3
+roi_ccp_max=0.1
