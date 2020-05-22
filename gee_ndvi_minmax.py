@@ -80,7 +80,7 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
     vi_min = minMax.get("{}min".format(vi))
     vi_max = minMax.get("{}max".format(vi))
     #print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
-    return vi_min.getInfo(),vi_max.getInfo()
+    return vi_min,vi_max
 
 
 def create_geojson(path_build_dataset):
@@ -106,8 +106,9 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
     geojson_path=create_geojson(path_build_dataset) #path where the geojson of the grid of all the tiles is stored
     l_grid_info=load_grid_geojson(geojson_path) #list of list with path to the image, and liste of coordo
-    df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
+    #df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
     print(l_grid_info[0:10])
+    features=[]
     #go over all the tiles
     for i,tile in enumerate(l_grid_info):
         print(i)
@@ -122,9 +123,12 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #get_ndvi_minmax_tile(collection, zone)
         print("We have collection")
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
-        df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
-    df.head(10)
-    return df
+        new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
+        features+=[new_feat]
+        #df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
+    #df.head(10)
+    fromList = ee.FeatureCollection(features)
+    ee.Export.table.toAsset(fromList,"export the NDVI min and max")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date):
     all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
