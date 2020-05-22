@@ -6,7 +6,7 @@ from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
-from constant.gee_constant import DICT_ORGA, XDIR,EPSG
+from constant.gee_constant import DICT_ORGA, XDIR,EPSG,DICT_EVI_PARAM
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -46,10 +46,21 @@ def normalize(image,band,geometry,scale=None):
         ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
 
+
 def apply_ndvi(image):
     valndvi = image.normalizedDifference(['B8_norm', 'B4_norm']).rename('ndvi')
     return image.addBands(valndvi)
 
+
+def apply_evi(image,param=None):
+    if param is None:
+        param=DICT_EVI_PARAM
+    evi=image.expression('{} * ((NIR-RED) / (NIR +{} * RED - {} * BLUE + {}))'.format(param["G"],param["C1"],param["C2"],param["L"]), {
+        'NIR': image.select('B8'),
+        'RED': image.select('B4'),
+        'BLUE': image.select('B2')
+    })
+    return image.addBands(evi.rename("evi"))
 
 def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
@@ -59,6 +70,7 @@ def _argparser():
     parser.add_argument('--ed', type=str, help="begin date")
     parser.add_argument('--zone', type=str, help="path where the zone coordinates are stored ")
     parser.add_argument('--c', type=int, help="collection")
+    parser.add_argument('--vi',default="ndvi",type=str, help="vegetation index could be  ndvi")
     return parser.parse_args()
 
 
@@ -100,7 +112,7 @@ def create_geojson(path_build_dataset):
     return geojson_path
 
 
-def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
+def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
     """:param path_build_dataset string path to the build dataset (path where all the tiles are stored)
     :param input_dataset path to the dataset which is used to train, test and val the model
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
@@ -127,12 +139,12 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         features+=[new_feat]
         df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min.getInfo(),vi_max.getInfo()])),ignore_index=True)
     df.head(10)
-    df.to_csv(path_build_dataset+"ndvi_min_mx.csv",sep=",")
+    df.to_csv(path_build_dataset+"{}_min_mx.csv".format(vi),sep=",")
     #fromList = ee.FeatureCollection(features)
     #batch.Export.table.toAsset(fromList,"exportNDVI","test2")
 
-def main(path_build_dataset, input_dataset,begin_date, ending_date):
-    all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
+def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
+    all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi)
     #name = ee.Image(collection.first()).get("PRODUCT_ID")
         #.getInfo()
     #print(ee.String(name).getInfo())
@@ -140,4 +152,4 @@ def main(path_build_dataset, input_dataset,begin_date, ending_date):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.path_bdata,args.path_input_data,args.bd, args.ed)
+    main(args.path_bdata,args.path_input_data,args.bd, args.ed,args.vi)

@@ -1,12 +1,13 @@
 # A file which contains all the information concerning the vegetation index functions
-from constant.gee_constant import DICT_BAND_LABEL,DICT_BAND_X
+from constant.gee_constant import DICT_BAND_LABEL,DICT_BAND_X,DICT_EVI_PARAM
 import numpy as np
 
 def extract_red_nir(image,dict_band):
     band_red = image[:, :, dict_band["R"][0]]
     band_nir = image[:, :, dict_band["NIR"][0]]
-
     return band_red,band_nir
+
+
 
 def compute_ndvi(image,dict_band=None):
     if dict_band is None:
@@ -34,12 +35,12 @@ def compute_msavi(image,dict_band=None):
     sqrt_terme=np.square(2*band_nir+1)-8*(band_nir-band_red)
     return np.divide(2*band_nir+1-np.sqrt(sqrt_terme),2)
 
-def compute_vi(image,vi,dict_band=None):
+def compute_vi(image,vi,dict_band=None,param=None):
     """vi a string of the vegetation index"""
     if dict_band is None:
         print("We consider it is a predicted image with R G B NIR only ")
         dict_band=DICT_BAND_LABEL
-    assert vi in ["msavi","bai","ndvi","identity"], "The vegetation index {} has no function defined. please define a function in utils.vi".format(vi)
+    assert vi in ["msavi","bai","ndvi","identity","evi"], "The vegetation index {} has no function defined. please define a function in utils.vi".format(vi)
     if vi=="ndvi":
         return compute_ndvi(image,dict_band)
     if vi=="bai":
@@ -48,6 +49,17 @@ def compute_vi(image,vi,dict_band=None):
         return compute_msavi(image,dict_band)
     if vi=="identity":
         return image
+    if vi=="evi":
+        return compute_evi(image,dict_band,param)
+
+def compute_evi(image,dict_band,param=None):
+    if param is None:
+        param=DICT_EVI_PARAM
+    red=image[:,:,dict_band["R"]]
+    nir=image[:,:,dict_band["NIR"]]
+    blue=image[:, :, dict_band["B"]]
+    return param["G"]*np.divide(nir-red,nir+param["C1"]*red-param["C2"]*blue+param["L"])
+
 
 def diff_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):
     """:param image_pre the image before the event
