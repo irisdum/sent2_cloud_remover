@@ -106,7 +106,7 @@ def filter_clouds(sent2_coll,roi):
     :param roi : a ee.Geometry
     :param sent2_coll : a ee.ImageCollection
     :returns : a ee.ImageCollection"""
-    print(roi.area(0.001).getInfo())
+    #print(roi.area(0.001).getInfo())
 
     s2_coll_filter=sent2_coll.map(lambda img: img.clip(roi))
 
