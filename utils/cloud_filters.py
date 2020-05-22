@@ -107,25 +107,21 @@ def filter_clouds(sent2_coll,roi):
     :param sent2_coll : a ee.ImageCollection
     :returns : a ee.ImageCollection"""
     print(roi.area(0.001).getInfo())
-    print("collection filtered {}".format(sent2_coll.toList(100).length().getInfo()))
+
     s2_coll_filter=sent2_coll.map(lambda img: img.clip(roi))
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
-    print(type(roi))
+
     s2_coll_filter=s2_coll_filter.map(lambda img: img.set('ROI',roi))
-    print("collection filtered {}".format(ee.ImageCollection(s2_coll_filter).toList(100).length().getInfo()))
+
     s2_coll_filter=s2_coll_filter.map(computeS2CloudScore)
-    print("after S2cloud score")
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
+
     s2_coll_filter=s2_coll_filter.map(calcCloudStats)
-    print("after stats")
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
+
     #s2_coll_filter=s2_coll_filter.map(projectShadows)
-    print("after shdaow") #TODO solve the prb of shadow sore band !!
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
+
     #s2_coll_filter=s2_coll_filter.map(computeQualityScore)
-    print("after qualty score")
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
+   
     s2_coll_filter=s2_coll_filter.sort('CLOUDY_PERCENTAGE_ROI').filter(ee.Filter.lt('CLOUDY_PERCENTAGE_ROI',roi_ccp_max))
     print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
     return s2_coll_filter
+
 
