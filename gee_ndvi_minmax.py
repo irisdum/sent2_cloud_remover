@@ -17,6 +17,7 @@ def load_grid_geojson(path_geojson):
     with open(path_geojson) as f:
         data = json.load(f)
     l_result=[]
+    assert len(data)>0, "The geojson file {} is empty {}".format(path_geojson,data)
     for i in range(len(data["features"])):
         path_image=data["features"][i]["location"]
         image_coordo=data["features"][i]["geometry"]["coordinates"]
@@ -86,7 +87,7 @@ def create_geojson(path_build_dataset):
         path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
     l_shp=glob.glob("{}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0]))
     assert len(l_shp)>0,"No shp files found at {}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
-    geojson_path=path_build_dataset+XDIR+DICT_ORGA[XDIR][0]+l_shp[0].split("/")[-1].split(".")[0]+"geojson"
+    geojson_path=path_build_dataset+XDIR+DICT_ORGA[XDIR][0]+l_shp[0].split("/")[-1].split(".")[0]+".geojson"
     if os.path.isfile(geojson_path):
         return geojson_path
     else:
