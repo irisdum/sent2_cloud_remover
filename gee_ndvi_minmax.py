@@ -155,6 +155,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
         new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
         features+=[new_feat]
         df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min.getInfo(),vi_max.getInfo()])),ignore_index=True)
+        print(df)
     df.head(10)
     df.to_csv(path_build_dataset+"{}_min_mx.csv".format(vi),sep=",")
     #fromList = ee.FeatureCollection(features)
@@ -175,6 +176,7 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
         dic_band_min_max=band_min_max(collection,zone,lband=lband)
         dic_band_min_max.update({"tile_id":path_tile})
         df=df.append(dic_band_min_max,ignore_index=True)
+        print(df)
     df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
