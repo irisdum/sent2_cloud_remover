@@ -79,7 +79,7 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
     minMax = ee.Image(vi_max).reduceRegion(maxReducer2,roi, 1, vi_max.projection())
     vi_min = minMax.get("{}_min".format(vi))
     vi_max = minMax.get("{}_max".format(vi))
-    print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
+    #print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
     return vi_min,vi_max
 
 
@@ -106,7 +106,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
     geojson_path=create_geojson(path_build_dataset) #path where the geojson of the grid of all the tiles is stored
     l_grid_info=load_grid_geojson(geojson_path) #list of list with path to the image, and liste of coordo
-    #df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
+    df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
     print(l_grid_info[0:10])
     features=[]
     #go over all the tiles
@@ -125,10 +125,11 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
         features+=[new_feat]
-        #df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
-    #df.head(10)
-    fromList = ee.FeatureCollection(features)
-    batch.Export.table.toAsset(fromList,"exportNDVI","test2")
+        df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min.getInfo(),vi_max.getInfo()])))
+    df.head(10)
+    df.to_csv(path_build_dataset+"ndvi_min_mx.csv",sep=",")
+    #fromList = ee.FeatureCollection(features)
+    #batch.Export.table.toAsset(fromList,"exportNDVI","test2")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date):
     all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
