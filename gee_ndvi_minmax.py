@@ -89,10 +89,12 @@ def create_geojson(path_build_dataset):
     assert len(l_shp)>0,"No shp files found at {}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
     geojson_path=path_build_dataset+XDIR+DICT_ORGA[XDIR][0]+l_shp[0].split("/")[-1].split(".")[0]+".geojson"
     if os.path.isfile(geojson_path):
+        print("The file has already been created")
         return geojson_path
     else:
         print("SAVE geojson at {} ".format(geojson_path))
         os.system("ogr2ogr -f GEOJSON  -t_srs crs:84 {} {} ".format(geojson_path,l_shp[0]))
+        assert os.path.isfile(geojson_path),"No file has been created at {} with the command \n {}".format(geojson_path,"ogr2ogr -f GEOJSON  -t_srs crs:84 {} {} ".format(geojson_path,l_shp[0]))
     return geojson_path
 
 
