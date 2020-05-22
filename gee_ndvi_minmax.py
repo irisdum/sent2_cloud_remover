@@ -79,7 +79,7 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
     minMax = ee.Image(vi_max).reduceRegion(maxReducer,roi, 1, vi_max.projection())
     vi_min = minMax.get("{}min".format(vi))
     vi_max = minMax.get("{}max".format(vi))
-    print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
+    #print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
     return vi_min.getInfo(),vi_max.getInfo()
 
 
