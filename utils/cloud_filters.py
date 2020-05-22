@@ -121,7 +121,7 @@ def filter_clouds(sent2_coll,roi):
     #s2_coll_filter=s2_coll_filter.map(computeQualityScore)
    
     s2_coll_filter=s2_coll_filter.sort('CLOUDY_PERCENTAGE_ROI').filter(ee.Filter.lt('CLOUDY_PERCENTAGE_ROI',roi_ccp_max))
-    print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
+    #print("collection filtered {}".format(s2_coll_filter.toList(100).length().getInfo()))
     return s2_coll_filter
 
 
