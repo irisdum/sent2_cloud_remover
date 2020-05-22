@@ -82,11 +82,11 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
 
 def create_geojson(path_build_dataset):
     print(path_build_dataset+XDIR+DICT_ORGA[XDIR])
-    assert os.path.isdir(path_build_dataset+XDIR+DICT_ORGA[XDIR]), "No dir exists at {}".format(
-        path_build_dataset+XDIR+DICT_ORGA[XDIR])
-    l_shp=glob.glob("{}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR]))
-    assert len(l_shp)>0,"No shp files found at {}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR])
-    geojson_path=path_build_dataset+XDIR+DICT_ORGA[XDIR]+l_shp[0].split("/")[-1].split(".")[0]+"geojson"
+    assert os.path.isdir(path_build_dataset+XDIR+DICT_ORGA[XDIR][0]), "No dir exists at {}".format(
+        path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
+    l_shp=glob.glob("{}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0]))
+    assert len(l_shp)>0,"No shp files found at {}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
+    geojson_path=path_build_dataset+XDIR+DICT_ORGA[XDIR][0]+l_shp[0].split("/")[-1].split(".")[0]+"geojson"
     if os.path.isfile(geojson_path):
         return geojson_path
     else:
