@@ -125,7 +125,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
         features+=[new_feat]
-        df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min.getInfo(),vi_max.getInfo()])))
+        df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min.getInfo(),vi_max.getInfo()])),ignore_index=True)
     df.head(10)
     df.to_csv(path_build_dataset+"ndvi_min_mx.csv",sep=",")
     #fromList = ee.FeatureCollection(features)
