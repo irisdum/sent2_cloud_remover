@@ -6,7 +6,7 @@ from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
-from constant.gee_constant import DICT_ORGA, XDIR,EPSG,DICT_EVI_PARAM
+from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -94,6 +94,11 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
     #print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
     return vi_min,vi_max
 
+def one_band_max(image_band,band,zone):
+    maxReducer = ee.Reducer.minMax()
+    minMax = ee.Image(image_band).reduceRegion(maxReducer,zone, 1,image_band.projection())
+    return minMax.get("{}_min".format(band)),minMax.get("{}_max".format(band))
+
 
 def create_geojson(path_build_dataset):
     print(path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
@@ -111,6 +116,18 @@ def create_geojson(path_build_dataset):
         assert os.path.isfile(geojson_path),"No file has been created at {} with the command \n {}".format(geojson_path,"ogr2ogr -f GEOJSON  -t_srs crs:84 {} {} ".format(geojson_path,l_shp[0]))
     return geojson_path
 
+
+def band_min_max(col,zone,lband=None):
+    "The aim of this function is to save a csv with th min max value of Sentinel 2 and use them to normalize the data"
+    if lband is None: #
+        lband=GEE_S2_BAND
+    dict_band_minmax={}
+    for band in lband:
+        _,band_max=one_band_max(col.select(band).max(),band,zone)
+        band_min,_=one_band_max(col.select(band).min(),band,zone)
+        dict_band_minmax.update({"{}min".format(band):band_min.getInfo(),"{}max".format(band):band_max.getInfo()})
+
+    return dict_band_minmax
 
 def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
     """:param path_build_dataset string path to the build dataset (path where all the tiles are stored)
@@ -143,8 +160,26 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
     #fromList = ee.FeatureCollection(features)
     #batch.Export.table.toAsset(fromList,"exportNDVI","test2")
 
+def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,save_name="s2_bands_min_max"):
+    geojson_path = create_geojson(path_build_dataset)  # path where the geojson of the grid of all the tiles is stored
+    l_grid_info = load_grid_geojson(geojson_path)  # list of list with path to the image, and liste of coordo
+    df = pd.DataFrame()
+    for i, tile in enumerate(l_grid_info):
+        path_tile = tile[0]
+        coordo_tile = tile[1]
+        print("ite {} image {}".format(i,path_tile))
+        # print(coordo_tile)
+        tile_id = extract_tile_id(path_tile)
+        zone = define_geometry(coordo_tile)
+        collection = get_filter_collection(begin_date, ending_date, zone, 2)
+        dic_band_min_max=band_min_max(collection,zone,lband=lband)
+        dic_band_min_max.update({"tile_id":path_tile})
+        df=df.append(dic_band_min_max,ignore_index=True)
+    df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
+
 def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
-    all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi)
+    all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi) #TODO adapt the script so the normalization of the data when computing the vi is the global constant
+    get_band_s2_min_max(path_build_dataset, begin_date, ending_date)
     #name = ee.Image(collection.first()).get("PRODUCT_ID")
         #.getInfo()
     #print(ee.String(name).getInfo())

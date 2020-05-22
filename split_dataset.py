@@ -11,6 +11,7 @@ def _argparser():
     parser.add_argument("--input_dataset",type=str,default="/datastore/dum031/data/dataset2/prepro1/build_dataset/",help="Path to the build_dataset")
     parser.add_argument("--output_dir_name",type=str,default="input_large_dataset")
     parser.add_argument("--random_state",type=int,default=2)
+    parser.add_argument("--norm", default=False, help="Bool if set to true apply a normalization while creating the dataset")
     return parser.parse_args()
 
 def main(input_dir,output_dir_name,ptrain,pval,ptest,rd_state):

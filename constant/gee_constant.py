@@ -13,7 +13,8 @@ TILING_DIR="tiling_dir/"
 XDIR="dataX/"
 LABEL_DIR="label/"
 SENT_FORMAT=["tiff", "jp2"]
-LISTE_BANDE=[["S1"],["B04", "B03", "B02","B08","cm"]]
+LISTE_BANDE=[["S1"],["B04", "B03", "B02","B08","cm"]] #for downloading the data avoid changing its value
+GEE_S2_BAND=["B2","B3","B4","B8"]
     #[["vh","vv"],["B04", "B03", "B02","B08","cm"]]
 
 
@@ -35,7 +36,7 @@ BOUND_X=[100,1000]
 BOUND_Y=[100,1000]
 
 ## CONVERT Uint16 2 Float 32
-CONVERTOR=7000
+CONVERTOR=7000 #apply when displaying the tif tile but also when creating the train, test, val dataset
 SCALE_S1=1
 
 ## SCAN TILES THRESHOLD OF NUMBER OF CLOUD PIXEL ALLOWED TO KEEP THE TILE
