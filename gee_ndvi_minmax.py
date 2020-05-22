@@ -24,7 +24,7 @@ def load_grid_geojson(path_geojson):
         image_coordo=data["features"][i]["geometry"]["coordinates"]
         assert type(path_image)==type("u"),"Wrong path information {}".format(path_image)
         assert type(image_coordo)==type([]),"Wrong coordo information {}".format(image_coordo)
-        assert len(image_coordo)>0,"No coordinates has been found {}".format(image_coordo)
+        assert len(image_coordo)>1,"No coordinates has been found {}".format(image_coordo)
         l_result+=[path_image,image_coordo]
     print("We have collected {} information on the tiles ".format(len(l_result)))
     return l_result
@@ -108,6 +108,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
     #go over all the tiles
     for tile in l_grid_info:
+        print(tile)
         path_tile=tile[0]
         coordo_tile=tile[1]
         print(coordo_tile)
