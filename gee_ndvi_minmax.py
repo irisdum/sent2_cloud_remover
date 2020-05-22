@@ -116,6 +116,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #print(coordo_tile)
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
+        print(type(zone))
         print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
         #get_ndvi_minmax_tile(collection, zone)
