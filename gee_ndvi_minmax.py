@@ -81,7 +81,7 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
 
 
 def create_geojson(path_build_dataset):
-    print(path_build_dataset+XDIR+DICT_ORGA[XDIR])
+    print(path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
     assert os.path.isdir(path_build_dataset+XDIR+DICT_ORGA[XDIR][0]), "No dir exists at {}".format(
         path_build_dataset+XDIR+DICT_ORGA[XDIR][0])
     l_shp=glob.glob("{}/**/*.shp".format(path_build_dataset+XDIR+DICT_ORGA[XDIR][0]))
