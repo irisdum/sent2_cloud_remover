@@ -38,8 +38,8 @@ def normalize(image,band,geometry,scale=None):
     subBand = image.select(band)
     if scale is None:
         minMax = ee.Image(subBand).reduceRegion(maxReducer, geometry, 1, subBand.projection())
-        bmin = minMax.get("{}min".format(band))
-        bmax = minMax.get("{}max".format(band))
+        bmin = minMax.get("{}_min".format(band))
+        bmax = minMax.get("{}_max".format(band))
     else:
         bmin,bmax=scale
     normalize_band=ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(
@@ -75,11 +75,11 @@ def get_ndvi_minmax_tile(col,roi,scale=None,liste_band=None,vi="ndvi"):
         assert "B4" in liste_band, "The band B4 has not been normalized {}".format(liste_band)
         col=col.map(apply_ndvi)
     vi_max=col.select(vi).max()
-    maxReducer = ee.Reducer.minMax()
-    minMax = ee.Image(vi_max).reduceRegion(maxReducer,roi, 1, vi_max.projection())
-    vi_min = minMax.get("{}min".format(vi))
-    vi_max = minMax.get("{}max".format(vi))
-    #print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
+    maxReducer2 = ee.Reducer.minMax()
+    minMax = ee.Image(vi_max).reduceRegion(maxReducer2,roi, 1, vi_max.projection())
+    vi_min = minMax.get("{}_min".format(vi))
+    vi_max = minMax.get("{}_max".format(vi))
+    print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
     return vi_min,vi_max
 
 
@@ -128,7 +128,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
     #df.head(10)
     fromList = ee.FeatureCollection(features)
-    batch.Export.table.toAsset(fromList,"exportNDVI","test")
+    batch.Export.table.toAsset(fromList,"exportNDVI","test2")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date):
     all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
