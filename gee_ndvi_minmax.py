@@ -26,8 +26,7 @@ def load_grid_geojson(path_geojson):
         assert type(image_coordo)==type([]),"Wrong coordo information {}".format(image_coordo)
         assert len(image_coordo)>0,"No coordinates has been found {}".format(image_coordo)
         l_result+=[[path_image,image_coordo]]
-        if i<5:
-            print([path_image,image_coordo])
+
     print("We have collected {} information on the tiles ".format(len(l_result)))
     return l_result
 
@@ -111,14 +110,15 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     print(l_grid_info[0:10])
     #go over all the tiles
     for tile in l_grid_info:
-        print(tile)
+        #print(tile)
         path_tile=tile[0]
         coordo_tile=tile[1]
-        print(coordo_tile)
+        #print(coordo_tile)
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
+        print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
-        get_ndvi_minmax_tile(collection, zone)
+        #get_ndvi_minmax_tile(collection, zone)
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
     df.head(10)
