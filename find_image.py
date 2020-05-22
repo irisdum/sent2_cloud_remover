@@ -84,7 +84,7 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
     display_search(begin_date, ending_date, zone, sent)
     collection = ee.ImageCollection(DICT_COLLECTION[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
-    print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
+    #print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
     print(type(collection))
     if sent == 2:
         return filter_clouds(collection,zone)
