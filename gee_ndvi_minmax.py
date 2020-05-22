@@ -25,7 +25,7 @@ def load_grid_geojson(path_geojson):
         assert type(path_image)==type("u"),"Wrong path information {}".format(path_image)
         assert type(image_coordo)==type([]),"Wrong coordo information {}".format(image_coordo)
         assert len(image_coordo)>0,"No coordinates has been found {}".format(image_coordo)
-        l_result+=[path_image,image_coordo]
+        l_result+=[[path_image,image_coordo]]
         if i<5:
             print([path_image,image_coordo])
     print("We have collected {} information on the tiles ".format(len(l_result)))
