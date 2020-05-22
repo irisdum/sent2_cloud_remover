@@ -6,7 +6,7 @@ from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
-from constant.gee_constant import DICT_ORGA, XDIR
+from constant.gee_constant import DICT_ORGA, XDIR,EPSG
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -95,7 +95,7 @@ def create_geojson(path_build_dataset):
         return geojson_path
     else:
         print("SAVE geojson at {} ".format(geojson_path))
-        os.system("ogr2ogr -f GEOJSON  -t_srs crs:84 {} {} ".format(geojson_path,l_shp[0]))
+        os.system("ogr2ogr -f GEOJSON -s_srs {}  -t_srs crs:84 {} {} ".format(EPSG,geojson_path,l_shp[0]))
         assert os.path.isfile(geojson_path),"No file has been created at {} with the command \n {}".format(geojson_path,"ogr2ogr -f GEOJSON  -t_srs crs:84 {} {} ".format(geojson_path,l_shp[0]))
     return geojson_path
 
