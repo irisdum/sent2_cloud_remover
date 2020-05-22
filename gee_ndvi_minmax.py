@@ -2,7 +2,7 @@
 import argparse
 import json
 import os
-
+from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
@@ -128,7 +128,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
     #df.head(10)
     fromList = ee.FeatureCollection(features)
-    ee.Export.table.toAsset(fromList,"export the NDVI min and max")
+    batch.Export.table.toAsset(fromList,"export the NDVI min and max")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date):
     all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
