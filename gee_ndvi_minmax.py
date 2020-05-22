@@ -128,7 +128,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
     #df.head(10)
     fromList = ee.FeatureCollection(features)
-    batch.Export.table.toAsset(fromList,"export the NDVI min and max")
+    batch.Export.table.toAsset(fromList,"exportNDVI")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date):
     all_minmax(path_build_dataset, input_dataset,begin_date, ending_date)
