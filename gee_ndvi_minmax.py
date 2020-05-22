@@ -110,6 +110,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     for tile in l_grid_info:
         path_tile=tile[0]
         coordo_tile=tile[1]
+        print(coordo_tile)
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
