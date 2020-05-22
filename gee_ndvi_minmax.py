@@ -18,9 +18,9 @@ def load_grid_geojson(path_geojson):
         data = json.load(f)
     l_result=[]
     assert len(data)>0, "The geojson file {} is empty {}".format(path_geojson,data)
-    print(data["features"])
+    #print(data["features"])
     for i in range(len(data["features"])):
-        path_image=data["features"][i]["location"]
+        path_image=data["features"][i]['properties']["location"]
         image_coordo=data["features"][i]["geometry"]["coordinates"]
         assert type(path_image)==type("u"),"Wrong path information {}".format(path_image)
         assert type(image_coordo)==type([]),"Wrong coordo information {}".format(image_coordo)
