@@ -109,8 +109,8 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
     df=pd.DataFrame(columns=["tile_id","vi_min","vi_max"])
     print(l_grid_info[0:10])
     #go over all the tiles
-    for tile in l_grid_info:
-        #print(tile)
+    for i,tile in enumerate(l_grid_info):
+        print(i)
         path_tile=tile[0]
         coordo_tile=tile[1]
         #print(coordo_tile)
@@ -120,6 +120,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date):
         #print("We are going to collect the image of the area {}".format(zone.area(0.001)))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
         #get_ndvi_minmax_tile(collection, zone)
+        print("We have collection")
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min,vi_max])))
     df.head(10)
