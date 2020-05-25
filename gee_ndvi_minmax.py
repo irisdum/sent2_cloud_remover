@@ -173,7 +173,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,expo
                                              fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
         print(type(task))
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
-        #task.start()
+        task.start()
     else:
         df.head(10)
         df.to_csv(path_build_dataset + "{}_min_mx.csv".format(vi), sep=",")
