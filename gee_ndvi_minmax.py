@@ -222,7 +222,7 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
                                    fileNamePrefix="{}-{}".format(begin_date, ending_date),fileFormat= "CSV")
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
         print(task.status())
-        print(task.task_type)
+        #print(task.task_type)
         print(task.list())
         task.start()
         print(task.status())
