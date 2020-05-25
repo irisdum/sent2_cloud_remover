@@ -74,3 +74,4 @@ roi_ccp_max=0.1
 ## CONSTANTS FOR THE EVI COMPUTATION
 
 DICT_EVI_PARAM={"L":1, "G":2.5, "C1":6, "C2":7.5}
+GEE_DRIVE_FOLDER="CSIRO/gee_data/"

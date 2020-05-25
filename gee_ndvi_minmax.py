@@ -6,7 +6,7 @@ from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
-from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND
+from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -129,7 +129,7 @@ def band_min_max(col,zone,lband=None):
 
     return dict_band_minmax
 
-def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
+def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,export="GEE"):
     """:param path_build_dataset string path to the build dataset (path where all the tiles are stored)
     :param input_dataset path to the dataset which is used to train, test and val the model
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
@@ -147,39 +147,51 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
         print("TYPE ROI {}".format(type(zone)))
-        print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
         #get_ndvi_minmax_tile(collection, zone)
         print("We have collection")
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
-        new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
-        features+=[new_feat]
-        vi_min_val=vi_min.getInfo()
-        print("MIN {}".format(vi_min_val))
-        vi_max_val=vi_max.getInfo()
-        print("MAX {}".format(vi_max))
-        df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min_val,vi_max_val])),ignore_index=True)
-        print(df)
-    df.head(10)
-    df.to_csv(path_build_dataset+"{}_min_mx.csv".format(vi),sep=",")
-    #fromList = ee.FeatureCollection(features)
-    #batch.Export.table.toAsset(fromList,"exportNDVI","test2")
+        if export=="GEE":
+            new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
+            features+=[new_feat]
+        else:
+            print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
+            vi_min_val=vi_min.getInfo()
+            print("MIN {}".format(vi_min_val))
+            vi_max_val=vi_max.getInfo()
+            print("MAX {}".format(vi_max))
+            df=df.append(dict(zip(["tile_id","vi_min","vi_max"],[tile_id,vi_min_val,vi_max_val])),ignore_index=True)
+            print(df)
+    if export=="GEE":
+        fromList = ee.FeatureCollection(features)
+        batch.Export.table.toDrive(fromList,"export_{}".format(vi),GEE_DRIVE_FOLDER,"{}-{}".format(begin_date,ending_date),"CSV")
+        print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
+    else:
+        df.head(10)
+        df.to_csv(path_build_dataset + "{}_min_mx.csv".format(vi), sep=",")
 
 def get_minmax_fromcsv(path_im,path_csv):
     """:path_im : str path to the npy image
-    :path_csv : str path to the csv which contains the minmax"""
+    :path_csv : str path to the csv which contains the minmax
+    :returns a dictionnary for each band giving the min_max"""
     assert os.path.isfile(path_csv),"No file found at {}".format(path_csv)
     df=pd.read_csv(path_csv,header=True)
     df.head(3)
     tile_id=extract_tile_id(path_im).replace("npy","tif")
     subf_df=df[df["tile_id"]==tile_id]
+    assert subf_df.shape[0]==1,"Wrong number of image found {}".format(subf_df)
+    dict_res=subf_df.iloc[0].to_dict()
+    return dict_res
 
 
 
-def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,save_name="s2_bands_min_max"):
+def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,save_name="s2_bands_min_max",export="GEE"):
+    """:param export a string if export in GEE save the file into a csv Drive if local export via pandas into the local computer
+    """
     geojson_path = create_geojson(path_build_dataset)  # path where the geojson of the grid of all the tiles is stored
     l_grid_info = load_grid_geojson(geojson_path)  # list of list with path to the image, and liste of coordo
     df = pd.DataFrame()
+    features=[]
     for i, tile in enumerate(l_grid_info):
         path_tile = tile[0]
         coordo_tile = tile[1]
@@ -190,9 +202,19 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
         dic_band_min_max=band_min_max(collection,zone,lband=lband)
         dic_band_min_max.update({"tile_id":tile_id})
-        df=df.append(dic_band_min_max,ignore_index=True)
-        print(df)
-    df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
+        if export=="GEE":
+            new_feat=ee.Feature(zone,dic_band_min_max)
+            features+=[new_feat]
+        else:
+            df=df.append(dic_band_min_max,ignore_index=True)
+            print(df)
+    if export=="GEE":
+        fromList = ee.FeatureCollection(features)
+        batch.Export.table.toDrive(fromList, "export_s2", GEE_DRIVE_FOLDER,
+                                   "{}-{}".format(begin_date, ending_date), "CSV")
+        print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
+    else:
+        df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
     if vi in ["evi","ndvi"]:
