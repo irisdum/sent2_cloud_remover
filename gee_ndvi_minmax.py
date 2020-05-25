@@ -109,6 +109,7 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
 
 
 def one_band_max(image_band, band, zone):
+    image_band=ee.Image(image_band.select(band))
     maxReducer = ee.Reducer.minMax()
     minMax = ee.Image(image_band).reduceRegion(maxReducer, zone, 1, image_band.projection())
     return minMax.get("{}_min".format(band)), minMax.get("{}_max".format(band))
