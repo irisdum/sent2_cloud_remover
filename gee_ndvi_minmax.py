@@ -42,10 +42,9 @@ def normalize(image, band, geometry, scale=None):
         minMax = ee.Image(subBand).reduceRegion(maxReducer, geometry, 1, subBand.projection())
         bmin = minMax.get("{}_min".format(band))
         bmax = minMax.get("{}_max".format(band))
-        print(type(bmin),type(bmax))
+        #print(type(bmin),type(bmax))
     else:
         bmin, bmax = scale
-    print("bmin {} bmax {}".format(ee.Number(bmin).getInfo(), ee.Number(bmax).getInfo()))
     normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(
         ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
@@ -93,6 +92,8 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     for b in liste_band:
         col = col.map(lambda img: normalize(img, b, scale))
     # compute the ndvi
+        test_min,test_max=one_band_max(col.first(),band="{}_norm",zone=roi)
+        print("test min {} max {}".format(test_min.getInfo(),test_max.getInfo()))
     if vi == "ndvi":
         assert "B8" in liste_band, "The band B8 has not been normalized {}".format(liste_band)
         assert "B4" in liste_band, "The band B4 has not been normalized {}".format(liste_band)
