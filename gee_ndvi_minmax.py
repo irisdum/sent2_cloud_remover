@@ -147,7 +147,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
         print("TYPE ROI {}".format(type(zone)))
-        print("We are going to collect the image of the area {}".format(zone.area(0.001)))
+        print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
         #get_ndvi_minmax_tile(collection, zone)
         print("We have collection")
@@ -164,6 +164,17 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi):
     df.to_csv(path_build_dataset+"{}_min_mx.csv".format(vi),sep=",")
     #fromList = ee.FeatureCollection(features)
     #batch.Export.table.toAsset(fromList,"exportNDVI","test2")
+
+def get_minmax_fromcsv(path_im,path_csv):
+    """:path_im : str path to the npy image
+    :path_csv : str path to the csv which contains the minmax"""
+    assert os.path.isfile(path_csv),"No file found at {}".format(path_csv)
+    df=pd.read_csv(path_csv,header=True)
+    df.head(3)
+    tile_id=extract_tile_id(path_im).replace("npy","tif")
+    subf_df=df[df["tile_id"]==tile_id]
+
+
 
 def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,save_name="s2_bands_min_max"):
     geojson_path = create_geojson(path_build_dataset)  # path where the geojson of the grid of all the tiles is stored

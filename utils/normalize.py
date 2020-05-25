@@ -220,3 +220,6 @@ def image_rescaling(data, dict_band, dict_stats, rescale_fun):
     return new_array
 
 
+def normalize_s2_from_csv(liste_im,path_csv):
+    """:param liste_im a list of str whih corresponds to the path of the image"""
+    pass

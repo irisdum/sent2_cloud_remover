@@ -101,8 +101,8 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
         label_shape = DICT_SHAPE[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
-    dataX = load_from_dir(path_directory + XDIR, x_shape)
-    data_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
+    dataX,path_tileX = load_from_dir(path_directory + XDIR, x_shape)
+    data_label,path_tile_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
     if normalization:
         dataX,data_label=rescale_on_batch(dataX,data_label,dict_band_X=dict_band_X,dict_band_label=dict_band_label,
                                           dict_rescale_type=dict_rescale_type)
@@ -119,7 +119,7 @@ def load_from_dir(path_dir, image_shape):
     data_array = np.zeros(batch_x_shape)
     for i, tile in enumerate(path_tile):
         data_array[i, :, :, :] = np.load(tile)
-    return data_array
+    return data_array,path_tile
 
 
 def save_images(images, dir_path,ite=0):
