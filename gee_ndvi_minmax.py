@@ -93,7 +93,7 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     for b in liste_band:
         col = col.map(lambda img: normalize(img, b, scale))
     # compute the ndvi
-        test_min,test_max=one_band_max(col.first(),band="{}_norm",zone=roi)
+        test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
         print("test min {} max {}".format(test_min.getInfo(),test_max.getInfo()))
     if vi == "ndvi":
         assert "B8" in liste_band, "The band B8 has not been normalized {}".format(liste_band)
