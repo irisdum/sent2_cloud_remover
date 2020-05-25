@@ -2,7 +2,6 @@
 import argparse
 import json
 import os
-from geetools import batch
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
@@ -170,8 +169,9 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,expo
             print(df)
     if export=="GEE":
         fromList = ee.FeatureCollection(features)
-        batch.Export.table.toDrive(fromList,"export_{}".format(vi),GEE_DRIVE_FOLDER,"{}-{}".format(begin_date,ending_date),"CSV")
+        task=ee.batch.Export.table.toDrive(fromList,"export_{}".format(vi),GEE_DRIVE_FOLDER,"{}-{}".format(begin_date,ending_date),"CSV")
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
+        task.start()
     else:
         df.head(10)
         df.to_csv(path_build_dataset + "{}_min_mx.csv".format(vi), sep=",")
@@ -216,9 +216,10 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
             print(df)
     if export=="GEE":
         fromList = ee.FeatureCollection(features)
-        batch.Export.table.toDrive(fromList, "export_s2", GEE_DRIVE_FOLDER,
+        task=ee.batch.Export.table.toDrive(fromList, "export_s2", GEE_DRIVE_FOLDER,
                                    "{}-{}".format(begin_date, ending_date), "CSV")
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
+        task.start()
     else:
         df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
