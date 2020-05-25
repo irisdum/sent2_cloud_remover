@@ -157,7 +157,7 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,expo
         print("We have collection")
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         if export=="GEE":
-            new_feat=ee.Feature(zone,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
+            new_feat=ee.Feature(None,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
             features+=[new_feat]
         else:
             print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
@@ -169,9 +169,11 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,expo
             print(df)
     if export=="GEE":
         fromList = ee.FeatureCollection(features)
-        task=ee.batch.Export.table.toDrive(fromList,"export_{}".format(vi),GEE_DRIVE_FOLDER,"{}-{}".format(begin_date,ending_date),"CSV")
+        task = ee.batch.Export.table.toDrive(collection=fromList, description="export_{}".format(vi), folder=GEE_DRIVE_FOLDER,
+                                             fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
+        print(type(task))
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
-        task.start()
+        #task.start()
     else:
         df.head(10)
         df.to_csv(path_build_dataset + "{}_min_mx.csv".format(vi), sep=",")
@@ -209,17 +211,17 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
         dic_band_min_max=band_min_max(collection,zone,lband=lband,export=export)
         dic_band_min_max.update({"tile_id":tile_id})
         if export=="GEE":
-            new_feat=ee.Feature(zone,dic_band_min_max)
+            new_feat=ee.Feature(None,dic_band_min_max)
             features+=[new_feat]
         else:
             df=df.append(dic_band_min_max,ignore_index=True)
             print(df)
     if export=="GEE":
         fromList = ee.FeatureCollection(features)
-        task=ee.batch.Export.table.toDrive(fromList, "export_s2", GEE_DRIVE_FOLDER,
-                                   "{}-{}".format(begin_date, ending_date), "CSV")
+        task=ee.batch.Export.table.toDrive(collection=fromList,description="export_s2",folder=GEE_DRIVE_FOLDER,
+                                   fileNamePrefix="{}-{}".format(begin_date, ending_date),fileFormat= "CSV")
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
-        task.start()
+        #task.start()
     else:
         df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
