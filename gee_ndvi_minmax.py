@@ -42,6 +42,7 @@ def normalize(image, band, geometry, scale=None):
         minMax = ee.Image(subBand).reduceRegion(maxReducer, geometry, 1, subBand.projection())
         bmin = minMax.get("{}_min".format(band))
         bmax = minMax.get("{}_max".format(band))
+        print(type(bmin),type(bmax))
     else:
         bmin, bmax = scale
     print("bmin {} bmax {}".format(bmin.getInfo(), bmax.getInfo()))
