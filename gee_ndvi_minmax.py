@@ -119,7 +119,7 @@ def create_geojson(path_build_dataset):
     return geojson_path
 
 
-def band_min_max(col,zone,lband=None):
+def band_min_max(col,zone,lband=None,export="GEE"):
     "The aim of this function is to save a csv with th min max value of Sentinel 2 and use them to normalize the data"
     if lband is None: #
         lband=GEE_S2_BAND
@@ -127,7 +127,11 @@ def band_min_max(col,zone,lband=None):
     for band in lband:
         _,band_max=one_band_max(col.select(band).max(),band,zone)
         band_min,_=one_band_max(col.select(band).min(),band,zone)
-        dict_band_minmax.update({"{}min".format(band):band_min.getInfo(),"{}max".format(band):band_max.getInfo()})
+        if export=="GEE":
+            dict_band_minmax.update(
+                {"{}min".format(band): band_min, "{}max".format(band): band_max})
+        else:
+            dict_band_minmax.update({"{}min".format(band):band_min.getInfo(),"{}max".format(band):band_max.getInfo()})
 
     return dict_band_minmax
 
@@ -202,7 +206,7 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
         tile_id = extract_tile_id(path_tile)
         zone = define_geometry(coordo_tile)
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
-        dic_band_min_max=band_min_max(collection,zone,lband=lband)
+        dic_band_min_max=band_min_max(collection,zone,lband=lband,export=export)
         dic_band_min_max.update({"tile_id":tile_id})
         if export=="GEE":
             new_feat=ee.Feature(zone,dic_band_min_max)
