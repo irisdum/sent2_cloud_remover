@@ -71,6 +71,8 @@ def _argparser():
     parser.add_argument('--zone', type=str, help="path where the zone coordinates are stored ")
     parser.add_argument('--c', type=int, help="collection")
     parser.add_argument('--vi',default="ndvi",type=str, help="vegetation index could be  ndvi")
+    parser.add_argument('--export',default="GEE",type=str,help="Type of export could be GEE (google earth engine dirve) or loac "
+                                                               "a csv via pandas lib")
     return parser.parse_args()
 
 
@@ -216,12 +218,12 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
     else:
         df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
-def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
+def main(path_build_dataset, input_dataset,begin_date, ending_date,vi,export):
     if vi in ["evi","ndvi"]:
-        all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi) #TODO adapt the script so the normalization of the data when computing the vi is the global constant
+        all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,export=export) #TODO adapt the script so the normalization of the data when computing the vi is the global constant
     else:
         print("We take care of the the S2 min max")
-        get_band_s2_min_max(path_build_dataset, begin_date, ending_date)
+        get_band_s2_min_max(path_build_dataset, begin_date, ending_date,export=export)
     #name = ee.Image(collection.first()).get("PRODUCT_ID")
         #.getInfo()
     #print(ee.String(name).getInfo())
@@ -229,4 +231,4 @@ def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.path_bdata,args.path_input_data,args.bd, args.ed,args.vi)
+    main(args.path_bdata,args.path_input_data,args.bd, args.ed,args.vi,args.export)
