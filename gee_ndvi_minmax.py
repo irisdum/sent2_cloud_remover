@@ -180,8 +180,11 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
     df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
 
 def main(path_build_dataset, input_dataset,begin_date, ending_date,vi):
-    all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi) #TODO adapt the script so the normalization of the data when computing the vi is the global constant
-    get_band_s2_min_max(path_build_dataset, begin_date, ending_date)
+    if vi in ["evi","ndvi"]:
+        all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi) #TODO adapt the script so the normalization of the data when computing the vi is the global constant
+    else:
+        print("We take care of the the S2 min max")
+        get_band_s2_min_max(path_build_dataset, begin_date, ending_date)
     #name = ee.Image(collection.first()).get("PRODUCT_ID")
         #.getInfo()
     #print(ee.String(name).getInfo())
