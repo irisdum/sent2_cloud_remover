@@ -45,7 +45,7 @@ def normalize(image, band, geometry, scale=None):
         print(type(bmin),type(bmax))
     else:
         bmin, bmax = scale
-    print("bmin {} bmax {}".format(bmin.getInfo(), bmax.getInfo()))
+    print("bmin {} bmax {}".format(ee.Number(bmin).getInfo(), ee.Number(bmax).getInfo()))
     normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(
         ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
