@@ -123,14 +123,16 @@ def band_min_max(col,zone,lband=None,export="GEE"):
     if lband is None: #
         lband=GEE_S2_BAND
     dict_band_minmax={}
+    print("TYPE ROI {}".format(type(zone)))
     for band in lband:
+        print(band)
         _,band_max=one_band_max(col.select(band).max(),band,zone)
         band_min,_=one_band_max(col.select(band).min(),band,zone)
         if export=="GEE":
             dict_band_minmax.update(
-                {"{}min".format(band): band_min, "{}max".format(band): band_max})
+                {"{}_min".format(band): band_min, "{}_max".format(band): band_max})
         else:
-            dict_band_minmax.update({"{}min".format(band):band_min.getInfo(),"{}max".format(band):band_max.getInfo()})
+            dict_band_minmax.update({"{}_min".format(band):band_min.getInfo(),"{}_max".format(band):band_max.getInfo()})
 
     return dict_band_minmax
 
@@ -210,6 +212,7 @@ def get_band_s2_min_max(path_build_dataset,begin_date, ending_date,lband=None,sa
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
         dic_band_min_max=band_min_max(collection,zone,lband=lband,export=export)
         dic_band_min_max.update({"tile_id":tile_id})
+        print(dic_band_min_max.keys())
         if export=="GEE":
             new_feat=ee.Feature(None,dic_band_min_max)
             features+=[new_feat]
