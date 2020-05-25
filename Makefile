@@ -26,9 +26,9 @@ find_image:
 	@python3 find_image.py  --bd ${begin_date1} --ed ${end_date1} --zone ${geojson_file} --c 2
 
 get_s2_minmax:
-	@python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi s2
+	@sbatch get_min_max.sh ${build_dataset_dir}  ${target_directory}${output_split_dir_name}  2019-01-01 2019-12-31  s2
 get_ndvi_minmax:
-	@python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi ndvi
+	@sbatch get_min_max.sh ${build_dataset_dir}  ${target_directory}${output_split_dir_name}  2019-01-01 2019-12-31  ndvi
 
 download_image:
 		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp"
