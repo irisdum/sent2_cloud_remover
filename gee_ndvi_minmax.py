@@ -41,6 +41,7 @@ def normalize(image,band,geometry,scale=None):
         bmax = minMax.get("{}_max".format(band))
     else:
         bmin,bmax=scale
+    print("bmin {} bmax {}".format(bmin.getInfo(),bmax.getInfo()))
     normalize_band=ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(
         ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
@@ -147,16 +148,17 @@ def all_minmax(path_build_dataset, input_dataset,begin_date, ending_date,vi,expo
     features=[]
     #go over all the tiles
     for i,tile in enumerate(l_grid_info):
-        print(i)
+        print(i,len(coordo_tile))
         path_tile=tile[0]
         coordo_tile=tile[1]
+        print("INFO ite {} nber of coordo {} ,name of tile {}".format(i, len(coordo_tile),path_tile))
         #print(coordo_tile)
         tile_id=extract_tile_id(path_tile)
         zone=define_geometry(coordo_tile)
         print("TYPE ROI {}".format(type(zone)))
         collection=get_filter_collection(begin_date, ending_date, zone, 2)
         #get_ndvi_minmax_tile(collection, zone)
-        print("We have collection")
+        print("We have collection") #TODO combien the two functions and see if it works
         vi_min,vi_max=get_ndvi_minmax_tile(collection,zone)
         if export=="GEE":
             new_feat=ee.Feature(None,{"name":tile_id,"vi_min":vi_min,"vi_max":vi_max})
