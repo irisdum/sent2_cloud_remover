@@ -25,6 +25,8 @@ conda_rasterio:
 find_image:
 	@python3 find_image.py  --bd ${begin_date1} --ed ${end_date1} --zone ${geojson_file} --c 2
 
+get_s2_minmax:
+	@python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi s2
 get_ndvi_minmax:
 	@python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi ndvi
 
