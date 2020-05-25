@@ -27,7 +27,7 @@ find_image:
 
 get_s2_minmax:
 	@sbatch get_minmax.sh ${build_dataset_dir}  ${target_directory}${output_split_dir_name}  2019-01-01 2019-12-31  s2
-	
+
 get_ndvi_minmax:
 	@python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi ndvi
 
