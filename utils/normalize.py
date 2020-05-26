@@ -165,18 +165,14 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,d
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
     #print("Before compute batch stat mean {} min {} max {}".format(np.mean(batch_X),np.min(batch_X),np.max(batch_X)))
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
-    #print("BATCH _DICT STATS",dict_stat)
-    if l_s2_stat is not None: #TODO adapt to extract the mean for the batch
-        assert batch_X.shape[0]==1, "This feature of using csv is not adapted for rescale_on_batch with a batch >1 {}".format(batch_X.shape)
-        #print("BEFORE UPDATE {}".format(dict_stat))
-        dict_s2_stat=l_s2_stat[0]  #WARNING this is hardcoded as we only use batch of 1 !! this should be completly
-        for b in dict_s2_stat: #We replace the s2 value computed by the values from the csv
-            assert b in dict_stat.keys(), "The key from the csv stats {} is not in the original dict_stat {}".format(b,dict_stat.keys())
-            dict_stat.update({b:dict_s2_stat[b]}) #TODO a method so the previous stat are not computed
-        #print("AFTER UPDATE {}".format(dict_stat))
-    #print("FINAL DICT STAT {}".format(dict_stat))
     for i in range(batch_size): #Rescale all the image on the batch
-       rescaled_batch_X[i,:,:,:],rescaled_batch_label[i,:,:,:]=rescaling_combined_methods(batch_X[i,:,:,:],batch_label[i,:,:,:],dict_band_X,
+        if l_s2_stat is not None:  # TODO adapt to extract the mean for the batch
+            # print("BEFORE UPDATE {}".format(dict_stat))
+            dict_s2_stat = l_s2_stat[i]  # WARNING this is hardcoded as we only use batch of 1 !! this should be completly
+            for b in dict_s2_stat:  # We replace the s2 value computed by the values from the csv
+                assert b in dict_stat.keys(), "The key from the csv stats {} is not in the original dict_stat {}".format(b, dict_stat.keys())
+                dict_stat.update({b: dict_s2_stat[b]})
+        rescaled_batch_X[i,:,:,:],rescaled_batch_label[i,:,:,:]=rescaling_combined_methods(batch_X[i,:,:,:],batch_label[i,:,:,:],dict_band_X,
                                                                                           dict_band_label,dict_rescale_type,plot=False,dict_stat=dict_stat)
     return rescaled_batch_X,rescaled_batch_label
 
