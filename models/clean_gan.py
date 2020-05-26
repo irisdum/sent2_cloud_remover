@@ -33,14 +33,18 @@ class GAN():
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         if "dict_band_x" not in train_yaml:
-            self.dict_band_X=None
-            self.dict_band_label=None
-            self.dict_rescale_type=None
+            self.dict_band_X = None
+            self.dict_band_label = None
+            self.dict_rescale_type = None
+            self.path_csv = None
         else:
-            self.dict_band_X=train_yaml["dict_band_x"]
-            self.dict_band_label=train_yaml["dict_band_label"]
-            self.dict_rescale_type=train_yaml["dict_rescale_type"]
-            assert type(self.dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(self.dict_band_label,type(self.dict_band_label))
+            self.dict_band_X = train_yaml["dict_band_x"]
+            self.dict_band_label = train_yaml["dict_band_label"]
+            self.dict_rescale_type = train_yaml["dict_rescale_type"]
+            assert type(self.dict_band_label) == type(
+                {"u": 1}), "The argument {} of dict band label is not a dictionnary  but {}".format(
+                self.dict_band_label, type(self.dict_band_label))
+            self.path_csv = train_yaml["path_csv"]
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
@@ -49,24 +53,28 @@ class GAN():
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
-        self.previous_checkpoint=train_yaml["load_model"]
+        self.previous_checkpoint = train_yaml["load_model"]
         # TRAIN PARAMETER
-        self.normalization=train_yaml["normalization"]
+        self.normalization = train_yaml["normalization"]
         self.epoch = train_yaml["epoch"]
         self.batch_size = train_yaml["batch_size"]
         # self.sess = sess
         self.learning_rate = train_yaml["lr"]
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
-        self.val_directory=train_yaml["val_directory"]
-        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization,dict_band_X=self.dict_band_X,dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type)
-        self.val_X, self.val_Y = load_data(self.val_directory,normalization=self.normalization,dict_band_X=self.dict_band_X,dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type)
-        print("Loading the data done dataX {} dataY ".format(self.data_X.shape,self.data_y.shape))
+        self.val_directory = train_yaml["val_directory"]
+        self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization,
+                                             dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
+                                             dict_rescale_type=self.dict_rescale_type)
+        self.val_X, self.val_Y = load_data(self.val_directory, normalization=self.normalization,
+                                           dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
+                                           dict_rescale_type=self.dict_rescale_type)
+        print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
-        self.w_saving_step=train_yaml["weights_saving_step"]
-        self.val_metric_step=train_yaml["metric_step"]
+        self.w_saving_step = train_yaml["weights_saving_step"]
+        self.val_metric_step = train_yaml["metric_step"]
         # REDUCE THE DISCRIMINATOR PERFORMANCE
         self.val_lambda = train_yaml["lambda"]
         self.real_label_smoothing = tuple(train_yaml["real_label_smoothing"])
@@ -77,10 +85,10 @@ class GAN():
         self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.d_optimizer = Adam(self.learning_rate, self.beta1)
         self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-        self.max_im=10
+        self.max_im = 10
         self.build_model()
-            # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
-            # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
+        # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
+        # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
     def build_model(self):
 
@@ -109,8 +117,6 @@ class GAN():
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
         print("[INFO] combiend model loss are : ".format(self.combined.metrics_names))
-
-
 
     def build_generator(self, model_yaml, is_training=True):
         img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
@@ -202,7 +208,7 @@ class GAN():
 
     def produce_noisy_input(self, input, sigma_val):
         if self.model_yaml["add_discri_white_noise"]:
-            #print("[INFO] On each batch GT label we add Gaussian Noise before training discri on labelled image")
+            # print("[INFO] On each batch GT label we add Gaussian Noise before training discri on labelled image")
             new_gt = GaussianNoise(sigma_val, input_shape=self.model_yaml["dim_gt_image"], name="d_inputGN")(
                 input)
             if self.model_yaml["add_relu_after_noise"]:
@@ -225,23 +231,23 @@ class GAN():
         fake = np.zeros((self.batch_size, 30, 30, 1))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
-            #TODO LOAD WEIGHTS FOR DISCRI COMBINED AND GENE
-            start_epoch=int(self.previous_checkpoint)+1
+            # TODO LOAD WEIGHTS FOR DISCRI COMBINED AND GENE
+            start_epoch = int(self.previous_checkpoint) + 1
             self.load_from_checkpoint(self.previous_checkpoint)
         else:
             create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
-            start_epoch=0
+            start_epoch = 0
         self.define_callback()
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
         start_batch_id = 0
         # dict_metric={"epoch":[],"d_loss_real":[],"d_loss_fake":[],"d_loss":[],"g_loss":[]}
-        d_loss_real=[100,100] #init losses
-        d_loss_fake=[100,100]
-        d_loss=[100,100]
-        l_val_name_metrics, l_val_value_metrics=[],[]
+        d_loss_real = [100, 100]  # init losses
+        d_loss_fake = [100, 100]
+        d_loss = [100, 100]
+        l_val_name_metrics, l_val_value_metrics = [], []
         for epoch in range(start_epoch, self.epoch):
             print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
@@ -259,22 +265,22 @@ class GAN():
                 d_noise_fake = random.uniform(self.fake_label_smoothing[0],
                                               self.fake_label_smoothing[1])  # Add noise on the loss
 
-                #Create a noisy gt images
-                batch_new_gt=self.produce_noisy_input(batch_gt,sigma_val)
+                # Create a noisy gt images
+                batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)
                 # Generate a batch of new images
-                #print("Make a prediction")
+                # print("Make a prediction")
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
 
                 if epoch not in [i for i in self.ite_train_g]:
-                    #print("Train the driscriminator real")
+                    # print("Train the driscriminator real")
                     d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
-                    #print("Train the discri fake")
+                    # print("Train the discri fake")
                     d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
                     d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
                 # Train the generator (to have the discriminator label samples as valid)
-                #print("Train combined")
+                # print("Train combined")
                 g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
 
                 # Plot the progress
@@ -282,13 +288,13 @@ class GAN():
                                                                                  d_loss[0], 100 * d_loss[1], g_loss[0],
                                                                                  g_loss[1]))
 
-                if epoch % self.im_saving_step == 0 and idx<self.max_im: #to save some generated_images
+                if epoch % self.im_saving_step == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
-                if idx % self.val_metric_step==0:
-                    l_val_name_metrics,l_val_value_metrics=self.val_metric()
-                    name_val_metric=["val_{}".format(name) for name in l_val_name_metrics]
+                if idx % self.val_metric_step == 0:
+                    l_val_name_metrics, l_val_value_metrics = self.val_metric()
+                    name_val_metric = ["val_{}".format(name) for name in l_val_name_metrics]
                     name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
                                                                "d_acc_real", "d_acc_fake", "d_acc_tot"]
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
@@ -299,14 +305,14 @@ class GAN():
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
 
-                    write_log(self.g_tensorboard_callback, name_logs + l_name_metrics+name_val_metric,
-                              val_logs + l_value_metrics+l_val_value_metrics,
+                    write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
+                              val_logs + l_value_metrics + l_val_value_metrics,
                               self.num_batches * epoch + idx)
 
-            if epoch % self.sigma_step == 0: #update simga
+            if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
-            #save the models
-            if epoch%self.w_saving_step==0:
+            # save the models
+            if epoch % self.w_saving_step == 0:
                 self.save_model(epoch)
 
     def save_model(self, step):
@@ -315,27 +321,28 @@ class GAN():
             os.makedirs(checkpoint_dir)
         if not os.path.isfile("{}model_generator.yaml".format(self.checkpoint_dir)):
             gene_yaml = self.generator.to_yaml()
-            with open("{}model_generator.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+            with open("{}model_generator.yaml".format(self.checkpoint_dir), "w") as yaml_file:
                 yaml_file.write(gene_yaml)
         if not os.path.isfile("{}model_combined.yaml".format(self.checkpoint_dir)):
             comb_yaml = self.combined.to_yaml()
-            with open("{}model_combined.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+            with open("{}model_combined.yaml".format(self.checkpoint_dir), "w") as yaml_file:
                 yaml_file.write(comb_yaml)
         if not os.path.isfile("{}model_discri.yaml".format(self.checkpoint_dir)):
             discri_yaml = self.discriminator.to_yaml()
-            with open("{}model_discri.yaml".format(self.checkpoint_dir),"w") as yaml_file:
+            with open("{}model_discri.yaml".format(self.checkpoint_dir), "w") as yaml_file:
                 yaml_file.write(discri_yaml)
-        self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
-        self.discriminator.save_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
-        self.combined.save_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
+        self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        self.discriminator.save_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        self.combined.save_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
 
-    def load_from_checkpoint(self,step):
-        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir,step)),"No file at {}".format("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
-        self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir,step))
-        self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir,step))
-        self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir,step))
+    def load_from_checkpoint(self, step):
+        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir, step)), "No file at {}".format(
+            "{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
 
-    def load_generator(self,path_yaml,path_weight):
+    def load_generator(self, path_yaml, path_weight):
         # load YAML and create model
         yaml_file = open(path_yaml, 'r')
         loaded_model_yaml = yaml_file.read()
@@ -347,32 +354,32 @@ class GAN():
         return loaded_model
 
     def val_metric(self):
-        val_pred=self.generator.predict(self.val_X)
-        return compute_metric(self.val_Y,val_pred)
+        val_pred = self.generator.predict(self.val_X)
+        return compute_metric(self.val_Y, val_pred)
 
-    def predict_on_iter(self,batch,path_save,l_image_id=None):
+    def predict_on_iter(self, batch, path_save, l_image_id=None):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory"""
-        if type(batch)==type("u"): #the param is an string we load the bathc from this directory
-            batch,_=load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                      dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
-            l_image_id=find_image_indir(batch, "npy")
+        if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
+            batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
+                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
+            l_image_id = find_image_indir(batch, "npy")
         else:
             if l_image_id is None:
-                l_image_id=[i for i in range(batch.shape[0])]
-        assert len(l_image_id)==batch.shape[0],"Wrong size of the name of the images is {} should be {} ".format(len(l_image_id),batch.shape[0])
+                l_image_id = [i for i in range(batch.shape[0])]
+        assert len(l_image_id) == batch.shape[0], "Wrong size of the name of the images is {} should be {} ".format(
+            len(l_image_id), batch.shape[0])
         if os.path.isdir(path_save):
             print("[INFO] the directory where to store the image already exists")
-            data_array,path_tile=load_from_dir(path_save,DICT_SHAPE[LABEL_DIR])
+            data_array, path_tile = load_from_dir(path_save, DICT_SHAPE[LABEL_DIR], self.path_csv)
             return data_array
         else:
             create_safe_directory(path_save)
-            batch_res=self.generator.predict(batch)
+            batch_res = self.generator.predict(batch)
             if path_save is not None:
-                #we store the data at path_save
+                # we store the data at path_save
                 for i in range(batch_res.shape[0]):
-                    np.save("{}_image_{}".format(path_save,l_image_id[i]))
+                    np.save("{}_image_{}".format(path_save, l_image_id[i]))
         return batch_res
-
 
 
 if __name__ == '__main__':

@@ -208,18 +208,6 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
         df.to_csv(path_build_dataset + "{}_min_mx.csv".format(vi), sep=",")
 
 
-def get_minmax_fromcsv(path_im, path_csv):
-    """:path_im : str path to the npy image
-    :path_csv : str path to the csv which contains the minmax
-    :returns a dictionnary for each band giving the min_max"""
-    assert os.path.isfile(path_csv), "No file found at {}".format(path_csv)
-    df = pd.read_csv(path_csv, header=True)
-    df.head(3)
-    tile_id = extract_tile_id(path_im).replace("npy", "tif")
-    subf_df = df[df["tile_id"] == tile_id]
-    assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
-    dict_res = subf_df.iloc[0].to_dict()
-    return dict_res
 
 
 def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None, save_name="s2_bands_min_max",

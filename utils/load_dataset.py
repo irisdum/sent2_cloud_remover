@@ -9,7 +9,7 @@ from utils.display_image import convert_array
 from osgeo import gdal
 import numpy as np
 
-from utils.normalize import rescale_on_batch
+from utils.normalize import rescale_on_batch, stat_from_csv
 
 
 def make_dataset_hierarchy(path_dataset):
@@ -93,7 +93,7 @@ def create_input_dataset(dict_tiles, input_dir, output_dir,norm=False):
         prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir,norm=norm)
 
 
-def load_data(path_directory, x_shape=None, label_shape=None, normalization=True,dict_band_X=None,dict_band_label=None,dict_rescale_type=None):
+def load_data(path_directory, x_shape=None, label_shape=None, normalization=True,dict_band_X=None,dict_band_label=None,dict_rescale_type=None,dir_csv=None):
     """:param path_directory : path to the directory (train,test or val) which contains two directory dataX and label """
     if x_shape is None:
         x_shape = DICT_SHAPE[XDIR]
@@ -101,25 +101,28 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
         label_shape = DICT_SHAPE[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
-    dataX,path_tileX = load_from_dir(path_directory + XDIR, x_shape)
-    data_label,path_tile_label = load_from_dir(path_directory + LABEL_DIR, label_shape)
+    dataX,path_tileX,ldict_stat= load_from_dir(path_directory + XDIR, x_shape,path_dir_csv=dir_csv) #only need to load once the s
+    data_label,path_tile_label,_ = load_from_dir(path_directory + LABEL_DIR, label_shape,path_dir_csv=None)
     if normalization:
         dataX,data_label=rescale_on_batch(dataX,data_label,dict_band_X=dict_band_X,dict_band_label=dict_band_label,
-                                          dict_rescale_type=dict_rescale_type)
+                                          dict_rescale_type=dict_rescale_type,l_s2_stat=ldict_stat)
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
     print("The shape of the data are data {} label {}".format(dataX.shape,data_label.shape))
     return dataX, data_label
 
 
-def load_from_dir(path_dir, image_shape):
+def load_from_dir(path_dir, image_shape, path_dir_csv=None):
     assert os.path.isdir(path_dir),"Dir {} does not exist".format(path_dir)
     path_tile = find_image_indir(path_dir, "npy")
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     data_array = np.zeros(batch_x_shape)
+    ldict_stat=[]
     for i, tile in enumerate(path_tile):
         data_array[i, :, :, :] = np.load(tile)
-    return data_array,path_tile
+        ldict_stat += [stat_from_csv(path_tile=tile, dir_csv=path_dir_csv)]
+    return data_array,path_tile,ldict_stat
+
 
 
 def save_images(images, dir_path,ite=0):
