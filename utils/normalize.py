@@ -163,17 +163,17 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,d
     rescaled_batch_label=np.zeros(batch_label.shape)
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
-    print("Before compute batch stat mean {} min {} max {}".format(np.mean(batch_X),np.min(batch_X),np.max(batch_X)))
+    #print("Before compute batch stat mean {} min {} max {}".format(np.mean(batch_X),np.min(batch_X),np.max(batch_X)))
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
-    print("BATCH _DICT STATS",dict_stat)
+    #print("BATCH _DICT STATS",dict_stat)
     if l_s2_stat is not None: #TODO adapt to extract the mean for the batch
         assert batch_X.shape[0]==1, "This feature of using csv is not adapted for rescale_on_batch with a batch >1 {}".format(batch_X.shape)
-        print("BEFORE UPDATE {}".format(dict_stat))
+        #print("BEFORE UPDATE {}".format(dict_stat))
         dict_s2_stat=l_s2_stat[0]  #WARNING this is hardcoded as we only use batch of 1 !! this should be completly
         for b in dict_s2_stat: #We replace the s2 value computed by the values from the csv
             assert b in dict_stat.keys(), "The key from the csv stats {} is not in the original dict_stat {}".format(b,dict_stat.keys())
             dict_stat.update({b:dict_s2_stat[b]}) #TODO a method so the previous stat are not computed
-        print("AFTER UPDATE {}".format(dict_stat))
+        #print("AFTER UPDATE {}".format(dict_stat))
     #print("FINAL DICT STAT {}".format(dict_stat))
     for i in range(batch_size): #Rescale all the image on the batch
        rescaled_batch_X[i,:,:,:],rescaled_batch_label[i,:,:,:]=rescaling_combined_methods(batch_X[i,:,:,:],batch_label[i,:,:,:],dict_band_X,
@@ -187,19 +187,19 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
     batch_size = batch_X.shape[0]
     list_batch_stat = [] #list of all the dict stat of each batch
     dict_stat=dict(zip([i for i in dict_rescale_type],[(0,0) for i in range(len(dict_rescale_type))]))
-    print(" in compute_batch_stat dict_stat",dict_stat)
+    #print(" in compute_batch_stat dict_stat",dict_stat)
     for i in range(batch_size):  # go over all the tiles in the batch tile to compute the stats
         array_dataX=batch_X[i,:,:,:]
         array_label=batch_label[i,:,:,:]
         stat_one_batch={}
         for band in dict_rescale_type:
-            print("compute stat band ")
+            #print("compute stat band ")
             dx, dlabel = create_dict_bande(band, dict_band_X, dict_band_label) #small dicts with only band
             rescale_type = dict_rescale_type[band]
             sub_dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
                                             stats=dict_method[rescale_type], plot=False)
             stat_one_batch.update(sub_dict_stat)
-            print("compute stat band ",stat_one_batch)
+            #print("compute stat band ",stat_one_batch)
         list_batch_stat+=[stat_one_batch]
     assert len(list_batch_stat)==batch_size, "Not enough stat has been computed {}".format(list_batch_stat)
     #print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
@@ -252,7 +252,7 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     image_id=extract_tile_id(path_tile).split(".")[0]+".tif"
     dict_stat={}
     for band in dict_translate_band:
-        print("Working with band {}".format(band))
+        #print("Working with band {}".format(band))
         band_name=dict_translate_band[band]
         min,max=get_minmax_fromcsv(image_id,find_csv(dir_csv,band),band)
         dict_stat.update({band_name:(min,max)})
@@ -272,14 +272,14 @@ def get_minmax_fromcsv(tile_id,path_csv,band):
     assert type(band)==type("u"),"The input should be a string not a {}".format(band)
     df=pd.read_csv(path_csv,sep=",",header=0)
     df.head(5)
-    print(df.head(5))
-    print(df.columns)
+    #print(df.head(5))
+    #print(df.columns)
     name_col=["{}_min".format(band),"{}_max".format(band)]
-    print("Looking for {}".format(tile_id))
+    #print("Looking for {}".format(tile_id))
     subf_df = df[df["tile_id"] == tile_id]
     assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
     dict_res = subf_df.iloc[0].to_dict()
-    print("Resultat min, max from {} : {}".format(path_csv,dict_res))
+    #print("Resultat min, max from {} : {}".format(path_csv,dict_res))
     print("We divide the res by this {} as it was used to rescale the data in the dataset ".format(CONVERTOR))
     return dict_res[name_col[0]]/CONVERTOR,dict_res[name_col[1]]/CONVERTOR
 
