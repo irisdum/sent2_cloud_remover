@@ -1,11 +1,8 @@
 #This file enables us to rain numerous test
 import sys
-
-from scanning_dataset import extract_tile_id
-
 sys.path.append("..")
 import argparse
-
+from scanning_dataset import extract_tile_id
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE
 from utils.display_image import find_image_indir
 from utils.load_dataset import load_from_dir
