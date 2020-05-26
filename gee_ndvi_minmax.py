@@ -249,12 +249,12 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
         fromList = ee.FeatureCollection(features)
         task = ee.batch.Export.table.toDrive(collection=fromList, description="export_s2", folder=GEE_DRIVE_FOLDER,
                                              fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
-
+        task.start()
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
         print(task.status())
         # print(task.task_type)
         print(task.list())
-        task.start()
+        #task.start()
         print(task.status())
     else:
         df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
