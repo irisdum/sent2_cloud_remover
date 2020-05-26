@@ -46,8 +46,7 @@ def normalize(image, band, geometry, scale=None):
     else:
         print("Max and min Given")
         bmin, bmax = scale
-    normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(
-        ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
+    normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
 
 
@@ -95,7 +94,8 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     #cast the value
     pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
     print(type(pixel_val))
-    col=col.select(liste_band).cast(dict(zip(liste_band,[pixel_val for i in range(len(liste_band))])),liste_band)
+    liste_band_norm=["{}_norm".format(b) for b in liste_band]
+    col=col.select([liste_band_norm]).cast(dict(zip(liste_band_norm,[pixel_val for i in range(len(liste_band_norm))])),liste_band)
     # compute the ndvi
         #test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
         #print("test min {} max {}".format(test_min.getInfo(),test_max.getInfo()))
