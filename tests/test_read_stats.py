@@ -21,7 +21,7 @@ def _argparser():
 def main(test_name,dataset_dir,input_dataset):
     print("[INFO] test {} is going to be runned".format(test_name))
     if test_name=="read_csv_stats":
-        tile_id=find_image_indir(input_dataset+LABEL_DIR, "npy")
+        tile_id=find_image_indir(input_dataset+LABEL_DIR, "npy")[0]
         path_csv=find_csv(dataset_dir,"B2")
         val_min, val_max=get_minmax_fromcsv(tile_id.split(".")[0] + "tif", path_csv, "B2")
         print("TEST for image {} the min_max from csv is {}".format(tile_id, (val_min, val_max)))
