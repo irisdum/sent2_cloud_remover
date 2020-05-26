@@ -163,6 +163,7 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,d
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
+    print("BATCH _DICT STATS",dict_stat)
     if l_s2_stat is not None: #TODO adapt to extract the mean for the batch
         assert batch_X.shape[0]==1, "This feature of using csv is not adapted for rescale_on_batch with a batch >1 {}".format(batch_X.shape)
         print("BEFORE UPDATE {}".format(dict_stat))

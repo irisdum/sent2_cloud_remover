@@ -103,6 +103,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
         label_shape, x_shape)
     dataX,path_tileX,ldict_stat= load_from_dir(path_directory + XDIR, x_shape,path_dir_csv=dir_csv) #only need to load once the s
     data_label,path_tile_label,_ = load_from_dir(path_directory + LABEL_DIR, label_shape,path_dir_csv=None)
+    print("L_dict_STAT {}".format(ldict_stat))
     if normalization:
         dataX,data_label=rescale_on_batch(dataX,data_label,dict_band_X=dict_band_X,dict_band_label=dict_band_label,
                                           dict_rescale_type=dict_rescale_type,l_s2_stat=ldict_stat)
@@ -124,7 +125,7 @@ def load_from_dir(path_dir, image_shape, path_dir_csv=None):
         for i, tile in enumerate(path_tile):
             data_array[i, :, :, :] = np.load(tile)
             ldict_stat += [stat_from_csv(path_tile=tile, dir_csv=path_dir_csv)]
-    return data_array,path_tile,ldict_stat
+        return data_array,path_tile,ldict_stat
 
 
 
