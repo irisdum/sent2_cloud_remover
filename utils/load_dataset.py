@@ -117,10 +117,13 @@ def load_from_dir(path_dir, image_shape, path_dir_csv=None):
     path_tile = find_image_indir(path_dir, "npy")
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     data_array = np.zeros(batch_x_shape)
-    ldict_stat=[]
-    for i, tile in enumerate(path_tile):
-        data_array[i, :, :, :] = np.load(tile)
-        ldict_stat += [stat_from_csv(path_tile=tile, dir_csv=path_dir_csv)]
+    if path_dir_csv is None:
+        return data_array, path_tile,None
+    else:
+        ldict_stat=[]
+        for i, tile in enumerate(path_tile):
+            data_array[i, :, :, :] = np.load(tile)
+            ldict_stat += [stat_from_csv(path_tile=tile, dir_csv=path_dir_csv)]
     return data_array,path_tile,ldict_stat
 
 

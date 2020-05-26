@@ -42,7 +42,7 @@ def main(test_name,dataset_dir,input_dataset):
                                       dict_band_X=None,
                                       dict_band_label=None, dict_rescale_type=None, dir_csv=None)
         print(np.mean(dataX[0, :, :, 4]), np.mean(data_label[0, :, :, 0]))
-        
+
 if __name__ == '__main__':
     args=_argparser()
     main(args.test_name,args.dataset_dir,args.input_dataset)
