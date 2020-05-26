@@ -247,8 +247,9 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     image_id=extract_tile_id(path_tile).split(".")[0]+".tif"
     dict_stat={}
     for band in dict_translate_band:
+        print("Working with band {}".format(band))
         band_name=dict_translate_band[band]
-        min,max=get_minmax_fromcsv(image_id,find_csv(dir_csv,band),dict_translate_band.keys())
+        min,max=get_minmax_fromcsv(image_id,find_csv(dir_csv,band),band)
         dict_stat.update({band_name:(min,max)})
     print("The stats found from csv are {}".format(dict_stat))
     return dict_stat
@@ -263,6 +264,7 @@ def find_csv(path_dir,band):
 def get_minmax_fromcsv(tile_id,path_csv,band):
     """:param : tile_id a string
     :param path_csv : the directory which contains the csv"""
+    assert type(band)==type("u"),"The input should be a string not a {}".format(band)
     df=pd.read_csv(path_csv,sep=",",header=0)
     df.head(5)
     print(df.head(5))
