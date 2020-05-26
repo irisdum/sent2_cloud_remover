@@ -73,6 +73,7 @@ def compute_band_stats(band_array, stats):
         stat1, stat2 = band_array.mean(), band_array.std()
     else:
         stat1, stat2 = band_array.min(), band_array.max()
+    print(stat1,stat2)
     return stat1, stat2
 
 
