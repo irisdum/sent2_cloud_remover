@@ -185,17 +185,19 @@ def compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_res
     batch_size = batch_X.shape[0]
     list_batch_stat = [] #list of all the dict stat of each batch
     dict_stat=dict(zip([i for i in dict_rescale_type],[(0,0) for i in range(len(dict_rescale_type))]))
-    #print("dict_stat",dict_stat)
+    print(" in compute_batch_stat dict_stat",dict_stat)
     for i in range(batch_size):  # go over all the tiles in the batch tile to compute the stats
         array_dataX=batch_X[i,:,:,:]
         array_label=batch_label[i,:,:,:]
         stat_one_batch={}
         for band in dict_rescale_type:
+            print("compute stat band ")
             dx, dlabel = create_dict_bande(band, dict_band_X, dict_band_label) #small dicts with only band
             rescale_type = dict_rescale_type[band]
             sub_dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dx, dictlabel=dlabel,
                                             stats=dict_method[rescale_type], plot=False)
             stat_one_batch.update(sub_dict_stat)
+            print("compute stat band ",stat_one_batch)
         list_batch_stat+=[stat_one_batch]
     assert len(list_batch_stat)==batch_size, "Not enough stat has been computed {}".format(list_batch_stat)
     #print("THE LIST OF THE BATHC STATS IS {}".format(list_batch_stat))
