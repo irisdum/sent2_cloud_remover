@@ -6,6 +6,7 @@ import numpy as np
 from osgeo import gdal
 #from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
+from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import  compute_vi,diff_metric,diff_relative_metric
 
 def plot_allbands_hist(path_tif,ax):
@@ -231,3 +232,38 @@ def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_po
     ax[3].set_title("relative differenced {}".format(vi))
     fig.colorbar(dr_im, ax=ax[3], orientation="vertical")
     plt.show()
+
+def plot_all_compar(batch_predict,batch_gt,max_im=100,title=""):
+    n=batch_predict.shape[0]
+    if n<max_im:
+        max_im=n
+    #fig,ax2=plt.subplots(n,4,figsize=(15,60))
+    lssim,_=ssim_batch(batch_predict,batch_gt)
+    lpsnr,_=batch_psnr(batch_predict,batch_gt)
+    lsam,_=batch_sam(batch_predict,batch_gt)
+    #print(len(lssim))
+    for i in range(max_im):
+        fig,ax2=plt.subplots(1,4,figsize=(20,20))
+        fig.suptitle(title)
+        image_pred=batch_predict[i,:,:,:]
+        image_gt=batch_gt[i,:,:,:]
+        display_final_tile(image_pred,band=[0,1,2],ax=ax2[0])
+        ax2[0].set_title("Sim True color visualization")
+        display_final_tile(image_pred,band=[3,0,1],ax=ax2[1])
+        ax2[1].set_title("Sim NIR color visualization")
+        ax2[2].set_title("Real image ssim {} psnr {} sam {}".format(round(lssim[i],3),round(lpsnr[i],3),round(lsam[i],3)))
+        display_final_tile(image_gt,band=[3,0,1],ax=ax2[3])
+        ax2[3].set_title("Real image NIR color visualisation")
+        display_final_tile(image_gt,band=[0,1,2],ax=ax2[2])
+        plt.show()
+
+def display_final_tile(raster_array,band=None,ax=None):
+    #raster_array=np.load(path_npy)
+    #print(raster_array.shape)
+    if ax is None:
+        fig,ax=plt.subplots()
+    if band is None:
+        band=0
+    ax.imshow(raster_array[:,:,band])
+    if ax is None:
+        plt.show()

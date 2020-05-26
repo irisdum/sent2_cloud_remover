@@ -12,10 +12,12 @@ from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
+from constant.gee_constant import LABEL_DIR, DICT_SHAPE
 from models.callbacks import write_log
 from models.losses import L1_loss
 from processing import create_safe_directory
-from utils.load_dataset import load_data, save_images
+from utils.display_image import find_image_indir
+from utils.load_dataset import load_data, save_images, load_from_dir
 from utils.open_yaml import open_yaml, saving_yaml
 from utils.metrics import batch_psnr, ssim_batch, compute_metric
 
@@ -31,14 +33,14 @@ class GAN():
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         if "dict_band_x" not in train_yaml:
-            dict_band_X=None
-            dict_band_label=None
-            dict_rescale_type=None
+            self.dict_band_X=None
+            self.dict_band_label=None
+            self.dict_rescale_type=None
         else:
-            dict_band_X=train_yaml["dict_band_x"]
-            dict_band_label=train_yaml["dict_band_label"]
-            dict_rescale_type=train_yaml["dict_rescale_type"]
-            assert type(dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(dict_band_label,type(dict_band_label))
+            self.dict_band_X=train_yaml["dict_band_x"]
+            self.dict_band_label=train_yaml["dict_band_label"]
+            self.dict_rescale_type=train_yaml["dict_rescale_type"]
+            assert type(self.dict_band_label)==type({"u":1}), "The argument {} of dict band label is not a dictionnary  but {}".format(self.dict_band_label,type(self.dict_band_label))
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
@@ -56,8 +58,9 @@ class GAN():
         self.learning_rate = train_yaml["lr"]
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
-        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label,dict_rescale_type=dict_rescale_type)
-        self.val_X, self.val_Y = load_data(train_yaml["val_directory"],normalization=self.normalization,dict_band_X=dict_band_X,dict_band_label=dict_band_label,dict_rescale_type=dict_rescale_type)
+        self.val_directory=train_yaml["val_directory"]
+        self.data_X, self.data_y = load_data(train_yaml["train_directory"],normalization=self.normalization,dict_band_X=self.dict_band_X,dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type)
+        self.val_X, self.val_Y = load_data(self.val_directory,normalization=self.normalization,dict_band_X=self.dict_band_X,dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape,self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -347,6 +350,28 @@ class GAN():
         val_pred=self.generator.predict(self.val_X)
         return compute_metric(self.val_Y,val_pred)
 
+    def predict_on_iter(self,batch,path_save,l_image_id=None):
+        """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory"""
+        if type(batch)==type("u"): #the param is an string we load the bathc from this directory
+            batch,_=load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
+                      dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
+            l_image_id=find_image_indir(batch, "npy")
+        else:
+            if l_image_id is None:
+                l_image_id=[i for i in range(batch.shape[0])]
+        assert len(l_image_id)==batch.shape[0],"Wrong size of the name of the images is {} should be {} ".format(len(l_image_id),batch.shape[0])
+        if os.path.isdir(path_save):
+            print("[INFO] the directory where to store the image already exists")
+            data_array,path_tile=load_from_dir(path_save,DICT_SHAPE[LABEL_DIR])
+            return data_array
+        else:
+            create_safe_directory(path_save)
+            batch_res=self.generator.predict(batch)
+            if path_save is not None:
+                #we store the data at path_save
+                for i in range(batch_res.shape[0]):
+                    np.save("{}_image_{}".format(path_save,l_image_id[i]))
+        return batch_res
 
 
 

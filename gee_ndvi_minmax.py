@@ -92,8 +92,11 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     # first we normalize
     for b in liste_band:
         col = col.map(lambda img: normalize(img, b, scale))
+    #cast the value
+    pixel_val=ee.PixelType(precision="float",minValue=0,maxValue=1)
+    col=col.select(liste_band).cast(dict(zip(liste_band,[pixel_val for i in range(len(liste_band))])),liste_band)
     # compute the ndvi
-        test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
+        #test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
         #print("test min {} max {}".format(test_min.getInfo(),test_max.getInfo()))
     if vi == "ndvi":
         assert "B8" in liste_band, "The band B8 has not been normalized {}".format(liste_band)
@@ -143,11 +146,11 @@ def band_min_max(col, zone, lband=None, export="GEE"):
         print(band)
         _, band_max = one_band_max(col.select(band).max(), band, zone)
         band_min, _ = one_band_max(col.select(band).min(), band, zone)
-        print("BAND MIN {} MAX {}".format(band_min.getInfo(),band_max.getInfo()))
         if export == "GEE":
             dict_band_minmax.update(
                 {"{}_min".format(band): band_min, "{}_max".format(band): band_max})
         else:
+            print("BAND MIN {} MAX {}".format(band_min.getInfo(), band_max.getInfo()))
             dict_band_minmax.update(
                 {"{}_min".format(band): band_min.getInfo(), "{}_max".format(band): band_max.getInfo()})
 
@@ -176,12 +179,12 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
         # get_ndvi_minmax_tile(collection, zone)
         print("We have collection")  # TODO combien the two functions and see if it works
-        vi_min, vi_max = get_ndvi_minmax_tile(collection, zone,vi=vi)
+        vi_min, vi_max = get_ndvi_minmax_tile(collection,zone,vi=vi)
         if export == "GEE":
             new_feat = ee.Feature(None, {"name": tile_id, "vi_min": vi_min, "vi_max": vi_max})
             features += [new_feat]
         else:
-            print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
+            #print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
             vi_min_val = vi_min.getInfo()
             print("MIN {}".format(vi_min_val))
             vi_max_val = vi_max.getInfo()
