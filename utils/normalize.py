@@ -163,6 +163,7 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,d
     rescaled_batch_label=np.zeros(batch_label.shape)
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
+    print("Before compute batch stat mean {} min {} max {}".format(np.mean(batch_X),np.min(batch_X),np.max(batch_X)))
     dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
     print("BATCH _DICT STATS",dict_stat)
     if l_s2_stat is not None: #TODO adapt to extract the mean for the batch
