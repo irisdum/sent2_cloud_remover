@@ -2,7 +2,7 @@ begin_date1=2019-10-15
 end_date1=2019-12-30
 begin_date2=2020-02-01
 end_date2=2020-04-01
-CCP=2
+CCP=50
 geojson_file=confs/train_kangaroo.geojson
 geojson_utm_file=confs/train_kangaroo_utm2.geojson
 wkt_file=confs/train_kangaroo_wkt2.txt
@@ -81,6 +81,11 @@ download_to_split:
 	convert_sent_inconda
 	tiling
 	split_dataset
+
+download_aus18_tif:
+	weget https://data.gov.au/dataset/6ebffd6f-a937-4fa6-843a-3fde2effbacd/resource/83f98691-de14-4c7d-a3f0-e445fba0b4c7/download/aus_for18.tiff
+
+
 
 
 help:

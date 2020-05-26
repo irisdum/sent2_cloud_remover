@@ -31,7 +31,7 @@ def _argparser():
                              "sentinel 2 image between bd1 and bd2 with less clouds")
     parser.add_argument("--optparam1", type=str, default=None, help="optional parameters to filter the data of "
                                                                     "sentinel 1 ")
-    parser.add_argument("--ccp", type=int, default=20, help="Percentage of cloud allowed in the image")
+    parser.add_argument("--ccp", type=int, default=20, help="Percentage of cloud allowed in the image, not really used anymore the roi_cpp defined in the constant file is more restrictive")
     parser.add_argument("--save", default=True, help="wether or not we are going to store the images")
     parser.add_argument("--output_path", default=True, help="where the image preprocess and ordered are going "
                                                             "to be stored")
@@ -142,7 +142,7 @@ def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
     else:
         assert sent2criteria == "lessclouds", "Wrong parameter sent2criteria  {} should be in begin,end,lessclouds" \
             .format(sent2criteria)
-        collection_zone = collection_zone.sort('CLOUDY_PIXEL_PERCENTAGE')
+        collection_zone = collection_zone.sort('CLOUDY_PERCENTAGE_ROI')
     # assert collection.toList(100).length().getInfo()>0, "No sentinel 2 image found with the ccp {}".format(ccp)
     return extract_name_date_first(collection_zone, 2)
 
@@ -182,7 +182,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     for sub_col in list_subcol_sent2_t1:  # Go over all the different subcollection
 
         name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
-                                                                   ccp, zone)  # filter the image with no many clouds
+                                                                   ccp, zone)  # returns the image with less clouds
         # on the specific zone which is the intersection of the two
         print("zone {}".format(type(zone)))
         print("zone  sent2 {}".format(type(zone)))

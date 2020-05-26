@@ -108,11 +108,14 @@ def list_2_str(list):
 
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0):
+    if sent in [1,2]:
+        name_shp="tiling_sent{}_t{}_fp.shp".format(sent, date_t)
+    else:
+        name_shp="output_grid_build_dataset.shp"
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     # os.system("gdalinfo {}".format(image_vrt))
     os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {}".format(image_vrt, output_dir,
-                                                                                  "tiling_sent{}_t{}_fp.shp".format(
-                                                                                      sent, date_t),
+                                                                                  name_shp,
                                                                                   "confs/retile_optfile.txt"))
     return output_dir + "tiling_fp.shp"
 
@@ -181,7 +184,6 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel1 at t1
     build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel2 at t1
     build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel1 at t2
-
     ##LABEL FOLDER
     build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson)  # sentinel2 at t2
 
@@ -208,6 +210,14 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
     # print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, sent, t)
+
+
+def tiling_aus18_map(path_tif,output_dir,path_geojson):
+    """Function used to tile the maps of the australian forest vegetation, into the same tiling process of the build_dataset"""
+    crop_image_name = crop_image(path_tif, path_geojson,
+                                output_dir + "crop_aus18.vrt")
+    os.system("gdalinfo {}".format(crop_image_name))
+    shp_file_t1 = tiling(crop_image_name, output_dir, 4,0)
 
 
 def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):

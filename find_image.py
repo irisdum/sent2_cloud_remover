@@ -115,7 +115,7 @@ def opt_filter(collection, opt_param, sent):
                 collection = collection.filter(
                     ee.Filter.eq('orbitProperties_pass',"DESCENDING")) #                    ee.Filter.eq('orbitProperties_pass', "")) #
 
-        else:  # sentinel2
+        else:
             # print("Sentinel 2 default mode are MSI and Level 1C !!! To change that change the constant parameters !!")
             # print(opt_param)
             assert "ccp" in opt_param, "Wrong param for sentinel 2 {} should only be the cloud coverage percentage".format(

@@ -144,8 +144,8 @@ def band_min_max(col, zone, lband=None, export="GEE"):
     print("TYPE ROI {}".format(type(zone)))
     for band in lband:
         print(band)
-        _, band_max = one_band_max(col.select(band).max(), band, zone)
-        band_min, _ = one_band_max(col.select(band).min(), band, zone)
+        _, band_max = one_band_max(col.select([band]).max(), [band], zone) #correct by adding putting list as an input of select
+        band_min, _ = one_band_max(col.select([band]).min(), [band], zone)
         if export == "GEE":
             dict_band_minmax.update(
                 {"{}_min".format(band): band_min, "{}_max".format(band): band_max})
