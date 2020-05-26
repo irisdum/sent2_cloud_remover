@@ -2,10 +2,11 @@
 import sys
 sys.path.append("..")
 import argparse
+import numpy as np
 from scanning_dataset import extract_tile_id
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR
 from utils.display_image import find_image_indir
-from utils.load_dataset import load_from_dir
+from utils.load_dataset import load_from_dir, load_data
 from utils.normalize import get_minmax_fromcsv, find_csv
 
 
@@ -33,8 +34,10 @@ def main(test_name,dataset_dir,input_dataset):
         assert data_array.shape[0]==len(ldict_stat),"The batch size and the len of ldict_stat dos not match {}".format(len(ldict_stat))
         print(ldict_stat)
         assert type(ldict_stat[0])==type({}),"Inside the list should be dict not {}".format(ldict_stat[0])
-
-
+        print("[TEST] load_data function")
+        dataX, data_label=load_data(input_dataset, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
+                  dict_band_label=None, dict_rescale_type=None, dir_csv=dataset_dir)
+        print(np.mean(dataX[0,:,:,4],np.mean(data_label[0,:,:,0])))
 if __name__ == '__main__':
     args=_argparser()
     main(args.test_name,args.dataset_dir,args.input_dataset)
