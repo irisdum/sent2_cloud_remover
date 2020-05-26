@@ -148,6 +148,7 @@ def band_min_max(col, zone, lband=None, export="GEE"):
         _, band_max = one_band_max(col.select([band]).max(), band, zone) #correct by adding putting list as an input of select
         band_min, _ = one_band_max(col.select([band]).min(), band, zone)
         if export == "GEE":
+            print("{}_min".format(band))
             dict_band_minmax.update(
                 {"{}_min".format(band): band_min, "{}_max".format(band): band_max})
         else:
@@ -239,6 +240,7 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
             tile_id = extract_tile_id(path_tile)
             zone = define_geometry(coordo_tile)
             collection = get_filter_collection(begin_date, ending_date, zone, 2)
+            print(band)
             dic_band_min_max = band_min_max(collection, zone, lband=[band], export=export)
             dic_band_min_max.update({"tile_id": tile_id})
             print(dic_band_min_max.keys())
