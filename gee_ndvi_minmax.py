@@ -96,7 +96,7 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     print(type(pixel_val))
     liste_band_norm=["{}_norm".format(b) for b in liste_band]
     print(liste_band_norm)
-    col=col.select([liste_band_norm]).cast(dict(zip(liste_band_norm,[pixel_val for i in range(len(liste_band_norm))])),liste_band_norm)
+    col=col.select(liste_band_norm).cast(dict(zip(liste_band_norm,[pixel_val for i in range(len(liste_band_norm))])),liste_band_norm)
     # compute the ndvi
         #test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
         #print("test min {} max {}".format(test_min.getInfo(),test_max.getInfo()))
@@ -253,7 +253,7 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
                 print(df)
         if export == "GEE":
             fromList = ee.FeatureCollection(features)
-            task = ee.batch.Export.table.toDrive(collection=fromList, description="{}_export_minmax".format(band), folder=GEE_DRIVE_FOLDER,
+            task = ee.batch.Export.table.toDrive(collection=fromList, description="{}_export_minmax".format(band), folder=GEE_DRIVE_FOLDER+band,
                                                  fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
             task.start()
             print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
