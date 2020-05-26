@@ -1,4 +1,6 @@
 #This file enables us to rain numerous test
+import sys
+sys.path.append("../")
 import argparse
 
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE
@@ -34,7 +36,5 @@ def main(test_name,dataset_dir,input_dataset):
 
 
 if __name__ == '__main__':
-    import sys
-    sys.path.append("../")
     args=_argparser()
     main(args.dataset_dir,args.test_name,args.input_dataset)
