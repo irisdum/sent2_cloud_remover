@@ -93,7 +93,7 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     for b in liste_band:
         col = col.map(lambda img: normalize(img, b, scale))
     #cast the value
-    pixel_val=ee.PixelType({"precision":"float","minValue":0,"maxValue":1})
+    pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
     print(type(pixel_val))
     col=col.select(liste_band).cast(dict(zip(liste_band,[pixel_val for i in range(len(liste_band))])),liste_band)
     # compute the ndvi
@@ -249,6 +249,7 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
         fromList = ee.FeatureCollection(features)
         task = ee.batch.Export.table.toDrive(collection=fromList, description="export_s2", folder=GEE_DRIVE_FOLDER,
                                              fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
+
         print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
         print(task.status())
         # print(task.task_type)
