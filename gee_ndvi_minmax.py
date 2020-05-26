@@ -93,7 +93,8 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
     for b in liste_band:
         col = col.map(lambda img: normalize(img, b, scale))
     #cast the value
-    pixel_val=ee.PixelType("float",minValue=0,maxValue=1)
+    pixel_val=ee.PixelType({"precision":"float","minValue":0,"maxValue":1})
+    print(type(pixel_val))
     col=col.select(liste_band).cast(dict(zip(liste_band,[pixel_val for i in range(len(liste_band))])),liste_band)
     # compute the ndvi
         #test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
