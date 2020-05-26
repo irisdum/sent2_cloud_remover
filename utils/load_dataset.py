@@ -119,6 +119,8 @@ def load_from_dir(path_dir, image_shape, path_dir_csv=None):
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     data_array = np.zeros(batch_x_shape)
     if path_dir_csv is None:
+        for i, tile in enumerate(path_tile):
+            data_array[i, :, :, :] = np.load(tile)
         return data_array, path_tile,None
     else:
         ldict_stat=[]
