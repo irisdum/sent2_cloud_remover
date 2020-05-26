@@ -113,7 +113,7 @@ def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
 
 
 def one_band_max(image_band, band, zone):
-    image_band=ee.Image(image_band.select(band))
+    image_band=ee.Image(image_band.select([band]))
     maxReducer = ee.Reducer.minMax()
     minMax = ee.Image(image_band).reduceRegion(maxReducer, zone, 1, image_band.projection())
     return minMax.get("{}_min".format(band)), minMax.get("{}_max".format(band))
@@ -145,8 +145,8 @@ def band_min_max(col, zone, lband=None, export="GEE"):
     print("TYPE ROI {}".format(type(zone)))
     for band in lband:
         print(band)
-        _, band_max = one_band_max(col.select([band]).max(), [band], zone) #correct by adding putting list as an input of select
-        band_min, _ = one_band_max(col.select([band]).min(), [band], zone)
+        _, band_max = one_band_max(col.select([band]).max(), band, zone) #correct by adding putting list as an input of select
+        band_min, _ = one_band_max(col.select([band]).min(), band, zone)
         if export == "GEE":
             dict_band_minmax.update(
                 {"{}_min".format(band): band_min, "{}_max".format(band): band_max})
