@@ -268,6 +268,7 @@ def get_minmax_fromcsv(tile_id,path_csv,band):
     print(df.head(5))
     print(df.columns)
     name_col=["{}_min".format(band),"{}_max".format(band)]
+    print("Looking for {}".format(tile_id))
     subf_df = df[df["tile_id"] == tile_id]
     assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
     dict_res = subf_df.iloc[0].to_dict()
