@@ -224,40 +224,43 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
                         export="GEE"):
     """:param export a string if export in GEE save the file into a csv Drive if local export via pandas into the local computer
     """
+    if lband is None:  #
+        lband = GEE_S2_BAND
     geojson_path = create_geojson(path_build_dataset)  # path where the geojson of the grid of all the tiles is stored
     l_grid_info = load_grid_geojson(geojson_path)  # list of list with path to the image, and liste of coordo
-    df = pd.DataFrame()
-    features = []
-    for i, tile in enumerate(l_grid_info):
-        path_tile = tile[0]
-        coordo_tile = tile[1]
-        print("ite {} image {}".format(i, path_tile))
-        # print(coordo_tile)
-        tile_id = extract_tile_id(path_tile)
-        zone = define_geometry(coordo_tile)
-        collection = get_filter_collection(begin_date, ending_date, zone, 2)
-        dic_band_min_max = band_min_max(collection, zone, lband=lband, export=export)
-        dic_band_min_max.update({"tile_id": tile_id})
-        print(dic_band_min_max.keys())
+    for band in lband:
+        df = pd.DataFrame()
+        features = []
+        for i, tile in enumerate(l_grid_info):
+            path_tile = tile[0]
+            coordo_tile = tile[1]
+            print("ite {} image {}".format(i, path_tile))
+            # print(coordo_tile)
+            tile_id = extract_tile_id(path_tile)
+            zone = define_geometry(coordo_tile)
+            collection = get_filter_collection(begin_date, ending_date, zone, 2)
+            dic_band_min_max = band_min_max(collection, zone, lband=[band], export=export)
+            dic_band_min_max.update({"tile_id": tile_id})
+            print(dic_band_min_max.keys())
+            if export == "GEE":
+                new_feat = ee.Feature(None, dic_band_min_max)
+                features += [new_feat]
+            else:
+                df = df.append(dic_band_min_max, ignore_index=True)
+                print(df)
         if export == "GEE":
-            new_feat = ee.Feature(None, dic_band_min_max)
-            features += [new_feat]
+            fromList = ee.FeatureCollection(features)
+            task = ee.batch.Export.table.toDrive(collection=fromList, description="{}_export_minmax".format(band), folder=GEE_DRIVE_FOLDER,
+                                                 fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
+            task.start()
+            print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
+            print(task.status())
+            # print(task.task_type)
+            print(task.list())
+            #task.start()
+            print(task.status())
         else:
-            df = df.append(dic_band_min_max, ignore_index=True)
-            print(df)
-    if export == "GEE":
-        fromList = ee.FeatureCollection(features)
-        task = ee.batch.Export.table.toDrive(collection=fromList, description="export_s2", folder=GEE_DRIVE_FOLDER,
-                                             fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
-        task.start()
-        print("Export of the CSV file in your Drive folder {}".format(GEE_DRIVE_FOLDER))
-        print(task.status())
-        # print(task.task_type)
-        print(task.list())
-        #task.start()
-        print(task.status())
-    else:
-        df.to_csv(path_build_dataset + "{}.csv".format(save_name), sep=",")
+            df.to_csv(path_build_dataset + "{}_{}.csv".format(band,save_name), sep=",")
 
 
 def main(path_build_dataset, input_dataset, begin_date, ending_date, vi, export):
