@@ -101,7 +101,9 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
         elif vi=="evi":
             liste_band=EVI_BAND
     # first we normalize
+    print("The dict is {}".format(dict_scale))
     for i,b in enumerate(liste_band):
+        print("We use band {}".format(dict_scale[DICT_TRANSLATE_BAND[b]]))
         col = col.map(lambda img: normalize(img, b, dict_scale[DICT_TRANSLATE_BAND[b]]))
     #cast the value
     pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
@@ -116,7 +118,9 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
         assert "B8" in liste_band, "The band B8 has not been normalized {}".format(liste_band)
         assert "B4" in liste_band, "The band B4 has not been normalized {}".format(liste_band)
         col = col.map(apply_ndvi)
-    vi_min,vi_max=one_band_max(col.max().select(vi),vi,zone=roi)
+    print("Band {} created".format(vi))
+    print(type(roi))
+    vi_min,vi_max=one_band_max(col.select(vi).max(),vi,zone=roi)
     # vi_max = col.select(vi).max()
     # maxReducer2 = ee.Reducer.minMax()
     # minMax = ee.Image(vi_max).reduceRegion(maxReducer2, roi, 1, vi_max.projection())
