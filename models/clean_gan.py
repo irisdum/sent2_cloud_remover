@@ -36,7 +36,6 @@ class GAN():
             self.dict_band_X = None
             self.dict_band_label = None
             self.dict_rescale_type = None
-            self.path_csv = None
         else:
             self.dict_band_X = train_yaml["dict_band_x"]
             self.dict_band_label = train_yaml["dict_band_label"]
@@ -45,6 +44,12 @@ class GAN():
                 {"u": 1}), "The argument {} of dict band label is not a dictionnary  but {}".format(
                 self.dict_band_label, type(self.dict_band_label))
             self.path_csv = train_yaml["path_csv"]
+
+        if "path_csv" not in train_yaml:
+            self.path_csv = None
+        else:
+            self.path_csv=train_yaml["path_csv"]
+
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
@@ -65,10 +70,10 @@ class GAN():
         self.val_directory = train_yaml["val_directory"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization,
                                              dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                             dict_rescale_type=self.dict_rescale_type)
+                                             dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
         self.val_X, self.val_Y = load_data(self.val_directory, normalization=self.normalization,
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type)
+                                           dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
