@@ -98,7 +98,7 @@ def _argparser():
     return parser.parse_args()
 
 
-def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
+def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi",export="GEE"):
     """:param col : An image collection of all the images in the roi
     :param roi : an ee.Geometry, corresponds to a tile footprint
     :param dict_scale dict of tuple keys are the bands R,G,B,NIR ex {R:(min,max}}
@@ -133,8 +133,8 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
     #print("Band {} created".format(vi))
     #print(type(roi))
     #vi_min,vi_max=one_band_max(col.select(vi).max(),vi,zone=roi)
-    vi_min,vi_max=band_min_max(col, roi, lband=[vi], export="GEE")[vi] 
-    return vi_min, vi_max
+
+    return band_min_max(col, roi, lband=[vi], export=export)
 
 
 def one_band_max(image_band, band, zone):
@@ -214,18 +214,18 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
         # get_ndvi_minmax_tile(collection, zone)
         print("We have collection")  # TODO combien the two functions and see if it works
-        vi_min, vi_max = get_ndvi_minmax_tile(collection,zone,vi=vi,dict_scale=dict_tile_stat)
+        dic_band_min_max = get_ndvi_minmax_tile(collection,zone,vi=vi,dict_scale=dict_tile_stat,export=export)
+        dic_band_min_max.update({"name": tile_id})
         if export == "GEE":
-            new_feat = ee.Feature(None, {"name": tile_id, "vi_min": vi_min, "vi_max": vi_max})
+            new_feat = ee.Feature(None,dic_band_min_max)
             features += [new_feat]
         else:
             #print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
             #vi_min_val = vi_min.getInfo()
-            print("MIN {}".format(vi_min))
+            #print("MIN {}".format(vi_min))
             #vi_max_val = vi_max.getInfo()
-            print("MAX {}".format(vi_max))
-            df = df.append(dict(zip(["tile_id", "vi_min", "vi_max"], [tile_id, vi_min, vi_max])),
-                           ignore_index=True)
+            #print("MAX {}".format(vi_max))
+            df = df.append(dic_band_min_max,ignore_index=True)
             print(df)
     if export == "GEE":
         nb_csv = NB_VI_CSV #To avoid broken pipe we divide the export in many csv files
