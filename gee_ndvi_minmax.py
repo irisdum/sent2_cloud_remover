@@ -219,7 +219,7 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
     if export == "GEE":
         fromList = ee.FeatureCollection(features)
         tot = len(l_grid_info)
-        nb_csv=10
+        nb_csv=200
         for i in range(0,nb_csv):
             print("Iter {} on {}, nb_element {}".format(i,nb_csv,tot/nb_csv))
             subset_coll=ee.FeatureCollection(fromList.toList(tot/nb_csv,i))
