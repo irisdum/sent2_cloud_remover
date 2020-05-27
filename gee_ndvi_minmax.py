@@ -74,9 +74,9 @@ def apply_evi(image, param=None):
     evi = image.expression(
         '{} * ((NIR-RED) / (NIR +{} * RED - {} * BLUE + {}))'.format(param["G"], param["C1"], param["C2"], param["L"]),
         {
-            'NIR': image.select('B8'),
-            'RED': image.select('B4'),
-            'BLUE': image.select('B2')
+            'NIR': image.select('B8_norm'),
+            'RED': image.select('B4_norm'),
+            'BLUE': image.select('B2_norm')
         })
     return image.addBands(evi.rename("evi"))
 
