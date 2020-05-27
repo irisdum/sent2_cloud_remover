@@ -217,13 +217,13 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
                            ignore_index=True)
             print(df)
     if export == "GEE":
-        fromList = ee.FeatureCollection(features)
+        nb_csv = 100
         tot = len(l_grid_info)
-        nb_csv=200
-        for i in range(0,nb_csv):
-            print("Iter {} on {}, nb_element {}".format(i,nb_csv,tot/nb_csv))
-            subset_coll=ee.FeatureCollection(fromList.toList(tot/nb_csv,i))
-            task = ee.batch.Export.table.toDrive(collection=subset_coll, description="export_{}_n{}".format(vi,i),
+        for i in range(0, nb_csv):
+
+            fromList = ee.FeatureCollection(features[i*(tot//nb_csv):(i+1)*(tot//nb_csv)])
+            print("Iter {} on {}, nb_element {}".format(i,nb_csv,len(features[i*(tot//nb_csv):(i+1)*(tot//nb_csv)])))
+            task = ee.batch.Export.table.toDrive(collection=fromList, description="export_{}_n{}".format(vi,i),
                                              folder=GEE_DRIVE_FOLDER,
                                              fileNamePrefix="{}-{}".format(begin_date, ending_date), fileFormat="CSV")
             print(type(task))
