@@ -6,7 +6,7 @@ import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
 from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER, EVI_BAND, \
-    NDVI_BAND, DICT_TRANSLATE_BAND
+    NDVI_BAND, DICT_TRANSLATE_BAND, NB_VI_CSV, CONVERTOR
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -48,8 +48,8 @@ def normalize(image, band, geometry, scale=None):
         #print(type(bmin),type(bmax))
     else:
         print("Max and min Given {}".format(scale))
-        bmin=ee.Number(scale[0])
-        bmax=ee.Number(scale[1])
+        bmin=ee.Number(scale[0]*CONVERTOR)
+        bmax=ee.Number(scale[1]*CONVERTOR)
     #to change
 
     normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
@@ -217,10 +217,9 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
                            ignore_index=True)
             print(df)
     if export == "GEE":
-        nb_csv = 1
+        nb_csv = NB_VI_CSV #To avoid broken pipe we divide the export in many csv files
         tot = len(l_grid_info)
         for i in range(0, nb_csv):
-
             fromList = ee.FeatureCollection(features[i*(tot//nb_csv):(i+1)*(tot//nb_csv)])
             print("Iter {} on {}, nb_element {}".format(i,nb_csv,len(features[i*(tot//nb_csv):(i+1)*(tot//nb_csv)])))
             task = ee.batch.Export.table.toDrive(collection=fromList, description="export_{}_n{}".format(vi,i),

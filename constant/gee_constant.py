@@ -80,3 +80,4 @@ GEE_DRIVE_FOLDER="CSIRO/gee_data/"
 DICT_TRANSLATE_BAND={"B2": "B", "B4": "R","B8": "NIR","B3":"G"}
 NDVI_BAND=["B4","B8"]
 EVI_BAND=["B4","B8","B2"]
+NB_VI_CSV=2
