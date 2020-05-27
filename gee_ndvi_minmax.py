@@ -217,7 +217,7 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
                            ignore_index=True)
             print(df)
     if export == "GEE":
-        nb_csv = 2
+        nb_csv = 1
         tot = len(l_grid_info)
         for i in range(0, nb_csv):
 
