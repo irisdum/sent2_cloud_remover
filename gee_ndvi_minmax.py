@@ -274,7 +274,7 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
 def main(path_build_dataset, input_dataset, begin_date, ending_date, vi, export,path_csv):
     if vi in ["evi", "ndvi"]:
         all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi,
-                   export=export)  # TODO adapt the script so the normalization of the data when computing the vi is the global constant
+                   export=export,path_csv=path_csv)  # TODO adapt the script so the normalization of the data when computing the vi is the global constant
     else:
         print("We take care of the the S2 min max")
         get_band_s2_min_max(path_build_dataset, begin_date, ending_date, export=export)
