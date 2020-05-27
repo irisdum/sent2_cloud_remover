@@ -60,7 +60,6 @@ def compute_evi(image,dict_band,param=None):
     nir=image[:,:,dict_band["NIR"]]
     blue=image[:, :, dict_band["B"]]
     evi_res= param["G"]*np.divide(nir-red,nir+param["C1"]*red-param["C2"]*blue+param["L"])
-    assert evi_res.shape==image.shape, "The output {} does not have the same shape as the input {}".format(evi_res.shape,image.shape)
     return evi_res
 
 
