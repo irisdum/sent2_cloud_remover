@@ -5,9 +5,12 @@ import os
 import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
-from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER
+from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER, EVI_BAND, \
+    NDVI_BAND
 from scanning_dataset import extract_tile_id
 import pandas as pd
+
+from utils.normalize import stat_from_csv
 
 ee.Initialize()
 
@@ -44,11 +47,11 @@ def normalize(image, band, geometry, scale=None):
         bmax = minMax.get(ee.String(band).cat(ee.String("_max")))
         #print(type(bmin),type(bmax))
     else:
-        print("Max and min Given")
-        bmin, bmax = scale
+        print("Max and min Given {}".format(scale))
+        bmin=ee.Number(scale[0])
+        bmax=ee.Number(scale[1])
     #to change
-    bmin=ee.Number(0)
-    bmax=ee.Number(7000)
+
     normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
     return image.addBands(normalize_band)
 
@@ -84,16 +87,22 @@ def _argparser():
     parser.add_argument('--export', default="GEE", type=str,
                         help="Type of export could be GEE (google earth engine dirve) or loac "
                              "a csv via pandas lib")
+    parser.add_argument('--path_csv', default=None, type=str,
+                        help="path to the directory where the csv are stored")
     return parser.parse_args()
 
 
-def get_ndvi_minmax_tile(col, roi, scale=None, liste_band=None, vi="ndvi"):
-    """:param col : An image collection of all the images in the roi"""
+def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
+    """:param col : An image collection of all the images in the roi
+    :param dict_scale dict of tuple"""
     if liste_band is None:
-        liste_band = ["B4", "B8"]
+        if vi=="ndvi":
+            liste_band = NDVI_BAND
+        elif vi=="evi":
+            liste_band=EVI_BAND
     # first we normalize
-    for b in liste_band:
-        col = col.map(lambda img: normalize(img, b, scale))
+    for i,b in enumerate(liste_band):
+        col = col.map(lambda img: normalize(img, b, dict_scale[b]))
     #cast the value
     pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
     print(type(pixel_val))
@@ -164,7 +173,7 @@ def band_min_max(col, zone, lband=None, export="GEE"):
     return dict_band_minmax
 
 
-def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, export="GEE"):
+def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, export="GEE",path_csv=None):
     """:param path_build_dataset string path to the build dataset (path where all the tiles are stored)
     :param input_dataset path to the dataset which is used to train, test and val the model
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
@@ -182,11 +191,15 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
         # print(coordo_tile)
         tile_id = extract_tile_id(path_tile)
         zone = define_geometry(coordo_tile)
+        if path_csv is not None: #we are going to be
+            dict_tile_stat=stat_from_csv(path_tile, path_csv, dict_translate_band=None) #get a dict of the stats of the tile
+        else:
+            dict_tile_stat=None
         print("TYPE ROI {}".format(type(zone)))
         collection = get_filter_collection(begin_date, ending_date, zone, 2)
         # get_ndvi_minmax_tile(collection, zone)
         print("We have collection")  # TODO combien the two functions and see if it works
-        vi_min, vi_max = get_ndvi_minmax_tile(collection,zone,vi=vi)
+        vi_min, vi_max = get_ndvi_minmax_tile(collection,zone,vi=vi,dict_scale=dict_tile_stat)
         if export == "GEE":
             new_feat = ee.Feature(None, {"name": tile_id, "vi_min": vi_min, "vi_max": vi_max})
             features += [new_feat]
@@ -258,7 +271,7 @@ def get_band_s2_min_max(path_build_dataset, begin_date, ending_date, lband=None,
             df.to_csv(path_build_dataset + "{}_{}.csv".format(band,save_name), sep=",")
 
 
-def main(path_build_dataset, input_dataset, begin_date, ending_date, vi, export):
+def main(path_build_dataset, input_dataset, begin_date, ending_date, vi, export,path_csv):
     if vi in ["evi", "ndvi"]:
         all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi,
                    export=export)  # TODO adapt the script so the normalization of the data when computing the vi is the global constant
@@ -273,4 +286,4 @@ def main(path_build_dataset, input_dataset, begin_date, ending_date, vi, export)
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.path_bdata, args.path_input_data, args.bd, args.ed, args.vi, args.export)
+    main(args.path_bdata, args.path_input_data, args.bd, args.ed, args.vi, args.export,args.path_csv)

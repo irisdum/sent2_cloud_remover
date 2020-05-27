@@ -237,7 +237,8 @@ def image_rescaling(data, dict_band, dict_stats, rescale_fun):
 def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     """:param path_tile path to the npy tile array svaed
     :param dir_csv path to the directory which contains the nomralized csv file
-    :param dict_band a dictionnary which contains the dict_band information """
+    :param dict_band a dictionnary which contains the dict_band information
+     :returns a dictionnary {B2:(min,max) ...}"""
     if dir_csv is None:
         return None
     assert os.path.isdir(dir_csv), "No directory at {}".format(dir_csv)

@@ -352,7 +352,7 @@ class Sen2ZipfileMeta(object):
             scaleValNode = scaleValNodeList[0]
             self.scaleValue = float(scaleValNode.firstChild.data.strip())
         else:
-            # We might be in a L2A file, in which case there are several scale values for different products
+            # We might be in a L2A file, in which case there are several list_scale values for different products
             scaleValNodeList = findElementByXPath(generalInfoNode, 'Product_Image_Characteristics/QUANTIFICATION_VALUES_LIST')
             if len(scaleValNodeList) > 0:
                 scaleValNode = scaleValNodeList[0]
