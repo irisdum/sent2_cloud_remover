@@ -242,7 +242,6 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     if dir_csv is None:
         return None
     assert os.path.isdir(dir_csv), "No directory at {}".format(dir_csv)
-    assert os.path.isfile(path_tile),"No file found at {}".format(path_tile)
     assert dir_csv[-1] == "/", "The path to the dir cvs should end with / not {}".format(dir_csv)
     if dict_translate_band is None:
         dict_translate_band=DICT_TRANSLATE_BAND
