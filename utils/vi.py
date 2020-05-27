@@ -60,7 +60,7 @@ def compute_evi(image,dict_band,param=None):
     nir=image[:,:,dict_band["NIR"]]
     blue=image[:, :, dict_band["B"]]
     evi_res= param["G"]*np.divide(nir-red,nir+param["C1"]*red-param["C2"]*blue+param["L"])
-    return evi_res
+    return np.resize(evi_res,(image.shape[0],image.shape[1]))
 
 
 def diff_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):
