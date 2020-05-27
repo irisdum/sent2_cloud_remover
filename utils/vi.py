@@ -37,6 +37,7 @@ def compute_msavi(image,dict_band=None):
 
 def compute_vi(image,vi,dict_band=None,param=None):
     """vi a string of the vegetation index"""
+    assert len(image.shape)==3, "Image shape (n,n,channel) only accepted not {} ".format(image.shape)
     if dict_band is None:
         print("We consider it is a predicted image with R G B NIR only ")
         dict_band=DICT_BAND_LABEL
@@ -58,7 +59,9 @@ def compute_evi(image,dict_band,param=None):
     red=image[:,:,dict_band["R"]]
     nir=image[:,:,dict_band["NIR"]]
     blue=image[:, :, dict_band["B"]]
-    return param["G"]*np.divide(nir-red,nir+param["C1"]*red-param["C2"]*blue+param["L"])
+    evi_res= param["G"]*np.divide(nir-red,nir+param["C1"]*red-param["C2"]*blue+param["L"])
+    assert evi_res.shape==image.shape, "The output {} does not have the same shape as the input {}".format(evi_res.shape,image.shape)
+    return evi_res
 
 
 def diff_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):

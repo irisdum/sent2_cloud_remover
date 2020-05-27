@@ -73,7 +73,7 @@ def compute_band_stats(band_array, stats):
         stat1, stat2 = band_array.mean(), band_array.std()
     else:
         stat1, stat2 = band_array.min(), band_array.max()
-    print(stat1,stat2)
+    #print(stat1,stat2)
     return stat1, stat2
 
 
@@ -252,7 +252,7 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
         band_name=dict_translate_band[band]
         min,max=get_minmax_fromcsv(image_id,find_csv(dir_csv,band),band)
         dict_stat.update({band_name:(min,max)})
-    print("The stats found from csv are {}".format(dict_stat))
+    #print("The stats found from csv are {}".format(dict_stat))
     return dict_stat
 
     #apply a normalization without computing the stats !
@@ -276,7 +276,7 @@ def get_minmax_fromcsv(tile_id,path_csv,band):
     assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
     dict_res = subf_df.iloc[0].to_dict()
     #print("Resultat min, max from {} : {}".format(path_csv,dict_res))
-    print("We divide the res by this {} as it was used to rescale the data in the dataset ".format(CONVERTOR))
+    #print("We divide the res by this {} as it was used to rescale the data in the dataset ".format(CONVERTOR))
     return dict_res[name_col[0]]/CONVERTOR,dict_res[name_col[1]]/CONVERTOR
 
 
