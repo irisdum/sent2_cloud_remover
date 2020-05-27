@@ -16,7 +16,7 @@ ee.Initialize()
 
 
 def load_grid_geojson(path_geojson):
-    """Open the path to the geojson, returns a list of list [location,liste_coordo]"""
+    """Open the path to the geojson, returns a list of list [path_image,liste_coordo]"""
     with open(path_geojson) as f:
         data = json.load(f)
     l_result = []
@@ -37,31 +37,37 @@ def load_grid_geojson(path_geojson):
 def normalize(image, band, geometry, scale=None):
     """:param image : an ee Image
     :param band a String should correspond exactly to the band as it is written in the GEE S2 images
+    :param scale a tuple (min,max)
+    :param geometry : an ee.Geometry
     : returns image with a new band which is norm_band"""
-    maxReducer = ee.Reducer.minMax()
     subBand = image.select(band)
-    if scale is None:
-        print("{} Compute our own norm".format(band))
-        minMax = ee.Image(subBand).reduceRegion(maxReducer, geometry, 1, subBand.projection())
-        bmin = minMax.get(ee.String(band).cat(ee.String("_min")))
-        bmax = minMax.get(ee.String(band).cat(ee.String("_max")))
-        #print(type(bmin),type(bmax))
+    if scale is None: #TODO : correct and find where the bugs come from
+        #We want to compute local max and min within the tile but it does not work ...
+        #print("{} Compute our own norm".format(band))
+        assert True, "This feature does not work, error Image.constant when exporting to Earth Engine"
+
+        bmin,bmax=one_band_max(subBand,band, geometry)
     else:
-        print("Max and min Given {}".format(scale))
+        #print("Max and min Given {}".format(scale))
         bmin=ee.Number(scale[0]*CONVERTOR)
         bmax=ee.Number(scale[1]*CONVERTOR)
     #to change
 
     normalize_band = ee.Image(subBand.select(band).subtract(ee.Image.constant(bmin))).divide(ee.Image.constant(bmax).subtract(ee.Image.constant(bmin))).rename("{}_norm".format(band))
+
     return image.addBands(normalize_band)
 
 
 def apply_ndvi(image):
+    """:param image : an ee.Image
+    add a band ndvi"""
     valndvi = image.normalizedDifference(['B8_norm', 'B4_norm']).rename('ndvi')
     return image.addBands(valndvi)
 
 
 def apply_evi(image, param=None):
+    """:param image : an ee.Image
+    :param param a dictionnary with the value of the constant used for evi computation"""
     if param is None:
         param = DICT_EVI_PARAM
     evi = image.expression(
@@ -94,22 +100,28 @@ def _argparser():
 
 def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
     """:param col : An image collection of all the images in the roi
-    :param dict_scale dict of tuple"""
+    :param roi : an ee.Geometry, corresponds to a tile footprint
+    :param dict_scale dict of tuple keys are the bands R,G,B,NIR ex {R:(min,max}}
+    :param liste_band : list of the band to use in order to get the ndvi should be in sentinel 2 format ie B2,B3,B4
+    :param vi : a string which corresponds to the name of the vegetation index we are interested in could be vi, or
+    :returns vi_min,vi_max  : ee.Numbers the maximum of the vi in the collection"""
+    assert vi in ["ndvi","evi"], "The extraction of min max for this vegetation index {} is undefined,please modify gee_ndvi_minmax.py".format(vi)
+
     if liste_band is None:
         if vi=="ndvi":
             liste_band = NDVI_BAND
         elif vi=="evi":
             liste_band=EVI_BAND
     # first we normalize
-    print("The dict is {}".format(dict_scale))
+    #print("The dict is {}".format(dict_scale))
     for i,b in enumerate(liste_band):
-        print("We use band {}".format(dict_scale[DICT_TRANSLATE_BAND[b]]))
+        #print("We use band {}".format(dict_scale[DICT_TRANSLATE_BAND[b]]))
         col = col.map(lambda img: normalize(img, b,roi, scale=dict_scale[DICT_TRANSLATE_BAND[b]]))
     #cast the value
     pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
-    print(type(pixel_val))
+    #print(type(pixel_val))
     liste_band_norm=["{}_norm".format(b) for b in liste_band]
-    print(liste_band_norm)
+    #print(liste_band_norm)
     col=col.select(liste_band_norm).cast(dict(zip(liste_band_norm,[pixel_val for i in range(len(liste_band_norm))])),liste_band_norm)
     # compute the ndvi
         #test_min,test_max=one_band_max(col.first(),band="{}_norm".format(b),zone=roi)
@@ -118,19 +130,18 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
         assert "B8" in liste_band, "The band B8 has not been normalized {}".format(liste_band)
         assert "B4" in liste_band, "The band B4 has not been normalized {}".format(liste_band)
         col = col.map(apply_ndvi)
-    print("Band {} created".format(vi))
-    print(type(roi))
-    vi_min,vi_max=one_band_max(col.select(vi).max(),vi,zone=roi)
-    # vi_max = col.select(vi).max()
-    # maxReducer2 = ee.Reducer.minMax()
-    # minMax = ee.Image(vi_max).reduceRegion(maxReducer2, roi, 1, vi_max.projection())
-    # vi_min = minMax.get("{}_min".format(vi))
-    # vi_max = minMax.get("{}_max".format(vi))
-    # print("We found vi {} min : {} max {}".format(vi,vi_min.getInfo(),vi_max.getInfo()))
+    #print("Band {} created".format(vi))
+    #print(type(roi))
+    #vi_min,vi_max=one_band_max(col.select(vi).max(),vi,zone=roi)
+    vi_min,vi_max=band_min_max(col, roi, lband=[vi], export="GEE")[vi] 
     return vi_min, vi_max
 
 
 def one_band_max(image_band, band, zone):
+    """:param image_band an ee.Image
+    :param band a string, should be S2 official band name i.e B2,B3,B4,B8 ...
+    :zone an ee.Geometry, the footprint
+    :returns the min and the max on this image """
     image_band=ee.Image(image_band.select([band]))
     maxReducer = ee.Reducer.minMax()
     minMax = ee.Image(image_band).reduceRegion(maxReducer, zone, 1, image_band.projection())
@@ -209,11 +220,11 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
             features += [new_feat]
         else:
             #print("We are going to collect the image of the area {}".format(zone.area(0.001).getInfo()))
-            vi_min_val = vi_min.getInfo()
-            print("MIN {}".format(vi_min_val))
-            vi_max_val = vi_max.getInfo()
+            #vi_min_val = vi_min.getInfo()
+            print("MIN {}".format(vi_min))
+            #vi_max_val = vi_max.getInfo()
             print("MAX {}".format(vi_max))
-            df = df.append(dict(zip(["tile_id", "vi_min", "vi_max"], [tile_id, vi_min_val, vi_max_val])),
+            df = df.append(dict(zip(["tile_id", "vi_min", "vi_max"], [tile_id, vi_min, vi_max])),
                            ignore_index=True)
             print(df)
     if export == "GEE":
