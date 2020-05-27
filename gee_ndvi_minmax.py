@@ -99,12 +99,12 @@ def _argparser():
 
 
 def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi",export="GEE"):
-    """:param col : An image collection of all the images in the roi
+    """    :param dict_scale: dict of tuple keys are the bands R,G,B,NIR ex {R:(min,max}}
+    :param col : An image collection of all the images in the roi
     :param roi : an ee.Geometry, corresponds to a tile footprint
-    :param dict_scale dict of tuple keys are the bands R,G,B,NIR ex {R:(min,max}}
     :param liste_band : list of the band to use in order to get the ndvi should be in sentinel 2 format ie B2,B3,B4
     :param vi : a string which corresponds to the name of the vegetation index we are interested in could be vi, or
-    :returns vi_min,vi_max  : ee.Numbers the maximum of the vi in the collection"""
+    :returns a dictionnary : {vi_min : value_min,vi_max : value_max }"""
     assert vi in ["ndvi","evi"], "The extraction of min max for this vegetation index {} is undefined,please modify gee_ndvi_minmax.py".format(vi)
 
     if liste_band is None:
@@ -137,7 +137,7 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi",e
     return band_min_max(col, roi, lband=[vi], export=export)
 
 
-def one_band_max(image_band, band, zone):
+def one_band_max(image_band, band, zone): #TODO DO NOT USE THIS FUNCTION
     """:param image_band an ee.Image
     :param band a string, should be S2 official band name i.e B2,B3,B4,B8 ...
     :zone an ee.Geometry, the footprint
@@ -194,7 +194,7 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
     :param output_name path of the name of the csv files we are going to create for the input_dataset with, for each image, tile_id and ndvi min and ndvi max"""
     geojson_path = create_geojson(path_build_dataset)  # path where the geojson of the grid of all the tiles is stored
     l_grid_info = load_grid_geojson(geojson_path)  # list of list with path to the image, and liste of coordo
-    df = pd.DataFrame(columns=["tile_id", "vi_min", "vi_max"])
+    df = pd.DataFrame()
     print(l_grid_info[0:10])
     features = []
     # go over all the tiles
