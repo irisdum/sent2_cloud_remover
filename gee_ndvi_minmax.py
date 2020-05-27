@@ -6,7 +6,7 @@ import ee
 import glob
 from find_image import gjson_2_eegeom, get_filter_collection, list_image_name, define_geometry
 from constant.gee_constant import DICT_ORGA, XDIR, EPSG, DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER, EVI_BAND, \
-    NDVI_BAND
+    NDVI_BAND, DICT_TRANSLATE_BAND
 from scanning_dataset import extract_tile_id
 import pandas as pd
 
@@ -102,7 +102,7 @@ def get_ndvi_minmax_tile(col, roi, dict_scale=None, liste_band=None, vi="ndvi"):
             liste_band=EVI_BAND
     # first we normalize
     for i,b in enumerate(liste_band):
-        col = col.map(lambda img: normalize(img, b, dict_scale[b]))
+        col = col.map(lambda img: normalize(img, b, dict_scale[DICT_TRANSLATE_BAND[b]]))
     #cast the value
     pixel_val=ee.PixelType('float',ee.Number(0),ee.Number(1))
     print(type(pixel_val))
