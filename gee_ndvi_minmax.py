@@ -221,7 +221,7 @@ def all_minmax(path_build_dataset, input_dataset, begin_date, ending_date, vi, e
         tot = len(l_grid_info)
         nb_csv=10
         for i in range(0,nb_csv):
-            print("Iter {} on {}, nb_element".format(i,nb_csv,tot/nb_csv))
+            print("Iter {} on {}, nb_element {}".format(i,nb_csv,tot/nb_csv))
             subset_coll=ee.FeatureCollection(fromList.toList(tot/nb_csv,i))
             task = ee.batch.Export.table.toDrive(collection=subset_coll, description="export_{}_n{}".format(vi,i),
                                              folder=GEE_DRIVE_FOLDER,
