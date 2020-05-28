@@ -91,7 +91,7 @@ download_aus18_tif:
 	mv aus_for18.tiff ${source_directory}
 
 tiling_aus18:
-	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir build_dataset_landclass --geojson ${geojson_utm_file}
+	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir ${build_dataset_landclass} --geojson ${geojson_utm_file}
 
 
 help:
