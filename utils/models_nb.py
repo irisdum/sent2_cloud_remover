@@ -14,11 +14,14 @@ def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plo
     l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
     path_val=gan.val_directory
     l_image_name=find_image_indir(path_val, "npy")
+    print("The val image founded are {}".format(l_image_name))
+    assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
     path_weight,founded=find_weight_path(l_weight,select_weight)
     assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
     gan_gen = gan.generator.load_weights(path_weight)
     if save:
         path_save=path_model + "training_{}/image_val_iter_{}/".format(training_nber,select_weight)
+
     else:
         path_save=None
     val_dataX, val_dataY = gan.val_X, gan.val_Y
