@@ -365,11 +365,13 @@ class GAN():
     def predict_on_iter(self, batch, path_save, l_image_id=None):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory"""
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
+            print("We load our data from {}".format(batch))
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
             l_image_id = find_image_indir(batch, "npy")
         else:
             if l_image_id is None:
+                print("We defined our own index for image name")
                 l_image_id = [i for i in range(batch.shape[0])]
         assert len(l_image_id) == batch.shape[0], "Wrong size of the name of the images is {} should be {} ".format(
             len(l_image_id), batch.shape[0])
