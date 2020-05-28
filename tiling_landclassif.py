@@ -1,7 +1,8 @@
 import argparse
 import os
 
-from processing import crop_image, tiling
+from processing import crop_image, tiling,  create_safe_directory
+
 
 def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
@@ -16,6 +17,7 @@ def _argparser():
 
 
 def main(path_tif,output_dir,path_geojson):
+    create_safe_directory(output_dir)
     crop_image_name = crop_image(path_tif, path_geojson,
                                  output_dir + "crop_aus18.vrt")
     os.system("gdalinfo {}".format(crop_image_name))
