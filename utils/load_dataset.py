@@ -120,6 +120,7 @@ def load_from_dir(path_dir, image_shape, path_dir_csv=None):
     data_array = np.zeros(batch_x_shape)
     if path_dir_csv is None:
         for i, tile in enumerate(path_tile):
+            assert os.path.isfile(tile),"Wrong path to tile {}".format(tile)
             data_array[i, :, :, :] = np.load(tile)
         return data_array, path_tile,None
     else:
