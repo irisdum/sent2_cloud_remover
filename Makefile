@@ -10,6 +10,7 @@ graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
 source_directory=/datastore/dum031/data/dataset2/
 target_directory=${source_directory}prepro2/
 build_dataset_dir=${target_directory}build_dataset/
+build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2.xml
 output_split_dir_name=input_large_dataset
 split_test=0.15
@@ -86,9 +87,11 @@ download_to_split:
 	split_dataset
 
 download_aus18_tif:
-	weget https://data.gov.au/dataset/6ebffd6f-a937-4fa6-843a-3fde2effbacd/resource/83f98691-de14-4c7d-a3f0-e445fba0b4c7/download/aus_for18.tiff
+	wget https://data.gov.au/dataset/6ebffd6f-a937-4fa6-843a-3fde2effbacd/resource/83f98691-de14-4c7d-a3f0-e445fba0b4c7/download/aus_for18.tiff
+	mv aus_for18.tiff ${source_directory}
 
-
+tiling_aus18:
+	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir build_dataset_landclass --geojson ${geojson_utm_file}
 
 
 help:
