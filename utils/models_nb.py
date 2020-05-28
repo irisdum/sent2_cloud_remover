@@ -5,12 +5,12 @@ import glob
 import os
 
 from utils.display_image import find_image_indir, plot_all_compar
-
+from utils.open_yaml import open_yaml
 
 def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plot=True):
     """Run a prediction of the model and save the images if required and plot them too"""
     path_model_yaml, path_train_yaml=get_important_path(path_model,training_nber)
-    gan = clean_gan.GAN(path_model_yaml, path_train_yaml)
+    gan = clean_gan.GAN(open_yaml(path_model_yaml), open_yaml(path_train_yaml))
     l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
     path_val=gan.val_directory
     l_image_name=find_image_indir(path_val, "npy")
