@@ -4,7 +4,7 @@ import os
 import numpy as np
 from constant.gee_constant import EPSG_LANDCLASS, EPSG
 from processing import crop_image, tiling,  create_safe_directory
-from utils.converter import geojson_2_strcoordo_ul_lr
+from utils.converter import geojson_2_strcoordo_ul_lr, add_batch_str_coorodo
 
 
 def get_landclass_tile(path_landclass_dir,tile_id):
@@ -37,8 +37,13 @@ def main(path_tif,output_dir,path_geojson):
     os.system("gdalwarp  -t_srs {} {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"_reproj.tiff"))
     crop_image_name = output_dir + "crop_aus18.vrt"
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
+    str_bbox_increase=add_batch_str_coorodo(str_bbox,[1000,1000,1000,1000]) #TODO add it in the constant file
+    #first resample using a small batch area, then once the resolution is set at 10 resample exactly
     os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0]+"_reproj.tiff",crop_image_name, str_bbox, EPSG))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0] + "_reproj.tiff",
+                                                                             path_tif.split(".")[0] + "_reproj2.tiff", str_bbox_increase, EPSG))
+    os.system(
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0]+"_reproj_2.tiff",crop_image_name, str_bbox, EPSG))
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4, 0)
 
