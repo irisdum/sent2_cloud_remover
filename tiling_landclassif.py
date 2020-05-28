@@ -1,8 +1,19 @@
 import argparse
+import glob
 import os
-
+import numpy as np
 from constant.gee_constant import EPSG_LANDCLASS, EPSG
 from processing import crop_image, tiling,  create_safe_directory
+
+def get_landclass_tile(path_landclass_dir,tile_id):
+    """:param"""
+    l=glob.glob('{}**/*{}*'.format(path_landclass_dir,tile_id.split(".")[0]),recursive=True)
+    assert len(l)==1,"No image found at {} for tile id {} \n using glob command {} ".format(path_landclass_dir,tile_id.split(".")[0],'{}**/*{}*'.format(path_landclass_dir,tile_id.split(".")[0]))
+    return l[0]
+
+def load_landclass_tile(path_landclass_dir,tile_id):
+    path_tile=get_landclass_tile(path_landclass_dir,tile_id)
+    return np.load(path_tile)
 
 
 def _argparser():
@@ -17,9 +28,11 @@ def _argparser():
     return parser.parse_args()
 
 
+
+
 def main(path_tif,output_dir,path_geojson):
     create_safe_directory(output_dir)
-    os.system("gdalwarp  -t_srs {} -tr 10 10 {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"reproj.tiff"))
+    os.system("gdalwarp  -t_srs {} {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"_reproj.tiff"))
     crop_image_name = crop_image(path_tif.split(".")[0]+"reproj.tiff", path_geojson,
                                  output_dir + "crop_aus18.vrt")
     os.system("gdalinfo {}".format(crop_image_name))
