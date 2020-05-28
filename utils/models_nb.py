@@ -1,5 +1,5 @@
 # Some functions useful for jupyter notebooks used to study the models
-
+from constant.gee_constant import XDIR
 from models import clean_gan
 import glob
 import os
@@ -13,7 +13,7 @@ def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plo
     gan = clean_gan.GAN(open_yaml(path_model_yaml), open_yaml(path_train_yaml))
     l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
     path_val=gan.val_directory
-    l_image_name=find_image_indir(path_val, "npy")
+    l_image_name=find_image_indir(path_val+XDIR, "npy")
     print("The val image founded are {}".format(l_image_name))
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
     path_weight,founded=find_weight_path(l_weight,select_weight)
