@@ -38,10 +38,10 @@ def main(path_tif,output_dir,path_geojson):
     crop_image_name = output_dir + "crop_aus18.vrt"
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
     os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} ".format(path_tif.split(".")[0]+"reproj.tiff",crop_image_name, str_bbox, EPSG))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} ".format(path_tif.split(".")[0]+"_reproj.tiff",crop_image_name, str_bbox, EPSG))
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4, 0)
-    
+
 if __name__ == '__main__':
     args = _argparser()
     main(args.path_tif,args.output_dir,args.geojson)
