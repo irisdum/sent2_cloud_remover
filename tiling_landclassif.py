@@ -19,7 +19,7 @@ def _argparser():
 
 def main(path_tif,output_dir,path_geojson):
     create_safe_directory(output_dir)
-    os.system("gdalwarp -s_srs {} -t_srs {} -tr 10 10 {} {}".format(EPSG_LANDCLASS,EPSG,path_tif,path_tif.split(".")[0]+"reproj.tiff"))
+    os.system("gdalwarp  -t_srs {} -tr 10 10 {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"reproj.tiff"))
     crop_image_name = crop_image(path_tif.split(".")[0]+"reproj.tiff", path_geojson,
                                  output_dir + "crop_aus18.vrt")
     os.system("gdalinfo {}".format(crop_image_name))
