@@ -46,6 +46,7 @@ class GAN():
             self.path_csv = train_yaml["path_csv"]
 
         if "path_csv" not in train_yaml:
+            print("path°csv undefined do not use global band min and max to normalize the data")
             self.path_csv = None
         else:
             self.path_csv=train_yaml["path_csv"]
@@ -69,8 +70,7 @@ class GAN():
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization,
-                                             dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                             dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
+                                             dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
         self.val_X, self.val_Y = load_data(self.val_directory, normalization=self.normalization,
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                            dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
