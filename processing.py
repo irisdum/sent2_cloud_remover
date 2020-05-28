@@ -214,8 +214,10 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
 
 def tiling_aus18_map(path_tif,output_dir,path_geojson):
     """Function used to tile the maps of the australian forest vegetation, into the same tiling process of the build_dataset"""
+
     crop_image_name = crop_image(path_tif, path_geojson,
                                 output_dir + "crop_aus18.vrt")
+
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4,0)
 

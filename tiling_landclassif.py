@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from constant.gee_constant import EPSG_LANDCLASS, EPSG
 from processing import crop_image, tiling,  create_safe_directory
 
 
@@ -18,7 +19,8 @@ def _argparser():
 
 def main(path_tif,output_dir,path_geojson):
     create_safe_directory(output_dir)
-    crop_image_name = crop_image(path_tif, path_geojson,
+    os.system("gdalwarp -s_srs {} -t_srs {} -tr 10 10 {} {}".format(EPSG_LANDCLASS,EPSG,path_tif,path_tif.split(".")[0]+"reproj.tiff"))
+    crop_image_name = crop_image(path_tif.split(".")[0]+"reproj.tiff", path_geojson,
                                  output_dir + "crop_aus18.vrt")
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4, 0)
