@@ -385,7 +385,7 @@ class GAN():
             if path_save is not None:
                 # we store the data at path_save
                 for i in range(batch_res.shape[0]):
-                    np.save("{}_image_{}".format(path_save, l_image_id[i]))
+                    np.save("{}_image_{}".format(path_save, l_image_id[i]),batch_res[i,:,:,:])
         return batch_res
 
 
