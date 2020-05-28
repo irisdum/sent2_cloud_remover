@@ -43,7 +43,7 @@ def main(path_tif,output_dir,path_geojson):
         "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0] + "_reproj.tiff",
                                                                              path_tif.split(".")[0] + "_reproj2.tiff", str_bbox_increase, EPSG))
     os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0]+"_reproj_2.tiff",crop_image_name, str_bbox, EPSG))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10".format(path_tif.split(".")[0]+"_reproj2.tiff",crop_image_name, str_bbox, EPSG))
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4, 0)
 
