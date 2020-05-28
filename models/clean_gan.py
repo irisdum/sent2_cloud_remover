@@ -377,7 +377,7 @@ class GAN():
             len(l_image_id), batch.shape[0])
         if os.path.isdir(path_save):
             print("[INFO] the directory where to store the image already exists")
-            data_array, path_tile = load_from_dir(path_save, DICT_SHAPE[LABEL_DIR], self.path_csv)
+            data_array, path_tile,_ = load_from_dir(path_save, DICT_SHAPE[LABEL_DIR], self.path_csv)
             return data_array
         else:
             create_safe_directory(path_save)

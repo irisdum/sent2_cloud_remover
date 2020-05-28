@@ -45,3 +45,14 @@ def geojson_2_strcoordo_ul_lr(path_geojson):
     coordo=sh.bounds
     print("Minx {}, miny {}, maxx {}, maxy{}".format(coordo[0],coordo[1],coordo[2],coordo[3]))
     return "{} {} {} {}".format(coordo[0], coordo[3], coordo[2], coordo[1])
+
+def add_batch_str_coorodo(coordo_str,add_val):
+    """:param coordo_str : string
+    :returns a string of the coordo where we have added the value of add_val"""
+    assert len(add_val)==4, "Wrong in put param add_val should be len 4 not {}".format(add_val)
+    l_coordo=coordo_str.split(" ")
+    l_increase=[]
+    for i,coordo in enumerate(l_coordo):
+        l_increase+=[str(float(coordo)+float(add_val[i]))]
+    print("We have addee {} to coordo str {} \n The new bbox coordo are {}".format(coordo_str,add_val," ".join(l_increase)))
+    return " ".join(l_increase)
