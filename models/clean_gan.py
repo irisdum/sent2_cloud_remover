@@ -382,7 +382,7 @@ class GAN():
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
-            assert batch_res.shape==batch.shape,"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,batch.shape)
+            assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,batch.shape)
             if path_save is not None:
                 # we store the data at path_save
                 for i in range(batch_res.shape[0]):
