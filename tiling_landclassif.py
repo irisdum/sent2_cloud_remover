@@ -31,7 +31,7 @@ def tiling_fromgrid(path_tif,path_grid_geojson,output_dir):
         fp = r.fp.intersection(poly)
         land_class_tile=r.get_data(fp=fp)
         #with buzz.create_raster(path='predictions_{}.tif'.format(i), fp=fp,
-                                dtype='uint8').close as out:
+                 #               dtype='uint8').close as out:
           #  out.set_data(land_class_tile)
 
 def _argparser():
