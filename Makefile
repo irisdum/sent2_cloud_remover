@@ -94,10 +94,13 @@ tiling_aus18:
 	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir ${build_dataset_landclass} --geojson ${geojson_utm_file}
 
 
-conda_buzz:
+install_conda_buzz:
 	conda create -n buzz python gdal>=2.3.3 shapely rtree -c 'conda-forge'
 	conda activate buzz
 	pip install buzzard
+
+activate_buzz_env:
+	conda activate buzz
 
 help:
 	@echo "[HELP] "
