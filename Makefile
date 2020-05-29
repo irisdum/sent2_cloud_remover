@@ -18,6 +18,8 @@ split_train=0.80
 split_val=0.05
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
+path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
+
 
 conda_rasterio:
 	conda config --add channels conda-forge
@@ -91,7 +93,7 @@ download_aus18_tif:
 	mv aus_for18.tiff ${source_directory}
 
 tiling_aus18:
-	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir ${build_dataset_landclass} --geojson ${build_dataset_dir}
+	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir ${build_dataset_landclass} --geojson ${path_grid_geosjon}
 
 
 install_conda_buzz:

@@ -19,8 +19,8 @@ def load_landclass_tile(path_landclass_dir,tile_id):
     path_tile=get_landclass_tile(path_landclass_dir,tile_id)
     return np.load(path_tile)
 
-def tiling_fromgrid(path_tif,path_builddataset,output_dir):
-    path_grid_geojson=create_geojson(path_builddataset)
+def tiling_fromgrid(path_tif,path_grid_geojson,output_dir):
+
     grid=load_grid_geojson(path_grid_geojson)
     ds = buzz.Dataset()
     r = ds.open_raster("raster",path_tif)
