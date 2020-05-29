@@ -21,7 +21,7 @@ def load_landclass_tile(path_landclass_dir,tile_id):
 def tiling_fromgrid(path_tif,path_grid_geojson,output_dir):
     ds = buzz.Dataset()
     r = ds.open_raster("raster",path_tif)
-    v = ds.open_vector(path_grid_geojson, driver='GeoJSON')
+    v = ds.open_vector("vect",path_grid_geojson, driver='GeoJSON')
 
     for poly in v.iter_data():
         # Compute the Footprint bounding `poly`
