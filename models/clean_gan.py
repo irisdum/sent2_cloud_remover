@@ -382,10 +382,11 @@ class GAN():
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
+            assert batch_res.shape==batch.shape,"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,batch.shape)
             if path_save is not None:
                 # we store the data at path_save
                 for i in range(batch_res.shape[0]):
-                    np.save("{}_image_{}".format(path_save, l_image_id[i]),batch_res[i,:,:,:])
+                    np.save("{}_image_{}".format(path_save, l_image_id[i].split("/")[-1]),batch_res[i,:,:,:])
         return batch_res
 
 

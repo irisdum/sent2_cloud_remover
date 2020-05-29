@@ -256,6 +256,8 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     return dict_stat
 
     #apply a normalization without computing the stats !
+
+
 def find_csv(path_dir,band):
     """:returns a string path to the csv [band]*.csv"""
     path_band_csv = glob.glob("{}*{}*.csv".format(path_dir, band))
@@ -279,7 +281,17 @@ def get_minmax_fromcsv(tile_id,path_csv,band):
     #print("We divide the res by this {} as it was used to rescale the data in the dataset ".format(CONVERTOR))
     return dict_res[name_col[0]]/CONVERTOR,dict_res[name_col[1]]/CONVERTOR
 
-
+def get_ndvi_minmax_fromcsv(tile_id,path_csv,vi): #TODO make one isnge function to read the csv
+    assert type(vi) == type("u"), "The input should be a string not a {}".format(vi)
+    df = pd.read_csv(path_csv, sep=",", header=0)
+    df.head(5)
+    # print(df.head(5))
+    # print(df.columns)
+    name_col = ["{}_min".format(vi), "{}_max".format(vi)]
+    subf_df = df[df["tile_id"] == tile_id]
+    assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
+    dict_res = subf_df.iloc[0].to_dict()
+    return dict_res[name_col[0]],dict_res[name_col[1]]
 
 
 
