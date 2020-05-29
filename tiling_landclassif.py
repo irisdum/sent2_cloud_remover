@@ -3,6 +3,7 @@ import glob
 import os
 import numpy as np
 from constant.gee_constant import EPSG_LANDCLASS, EPSG
+from gee_ndvi_minmax import load_grid_geojson, create_geojson
 from processing import crop_image, tiling,  create_safe_directory
 from scanning_dataset import extract_tile_id
 from utils.converter import geojson_2_strcoordo_ul_lr, add_batch_str_coorodo
@@ -18,17 +19,20 @@ def load_landclass_tile(path_landclass_dir,tile_id):
     path_tile=get_landclass_tile(path_landclass_dir,tile_id)
     return np.load(path_tile)
 
-def tiling_fromgrid(path_tif,path_grid_geojson,output_dir):
+def tiling_fromgrid(path_tif,path_builddataset,output_dir):
+    path_grid_geojson=create_geojson(path_builddataset)
+    grid=load_grid_geojson(path_grid_geojson)
     ds = buzz.Dataset()
     r = ds.open_raster("raster",path_tif)
     v = ds.open_vector("vect",path_grid_geojson, driver='GeoJSON')
     print(type(v))
     print(v.get_keys())
-    for poly in v.iter_data():
+    for i,poly in enumerate(v.iter_data()):
         # Compute the Footprint bounding `poly`
         print(poly)
         print(type(poly))
-        print(poly["location"])
+        print(grid)
+        #print(poly["location"])
         fp = r.fp.intersection(poly)
         land_class_tile=r.get_data(fp=fp)
         #with buzz.create_raster(path='predictions_{}.tif'.format(i), fp=fp,
