@@ -54,10 +54,10 @@ def _argparser():
 
 
 def main(path_tif,output_dir,path_geojson):
-
-    tiling_fromgrid(path_tif,path_geojson,output_dir)
+    os.system("gdalwarp  -t_srs {} {} {}".format(EPSG, path_tif, path_tif.split(".")[0] + "_reproj.tiff"))
+    tiling_fromgrid(path_tif.split(".")[0] + "_reproj.tiff",path_geojson,output_dir)
     # create_safe_directory(output_dir)
-    # os.system("gdalwarp  -t_srs {} {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"_reproj.tiff"))
+    #os.system("gdalwarp  -t_srs {} {} {}".format(EPSG,path_tif,path_tif.split(".")[0]+"_reproj.tiff"))
     # crop_image_name = output_dir + "crop_aus18.vrt"
     # str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
     # str_bbox_increase=add_batch_str_coorodo(str_bbox,[1000,1000,1000,1000]) #TODO add it in the constant file
