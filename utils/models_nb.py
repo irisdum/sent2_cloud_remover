@@ -28,7 +28,7 @@ def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plo
     bath_res=gan.predict_on_iter(val_dataX,path_save,l_image_id=l_image_name)
     if plot:
         plot_all_compar(bath_res,val_dataY)
-    return bath_res
+    return bath_res,gan
 
 
 def get_important_path(path_model,training_nber):
