@@ -23,7 +23,7 @@ def tiling_fromgrid(path_tif,path_grid_geojson,output_dir):
     r = ds.open_raster("raster",path_tif)
     v = ds.open_vector("vect",path_grid_geojson, driver='GeoJSON')
     print(type(v))
-    print(v)
+    print(v.get_keys())
     for poly in v.iter_data():
         # Compute the Footprint bounding `poly`
         print(poly)
