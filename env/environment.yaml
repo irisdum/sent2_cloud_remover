@@ -1,21 +1,21 @@
 name: proj_env
-channel_priority: strict
+
 channels:
   - conda-forge
   - defaults
-  - anaconda
+  #- anaconda
   - conda-forge/label/cf201901
   - conda-forge/label/broken
 
 dependencies:
-  - python=3.6
-  - pip
+  #- python=3.6
+  #- pip
   - gdal=2.4.0 #=py36hf242f0b_1005 gdal=3.1.0=py38h172510d_2
-  - tensorflow=2.0.0 #=h0d30ee6_0
-  - tensorboard=2.0.0 #build anaconda
-  - python-fmask=0.5.4
-  - pip:
-      -keras=2.2.4
-    
+ # - tensorflow=2.0.0 #=h0d30ee6_0
+ # - tensorboard=2.0.0 #build anaconda
+ # - python-fmask=0.5.4
+  #- pip:
+  #    -keras=2.2.4
+
 
 
