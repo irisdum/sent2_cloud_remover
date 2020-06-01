@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
   - conda-forge/label/cf201901
+  - conda-forge/label/broken
 dependencies:
   - python=3.8
   - gdal=2.4.0 #=py36hf242f0b_1005 gdal=3.1.0=py38h172510d_2
