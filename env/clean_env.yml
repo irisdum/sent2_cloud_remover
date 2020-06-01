@@ -1,13 +1,18 @@
-name: proj_env
+name: proj_env2
 
 channels:
   - conda-forge/label/cf201901 #for gdal
   - conda-forge
   - defaults
+  - anaconda
 
 dependencies:
   - python=3.6
   - gdal=2.*
-  - tensorflow=2.0
-  - tensorboard
   - pip
+  - python-fmask
+  - pip :
+      - geojson==2.5.0
+      - buzzard
+      - tensorflow==2.0.0a0
+  - tensorboard=2.*
