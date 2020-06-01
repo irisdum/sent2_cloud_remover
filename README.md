@@ -100,10 +100,25 @@ xml v2 :
 - Terrain Correction
 -Linear from db
 - Write as TIFF
+
+xml v3 : 
+- Apply Orbit File
+- Subset 
+- Thermal Noise
+- Remove GRD Noise
+- Calibration
+- Speckle (Refined Lee)
+- Terrain Correction, setting the grid with the S2 grid
+-Linear from db
+- Write as TIFF
+
 For Sentinel 2 : 
 - Resample at 10 meters
 - Subset 
 - Write TIFF
+
+
+
 
 ### bash script
 
@@ -138,7 +153,13 @@ Notebooks will soon be released showing examples of the results
 ### Normalization of the data
 
 Before training the model, it is recommended to rescale your data between 0 and 1. Different way of rescaling have been studied.
-By default :  a normalization of S2 bands is done. For each band min and max are computed on the batch
+By default :  a normalization of S2 bands is done. For each band min and max are computed on the batch. Then the mean of the max and min
+computed for each tile of the batch is used to normalize (band by band) the S2 band. For S1 band a standardization is applied
+In order to compare the compute meaningful vegetation index on the simulated s2 images, it could be interesting the get the 
+minimum and maximum value for each S2 band on each tile. Then the min and max value will be used to normalized the data as for the previous method.
+In order to get the S2 min and max over a year, python script is made using Google earth engine API. The output of this script
+is a csv.
+
 
 
 
