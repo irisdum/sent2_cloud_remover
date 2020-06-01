@@ -22,4 +22,7 @@ dependencies:
       - earthengine-api
       - click
       - tensorboard>=2.0
+      - sklearn
+      - pandas
+      - ruamel.yaml
   #- tensorflow-estimator=2*
