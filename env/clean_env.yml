@@ -1,0 +1,9 @@
+name: proj_env
+
+channels:
+  - conda-forge
+  - defaults
+
+
+dependencies:
+  - gdal=2.4.0
