@@ -8,7 +8,7 @@ channels:
 
 dependencies:
   - python=3.6
-  - gdal=2.3.3
+  - conda-forge/label/cf201901::gdal=2.3.3
   - pip=20.*
   - python-fmask
   - shapely>=1.6.1
@@ -16,7 +16,8 @@ dependencies:
   - rtree
   - pip :
       - geojson==2.5.0
-      - buzzard=0.6.0
+      - buzzard==0.6.0
       - tensorflow==2.0.0a0
+      - earthengine-api
   - tensorboard=2.*
   - tensorflow-estimator=2*

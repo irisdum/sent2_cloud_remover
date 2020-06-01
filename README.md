@@ -160,6 +160,9 @@ minimum and maximum value for each S2 band on each tile. Then the min and max va
 In order to get the S2 min and max over a year, python script is made using Google earth engine API. The output of this script
 is a csv.
 
+## Vegetation index 
+In order to assess the burned area different vegetation index have been implemented
+
 
 
 
