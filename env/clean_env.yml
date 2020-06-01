@@ -5,10 +5,11 @@ channels:
   - conda-forge
   - defaults
   - anaconda
+  - conda-forge/label/broken
 
 dependencies:
   - python=3.6
-  - conda-forge/label/cf201901::gdal=2*
+  - conda-forge/label/cf201901::gdal>=2.3.3
   - pip=20.*
   - python-fmask
   - shapely>=1.6.1
@@ -19,5 +20,6 @@ dependencies:
       - buzzard==0.6.0
       - tensorflow==2.0.0a0
       - earthengine-api
-  - tensorboard=2.*
-  - tensorflow-estimator=2*
+      - click
+      - tensorboard>=2.0
+  #- tensorflow-estimator=2*

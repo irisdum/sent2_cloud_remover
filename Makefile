@@ -113,3 +113,5 @@ help:
 	@echo "To apply the tiling process coordinates system conversion, resampling 10 res .. make tiling"
 	@echo "To split the dataset between train, val and test folder make split_dataset"
 	@echo "To train a model make train_model, please check the value of the train yaml and model yaml before to do so, it will run with sbatch !"
+	@echo "To download land classfication tiff from Australian forest report 2018 make download_aus18_tif"
+	@echo "To get the min max value from sentinel 2 over a year make get_s2_minmax:"

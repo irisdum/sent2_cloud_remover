@@ -39,7 +39,7 @@ Input :
 The script will connect to Google earth engine in order to find the Sentinel 2 images within the date range that have a lower
 ccp thant max_ccp and cover the area. Given the date of acquisition of the Sentinel 2, the closest Sentinel 1 images (in time).
 The python script used `find_images.py`, an exemple of the use is shown on `bash_scripts/search_image.sh`.
-
+The cloud filter is python script adapted from  http://bit.ly/Sen2CloudFree
 
 ## Downloading the data
 
@@ -118,8 +118,6 @@ For Sentinel 2 :
 - Write TIFF
 
 
-
-
 ### bash script
 
 If there are numerous geometry in the .txt file For each geometry, the preprocessing of is done for each bands 
@@ -161,7 +159,10 @@ In order to get the S2 min and max over a year, python script is made using Goog
 is a csv.
 
 ## Vegetation index 
-In order to assess the burned area different vegetation index have been implemented
+In order to assess the burned area different vegetation index have been implemented.
+
+## Land classification
+
 
 
 
