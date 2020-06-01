@@ -126,6 +126,21 @@ For dataX :
 Using gdalbuildvrt a VRT file is created creating first a mosaic for each image bands. Then another VRT file is made merging
 the required bands together : 
 
+## Training a Model
+The cycle GAN model used is defined in models/clean_gan.py
+In order to train a model two yaml should be modified, examples available in GAN_confs :  
+- model.yaml
+- train.yaml
+Then running gan_train.sh path_to_model_yaml path_to_train_yaml will start the training job
+
+Notebooks will soon be released showing examples of the results
+
+### Normalization of the data
+
+Before training the model, it is recommended to rescale your data between 0 and 1. Different way of rescaling have been studied.
+By default :  a normalization of S2 bands is done. For each band min and max are computed on the batch
+
+
 
 
 

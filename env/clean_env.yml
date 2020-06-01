@@ -9,10 +9,11 @@ channels:
 dependencies:
   - python=3.6
   - gdal=2.*
-  - pip
+  - pip=20.*
   - python-fmask
   - pip :
       - geojson==2.5.0
-      - buzzard
+      - buzzard=0.6.0
       - tensorflow==2.0.0a0
   - tensorboard=2.*
+  - tensorflow-estimator=2*
