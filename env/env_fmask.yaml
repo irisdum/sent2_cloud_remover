@@ -1,0 +1,5 @@
+name: myenv
+channels:
+  - conda-forge
+  - defaults
+prefix: /home/dum031/.conda/envs/myenv

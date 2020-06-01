@@ -1,0 +1,9 @@
+name: project_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - gdal=2.4.0 #=py36hf242f0b_1005 gdal=3.1.0=py38h172510d_2
+  - tensorflow-gpu=2.0.0
+#prefix: #/datastore/dum031/envs/proj_env

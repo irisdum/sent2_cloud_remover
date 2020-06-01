@@ -267,3 +267,43 @@ def display_final_tile(raster_array,band=None,ax=None):
     ax.imshow(raster_array[:,:,band])
     if ax is None:
         plt.show()
+
+    
+
+def compute_batch_vi(batch_x,batch_predict,batch_gt,max_im=100,vi="ndvi"):
+    n=batch_predict.shape[0]
+    if n<max_im:
+        max_im=n
+    for i in range(max_im):
+        image_pre_fire=batch_x[i,:,:,:]
+        image_post=batch_gt[i,:,:,:]
+        image_pred=batch_predict[i,:,:,]
+        print(image_pre_fire.shape,image_post.shape,image_pred.shape)
+        plot_pre_post_pred(image_pre_fire,image_post,image_pred)
+        fig,ax=plt.subplots(1,3,figsize=(40,10))
+        #vi_pre=compute_vi(image_pre_fire,vi)
+        display_one_image_vi(image_pre_fire,fig,ax[0],vi,dict_band={"R":[4],"NIR":[7]},title='Pre fire',cmap=None,vminmax=(-1,1))
+        #vi_post=compute_vi(image_post,vi)
+        display_one_image_vi(image_post,fig,ax[1],vi,dict_band=None,title='GT post fire',cmap=None,vminmax=(-1,1))
+        #vi_pred=compute_vi(image_pred,vi)
+        display_one_image_vi(image_pred,fig,ax[2],vi,dict_band=None,title='Prediction post fire',cmap=None,vminmax=(-1,1))
+        plt.show()
+        fig2,ax2=plt.subplots(1,2,figsize=(20,10))
+        gt_dvi=diff_metric(image_pre_fire,image_post,vi,dict_band_pre={"R":[4],"NIR":[7]},dict_band_post=DICT_BAND_LABEL)
+        pred_dvi=diff_metric(image_pre_fire,image_pred,vi,dict_band_pre=DICT_BAND_X,dict_band_post=DICT_BAND_LABEL)
+        display_one_image_vi(gt_dvi,fig2,ax2[0],"identity",dict_band=None,title='GT Relative difference',cmap="OrRd")
+        display_one_image_vi(pred_dvi,fig2,ax2[1],"identity",dict_band=None,title='Pred Relative difference',cmap="OrRd")
+        plt.show()
+def plot_pre_post_pred(image_pre,image_post,image_pred,l_ax=None,L_band=None):
+    if l_ax is None:
+        fig,l_ax=plt.subplots(1,3,figsize=(20,20))
+    if L_band is None:
+        L_band=[[4,5,6],[0,1,2],[0,1,2]]
+    display_final_tile(image_pre,band=L_band[0],ax=l_ax[0])
+    l_ax[0].set_title("Pre fire")
+    display_final_tile(image_post,band=L_band[1],ax=l_ax[1])
+    l_ax[1].set_title("Post fire")
+    display_final_tile(image_pred,band=L_band[2],ax=l_ax[2])
+    l_ax[2].set_title(" Predict post fire")
+    if l_ax is None:
+        plt.show()
