@@ -1,4 +1,4 @@
-name: null
+name: proj_env
 channel_priority: strict
 channels:
   - conda-forge
@@ -8,9 +8,14 @@ channels:
   - conda-forge/label/broken
 
 dependencies:
-  - python=3.8
+  - python=3.6
+  - pip
   - gdal=2.4.0 #=py36hf242f0b_1005 gdal=3.1.0=py38h172510d_2
-  - tensorflow-gpu=2.0.0=h0d30ee6_0
+  - tensorflow=2.0.0 #=h0d30ee6_0
   - tensorboard=2.0.0 #build anaconda
-  - keras=2.2.4
-prefix: /datastore/dum031/envs/proj_env
+  - python-fmask=0.5.4
+  - pip:
+      -keras=2.2.4
+    
+
+
