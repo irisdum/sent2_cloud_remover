@@ -4,34 +4,36 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
-#from skimage.exposure import is_low_contrast,equalize_hist
-from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1
+# from skimage.exposure import is_low_contrast,equalize_hist
+from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
+from constant.landclass_constant import LISTE_LAND_CLASS
+from utils.land_classif import load_tile_classif
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
-from utils.vi import  compute_vi,diff_metric,diff_relative_metric
+from utils.vi import compute_vi, diff_metric, diff_relative_metric
+import matplotlib.colors as colors
+import matplotlib.patches as mpatches
 
-def plot_allbands_hist(path_tif,ax):
-    raster=gdal.Open(path_tif)
-    image=raster.ReadAsArray()
-    image=np.moveaxis(image,0,-1)
+
+def plot_allbands_hist(path_tif, ax):
+    raster = gdal.Open(path_tif)
+    image = raster.ReadAsArray()
+    image = np.moveaxis(image, 0, -1)
     if ax is None:
-        fig,ax=plt.subplots()
-    ax.hist(image.ravel(), bins = 256, color = 'orange', )
-    nb=image.shape[-1]
-    if nb==5:
-        nb-=1
-    l_legend=[]
-    l_color=["red","green","blue","gray","pink"]
+        fig, ax = plt.subplots()
+    ax.hist(image.ravel(), bins=256, color='orange', )
+    nb = image.shape[-1]
+    if nb == 5:
+        nb -= 1
+    l_legend = []
+    l_color = ["red", "green", "blue", "gray", "pink"]
     for b in range(nb):
-        ax.hist(image[:, :, b].ravel(), bins = 256, color = l_color[b], alpha = 0.5)
-        l_legend+=["Bande {}".format(b+1)]
+        ax.hist(image[:, :, b].ravel(), bins=256, color=l_color[b], alpha=0.5)
+        l_legend += ["Bande {}".format(b + 1)]
         ax.set_xlabel('Intensity Value')
         ax.set_ylabel('Count')
         ax.legend(l_legend)
     if ax is None:
         plt.show()
-
-
-
 
 
 def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
@@ -45,7 +47,7 @@ def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
         np.where(raster_array == 5, 0, raster_array)  # water
         return np.divide(raster_array, 5).astype(np.float32)
     else:
-        return np.divide(raster_array,np.max(raster_array))
+        return np.divide(raster_array, np.max(raster_array))
 
 
 def uin16_2_float32(raster_array, max_scale=CONVERTOR):
@@ -70,7 +72,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
     if name_image is None:
         name_image = path_image.split("/")[-1]
     raster_array = raster.ReadAsArray()
-    raster_array = convert_array(raster_array,mode=mode)
+    raster_array = convert_array(raster_array, mode=mode)
     if mode is None:
         nband = raster_array.shape[0]
         if nband == 2:  # sentinel 1
@@ -129,7 +131,8 @@ def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
 def find_image_indir(path_dir, image_format):
     """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
     dir"""
-    assert image_format in ["vrt", "tif", "SAFE/","npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
+    assert image_format in ["vrt", "tif", "SAFE/",
+                            "npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
     return glob.glob("{}*.{}".format(path_dir, image_format))
 
@@ -165,18 +168,20 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         plt.show()
 
 
-def plot_subset_array(raster_array, ax, bound_x, bound_y,rescaled=False):
+def plot_subset_array(raster_array, ax, bound_x, bound_y, rescaled=False):
     if rescaled:
-        raster_array=rescale_image(raster_array)
+        raster_array = rescale_image(raster_array)
     ax.imshow(raster_array[bound_x[0]:bound_x[1], bound_y[0]:bound_y[1]])
+
 
 def rescale_image(raster_array):
     print("Warning the array should be channel last !")
-    rescaled_array=np.zeros(raster_array.shape)
+    rescaled_array = np.zeros(raster_array.shape)
     for b in range(raster_array.shape[-1]):
-        rescaled_array[:,:,b]=raster_array[:,:,b]
+        rescaled_array[:, :, b] = raster_array[:, :, b]
 
     return rescaled_array
+
 
 def plot_s2(raster_array, opt="RGB"):
     fig, ax = plt.subplots()
@@ -191,119 +196,178 @@ def plot_s2(raster_array, opt="RGB"):
         ax.imshow(np.moveaxis(nir_array, 0, -1))
     plt.show()
 
-def plot_one_band(raster_array,fig,ax,title=""):
-    #print("Imagse shape {}".format(raster_array))
+
+def plot_one_band(raster_array, fig, ax, title=""):
+    # print("Imagse shape {}".format(raster_array))
     if ax is None:
-        fig,ax=plt.subplots()
+        fig, ax = plt.subplots()
     im = ax.imshow(raster_array, cmap='bone')
     ax.set_title(title)
     fig.colorbar(im, ax=ax, orientation='vertical')
     if ax is None:
         plt.show()
 
-def display_one_image_vi(raster_array,fig,ax,vi,dict_band=None,title=None,cmap=None,vminmax=(0,1)):
-    raster_vi=compute_vi(raster_array,vi,dict_band)
+
+def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, cmap=None, vminmax=(0, 1)):
+    raster_vi = compute_vi(raster_array, vi, dict_band)
     if cmap is None:
-        cmap="RdYlGn"
+        cmap = "RdYlGn"
     if ax is None:
-        fig,ax=plt.subplots()
+        fig, ax = plt.subplots()
     if title is None:
-        title=vi
-    im=ax.imshow(raster_vi,cmap=cmap,vmin=vminmax[0], vmax=vminmax[1])
-    fig.colorbar(im,ax=ax,orientation="vertical")
+        title = vi
+    im = ax.imshow(raster_vi, cmap=cmap, vmin=vminmax[0], vmax=vminmax[1])
+    fig.colorbar(im, ax=ax, orientation="vertical")
     ax.set_title(title)
     if ax is None:
         plt.show()
 
 
-def display_compare_vi(image_pre,image_post,vi,fig,ax,dict_band_pre,dict_band_post,figuresize=None,vminmax=(0,1)):
+def display_compare_vi(image_pre, image_post, vi, fig, ax, dict_band_pre, dict_band_post, figuresize=None,
+                       vminmax=(0, 1)):
     if figuresize is None:
-        figuresize=(20,20)
+        figuresize = (20, 20)
     if ax is None:
-        fig,ax=plt.subplots(1,4,figsize=figuresize)
-    display_one_image_vi(image_pre,fig,ax[0],vi,dict_band_pre,title="vi {} image pre".format(vi),vminmax=vminmax)
-    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi),vminmax=vminmax)
-    dr_vi=diff_relative_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
-    d_vi=diff_metric(image_pre,image_post,vi,dict_band_pre,dict_band_post)
-    d_im=ax[2].imshow(d_vi,cmap="bwr",vmin=vminmax[0],vmax=vminmax[1])
+        fig, ax = plt.subplots(1, 4, figsize=figuresize)
+    display_one_image_vi(image_pre, fig, ax[0], vi, dict_band_pre, title="vi {} image pre".format(vi), vminmax=vminmax)
+    display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi),
+                         vminmax=vminmax)
+    dr_vi = diff_relative_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post)
+    d_vi = diff_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post)
+    d_im = ax[2].imshow(d_vi, cmap="bwr", vmin=vminmax[0], vmax=vminmax[1])
     ax[2].set_title("differenced {}".format(vi))
     fig.colorbar(d_im, ax=ax[2], orientation="vertical")
-    dr_im=ax[3].imshow(dr_vi,cmap="bwr",vmin=vminmax[0],vmax=vminmax[1])
+    dr_im = ax[3].imshow(dr_vi, cmap="bwr", vmin=vminmax[0], vmax=vminmax[1])
     ax[3].set_title("relative differenced {}".format(vi))
     fig.colorbar(dr_im, ax=ax[3], orientation="vertical")
     plt.show()
 
-def plot_all_compar(batch_predict,batch_gt,max_im=100,title=""):
-    n=batch_predict.shape[0]
-    if n<max_im:
-        max_im=n
-    #fig,ax2=plt.subplots(n,4,figsize=(15,60))
-    lssim,_=ssim_batch(batch_predict,batch_gt)
-    lpsnr,_=batch_psnr(batch_predict,batch_gt)
-    lsam,_=batch_sam(batch_predict,batch_gt)
-    #print(len(lssim))
+
+def plot_all_compar(batch_predict, batch_gt, max_im=100, title=""):
+    n = batch_predict.shape[0]
+    if n < max_im:
+        max_im = n
+    # fig,ax2=plt.subplots(n,4,figsize=(15,60))
+    lssim, _ = ssim_batch(batch_predict, batch_gt)
+    lpsnr, _ = batch_psnr(batch_predict, batch_gt)
+    lsam, _ = batch_sam(batch_predict, batch_gt)
+    # print(len(lssim))
     for i in range(max_im):
-        fig,ax2=plt.subplots(1,4,figsize=(20,20))
+        fig, ax2 = plt.subplots(1, 4, figsize=(20, 20))
         fig.suptitle(title)
-        image_pred=batch_predict[i,:,:,:]
-        image_gt=batch_gt[i,:,:,:]
-        display_final_tile(image_pred,band=[0,1,2],ax=ax2[0])
+        image_pred = batch_predict[i, :, :, :]
+        image_gt = batch_gt[i, :, :, :]
+        display_final_tile(image_pred, band=[0, 1, 2], ax=ax2[0])
         ax2[0].set_title("Sim True color visualization")
-        display_final_tile(image_pred,band=[3,0,1],ax=ax2[1])
+        display_final_tile(image_pred, band=[3, 0, 1], ax=ax2[1])
         ax2[1].set_title("Sim NIR color visualization")
-        ax2[2].set_title("Real image ssim {} psnr {} sam {}".format(round(lssim[i],3),round(lpsnr[i],3),round(lsam[i],3)))
-        display_final_tile(image_gt,band=[3,0,1],ax=ax2[3])
+        ax2[2].set_title(
+            "Real image ssim {} psnr {} sam {}".format(round(lssim[i], 3), round(lpsnr[i], 3), round(lsam[i], 3)))
+        display_final_tile(image_gt, band=[3, 0, 1], ax=ax2[3])
         ax2[3].set_title("Real image NIR color visualisation")
-        display_final_tile(image_gt,band=[0,1,2],ax=ax2[2])
+        display_final_tile(image_gt, band=[0, 1, 2], ax=ax2[2])
         plt.show()
 
-def display_final_tile(raster_array,band=None,ax=None):
-    #raster_array=np.load(path_npy)
-    #print(raster_array.shape)
+
+def display_final_tile(raster_array, band=None, ax=None):
+    # raster_array=np.load(path_npy)
+    # print(raster_array.shape)
     if ax is None:
-        fig,ax=plt.subplots()
+        fig, ax = plt.subplots()
     if band is None:
-        band=0
-    ax.imshow(raster_array[:,:,band])
+        band = 0
+    ax.imshow(raster_array[:, :, band])
     if ax is None:
         plt.show()
 
-    
 
-def compute_batch_vi(batch_x,batch_predict,batch_gt,max_im=100,vi="ndvi"):
-    n=batch_predict.shape[0]
-    if n<max_im:
-        max_im=n
+def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi"):
+    n = batch_predict.shape[0]
+    if n < max_im:
+        max_im = n
     for i in range(max_im):
-        image_pre_fire=batch_x[i,:,:,:]
-        image_post=batch_gt[i,:,:,:]
-        image_pred=batch_predict[i,:,:,]
-        print(image_pre_fire.shape,image_post.shape,image_pred.shape)
-        plot_pre_post_pred(image_pre_fire,image_post,image_pred)
-        fig,ax=plt.subplots(1,3,figsize=(40,10))
-        #vi_pre=compute_vi(image_pre_fire,vi)
-        display_one_image_vi(image_pre_fire,fig,ax[0],vi,dict_band={"R":[4],"NIR":[7]},title='Pre fire',cmap=None,vminmax=(-1,1))
-        #vi_post=compute_vi(image_post,vi)
-        display_one_image_vi(image_post,fig,ax[1],vi,dict_band=None,title='GT post fire',cmap=None,vminmax=(-1,1))
-        #vi_pred=compute_vi(image_pred,vi)
-        display_one_image_vi(image_pred,fig,ax[2],vi,dict_band=None,title='Prediction post fire',cmap=None,vminmax=(-1,1))
+        image_pre_fire = batch_x[i, :, :, :]
+        image_post = batch_gt[i, :, :, :]
+        image_pred = batch_predict[i, :, :, ]
+        print(image_pre_fire.shape, image_post.shape, image_pred.shape)
+        plot_pre_post_pred(image_pre_fire, image_post, image_pred)
+        fig, ax = plt.subplots(1, 3, figsize=(40, 10))
+        # vi_pre=compute_vi(image_pre_fire,vi)
+        display_one_image_vi(image_pre_fire, fig, ax[0], vi, dict_band={"R": [4], "NIR": [7]}, title='Pre fire',
+                             cmap=None, vminmax=(-1, 1))
+        # vi_post=compute_vi(image_post,vi)
+        display_one_image_vi(image_post, fig, ax[1], vi, dict_band=None, title='GT post fire', cmap=None,
+                             vminmax=(-1, 1))
+        # vi_pred=compute_vi(image_pred,vi)
+        display_one_image_vi(image_pred, fig, ax[2], vi, dict_band=None, title='Prediction post fire', cmap=None,
+                             vminmax=(-1, 1))
         plt.show()
-        fig2,ax2=plt.subplots(1,2,figsize=(20,10))
-        gt_dvi=diff_metric(image_pre_fire,image_post,vi,dict_band_pre={"R":[4],"NIR":[7]},dict_band_post=DICT_BAND_LABEL)
-        pred_dvi=diff_metric(image_pre_fire,image_pred,vi,dict_band_pre=DICT_BAND_X,dict_band_post=DICT_BAND_LABEL)
-        display_one_image_vi(gt_dvi,fig2,ax2[0],"identity",dict_band=None,title='GT Relative difference',cmap="OrRd")
-        display_one_image_vi(pred_dvi,fig2,ax2[1],"identity",dict_band=None,title='Pred Relative difference',cmap="OrRd")
+        fig2, ax2 = plt.subplots(1, 2, figsize=(20, 10))
+        gt_dvi = diff_metric(image_pre_fire, image_post, vi, dict_band_pre={"R": [4], "NIR": [7]},
+                             dict_band_post=DICT_BAND_LABEL)
+        pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
+                               dict_band_post=DICT_BAND_LABEL)
+        display_one_image_vi(gt_dvi, fig2, ax2[0], "identity", dict_band=None, title='GT Relative difference',
+                             cmap="OrRd")
+        display_one_image_vi(pred_dvi, fig2, ax2[1], "identity", dict_band=None, title='Pred Relative difference',
+                             cmap="OrRd")
         plt.show()
-def plot_pre_post_pred(image_pre,image_post,image_pred,l_ax=None,L_band=None):
+
+
+def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None):
     if l_ax is None:
-        fig,l_ax=plt.subplots(1,3,figsize=(20,20))
+        fig, l_ax = plt.subplots(1, 3, figsize=(20, 20))
     if L_band is None:
-        L_band=[[4,5,6],[0,1,2],[0,1,2]]
-    display_final_tile(image_pre,band=L_band[0],ax=l_ax[0])
+        L_band = [[4, 5, 6], [0, 1, 2], [0, 1, 2]]
+    display_final_tile(image_pre, band=L_band[0], ax=l_ax[0])
     l_ax[0].set_title("Pre fire")
-    display_final_tile(image_post,band=L_band[1],ax=l_ax[1])
+    display_final_tile(image_post, band=L_band[1], ax=l_ax[1])
     l_ax[1].set_title("Post fire")
-    display_final_tile(image_pred,band=L_band[2],ax=l_ax[2])
+    display_final_tile(image_pred, band=L_band[2], ax=l_ax[2])
     l_ax[2].set_title(" Predict post fire")
     if l_ax is None:
+        plt.show()
+
+
+def plot_landclass(array_lc, ax=None, fig=None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(10, 10))
+    cmap, norm, boundaries = define_colormap()
+
+    # Shrink current axis by 20%
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width, box.height])
+    ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
+              ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
+              bbox_to_anchor=(1, 0.5))
+    ax.imshow(array_lc, cmap=cmap)
+    plt.show()
+
+
+def define_colormap(LISTE_COLOR=None):
+    cmap = colors.ListedColormap(LISTE_COLOR)
+    boundaries = [i for i in range(24)]
+    norm = colors.BoundaryNorm(boundaries, cmap.N, clip=True)
+    return cmap, norm, boundaries
+
+
+def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_pred=None):
+    if batch_pred is None:
+        ncol = 5
+    else:
+        ncol = 7
+    assert len(path_tile) == batch_x.shape[
+        0], "The list name tile len {} does not have the same length of the batch {}".format(len(path_tile),
+                                                                                             batch_x.shape[0])
+    l_array_lc = load_tile_classif(input_dataset, path_tile, path_lc, max_im=1000)
+    for i in range(len(path_tile)):
+        fig, ax = plt.subplots(1, ncol, figsize=(15, 15))
+        display_final_tile(batch_x[i, :, :, :], band=[4, 5, 6], ax=ax[0])
+        display_final_tile(batch_x[i, :, :, :], band=[7, 4, 5], ax=ax[1])
+        display_final_tile(batch_label[i, :, :, :], band=[0, 1, 2], ax=ax[2])
+        display_final_tile(batch_label[i, :, :, :], band=[3, 1, 2], ax=ax[3])
+        plot_landclass(l_array_lc[i], ax=ax[4], fig=fig)
+        if batch_pred is not None:
+            display_final_tile(batch_pred[i, :, :, :], band=[0, 1, 2], ax=ax[5])
+            display_final_tile(batch_pred[i, :, :, :], band=[3, 1, 2], ax=ax[6])
         plt.show()

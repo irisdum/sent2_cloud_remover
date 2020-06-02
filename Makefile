@@ -91,18 +91,9 @@ download_to_split:
 download_aus18_tif:
 	wget https://data.gov.au/dataset/6ebffd6f-a937-4fa6-843a-3fde2effbacd/resource/83f98691-de14-4c7d-a3f0-e445fba0b4c7/download/aus_for18.tiff
 	mv aus_for18.tiff ${source_directory}
-
-tiling_aus18:
-	python tiling_landclassif.py --path_tif ${source_directory}aus_for18.tiff --output_dir ${build_dataset_landclass} --geojson ${path_grid_geosjon}
+	gdalwarp -t_srs EPSG:32756 ${source_directory}aus_for18.tiff ${source_directory}aus_for18_reproj.tiff
 
 
-install_conda_buzz:
-	conda create -n buzz python gdal>=2.3.3 shapely rtree -c 'conda-forge'
-	conda activate buzz
-	pip install buzzard
-
-activate_buzz_env:
-	conda activate buzz
 
 help:
 	@echo "[HELP] "
@@ -113,5 +104,5 @@ help:
 	@echo "To apply the tiling process coordinates system conversion, resampling 10 res .. make tiling"
 	@echo "To split the dataset between train, val and test folder make split_dataset"
 	@echo "To train a model make train_model, please check the value of the train yaml and model yaml before to do so, it will run with sbatch !"
-	@echo "To download land classfication tiff from Australian forest report 2018 make download_aus18_tif"
+	@echo "To download land classfication tiff from Australian forest report 2018 make download_aus18_tif and reroj it to EPSG 32756"
 	@echo "To get the min max value from sentinel 2 over a year make get_s2_minmax:"

@@ -12,16 +12,18 @@ Many of the different computation steps are easily available from the Makefile.
 
 ## Installation requirements : 
 
- - Google earth engine
+
  - Esa SNAP (command gpt will be used)
- - GDAL 
- -Fmask 
- Exemple of a docker image with GDAL : 
- To build the docker image
-`docker build -t thinkwhere/gdal-python:3.7-ubuntu . `  
-To run the docker image
-` docker run -p 8888:8888  `
-One of the final aim would be to create a docker with all the installation required or more easily a conda env ?
+ The conda env yaml  is in env/clean_env.yml. It enables to use google earth engine api, gdal (2.4), buzzard (0.6), tensorfow2, 
+ jupyter notebook, Fmask.
+ Only tensorboard does not seems to work within this environmnent.
+ `conda-env create -f env/clean_env.yml -name proj_env`
+ `conda activate proj_env`
+ To run jupyter notebook within this conda env : 
+ `python -m ipykernel install --user --name=myEnv`
+ Then run `jupyter notebook` and select myEnv into the kernels available
+
+
 
 ## Downloading the data
 

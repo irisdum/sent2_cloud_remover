@@ -137,23 +137,23 @@ def is_conform(path_tile):
         .format(raster_array.shape, len(LISTE_BANDE[0]), len(LISTE_BANDE[1]))
 
     if is_wrong_size(raster_array):
-        print("Image {} wrong size ".format(path_tile.split("/")[-1]))
+        #print("Image {} wrong size ".format(path_tile.split("/")[-1]))
         return False
 
     if is_no_signal(raster_array):
-        print("Image {} only 0 ".format(path_tile.split("/")[-1]))
+        #print("Image {} only 0 ".format(path_tile.split("/")[-1]))
         return False
 
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
         if is_s2_cloud(raster_array):
-            print("Image {} clouds ".format(path_tile.split("/")[-1]))
+            #print("Image {} clouds ".format(path_tile.split("/")[-1]))
             return False
         if is_no_data(raster, 2):
-            print("Image {} no data ".format(path_tile.split("/")[-1]))
+            #print("Image {} no data ".format(path_tile.split("/")[-1]))
             return False
     else:
         if is_no_data(raster, 1):
-            print("Image {} no_data ".format(path_tile.split("/")[-1]))
+            #print("Image {} no_data ".format(path_tile.split("/")[-1]))
             return False
 
     return True
