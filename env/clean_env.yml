@@ -15,6 +15,7 @@ dependencies:
   - shapely>=1.6.1
   - opencv>=3.1.0
   - rtree
+  - anaconda::ipykernel
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
