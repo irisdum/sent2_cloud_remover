@@ -86,7 +86,7 @@
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
       <pixelSpacingInMeter>10.0</pixelSpacingInMeter>
-      <mapProjection>${crs}</mapProjection>
+      <mapProjection>EPSG:32756</mapProjection>
         <alignToStandardGrid>true</alignToStandardGrid>
         <standardGridOriginX>5</standardGridOriginX>
         <standardGridOriginY>5</standardGridOriginY>
