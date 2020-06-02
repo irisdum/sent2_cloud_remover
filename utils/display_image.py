@@ -363,7 +363,7 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
                                                                                              batch_x.shape[0])
     l_array_lc = load_tile_classif(input_dataset, path_tile, path_lc, max_im=1000)
     if get_stat:
-        batch_stat_df = compute_batch_land_class_stat(l_array_lc, path_lc)
+        batch_stat_df = compute_batch_land_class_stat(l_array_lc,path_tile)
 
     for i in range(len(path_tile)):
         fig, ax = plt.subplots(1, ncol, figsize=(15, 15))
