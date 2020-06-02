@@ -337,10 +337,12 @@ def plot_landclass(array_lc, ax=None, fig=None):
     # Shrink current axis by 20%
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width, box.height])
-    ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
-              ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
-              bbox_to_anchor=(1, 0.5))
-    ax.imshow(array_lc, cmap=cmap)
+    im = ax.imshow(array_lc, cmap=cmap, vmin=0, vmax=22)
+    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(23))
+    cbar.ax.set_yticklabels(LISTE_LAND_CLASS)
+    # ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
+    #           ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
+    #           bbox_to_anchor=(1, 0.5))
     plt.show()
 
 
