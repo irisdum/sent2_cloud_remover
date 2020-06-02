@@ -6,7 +6,7 @@ import numpy as np
 from osgeo import gdal
 # from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
-from constant.landclass_constant import LISTE_LAND_CLASS
+from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
 from utils.land_classif import load_tile_classif
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
@@ -344,8 +344,10 @@ def plot_landclass(array_lc, ax=None, fig=None):
     plt.show()
 
 
-def define_colormap(LISTE_COLOR=None):
-    cmap = colors.ListedColormap(LISTE_COLOR)
+def define_colormap(list_col=None):
+    if list_col is None:
+        list_col=LISTE_COLOR
+    cmap = colors.ListedColormap(list_col)
     boundaries = [i for i in range(24)]
     norm = colors.BoundaryNorm(boundaries, cmap.N, clip=True)
     return cmap, norm, boundaries
