@@ -40,8 +40,7 @@ def compute_land_class_stats(array_lc):
     return final_dic
 
 def compute_batch_land_class_stat(list_arr_lc,path_tileid):
-    """:param list_arr_lc : list of array
-    :param path_tileid : list of str
+    """:param list_arr_lc
     :returns a pd dataframe with for all tiles the stats"""
     df=pd.DataFrame()
     assert len(list_arr_lc)==len(path_tileid),"The list of array lc len {} does not have the same lenght as list path tile {}".format(len(list_arr_lc),len(path_tileid))

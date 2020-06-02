@@ -7,7 +7,7 @@ from osgeo import gdal
 # from skimage.exposure import is_low_contrast,equalize_hist
 from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
-from utils.land_classif import load_tile_classif
+from utils.land_classif import load_tile_classif, compute_batch_land_class_stat
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
 import matplotlib.colors as colors
@@ -353,7 +353,7 @@ def define_colormap(list_col=None):
     return cmap, norm, boundaries
 
 
-def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_pred=None):
+def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_pred=None,get_stat=True):
     if batch_pred is None:
         ncol = 5
     else:
@@ -362,13 +362,20 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
         0], "The list name tile len {} does not have the same length of the batch {}".format(len(path_tile),
                                                                                              batch_x.shape[0])
     l_array_lc = load_tile_classif(input_dataset, path_tile, path_lc, max_im=1000)
+    if get_stat:
+        batch_stat_df = compute_batch_land_class_stat(l_array_lc, path_lc)
+
     for i in range(len(path_tile)):
         fig, ax = plt.subplots(1, ncol, figsize=(15, 15))
+        fig.suptitle(path_tile[i])
         display_final_tile(batch_x[i, :, :, :], band=[4, 5, 6], ax=ax[0])
         display_final_tile(batch_x[i, :, :, :], band=[7, 4, 5], ax=ax[1])
         display_final_tile(batch_label[i, :, :, :], band=[0, 1, 2], ax=ax[2])
         display_final_tile(batch_label[i, :, :, :], band=[3, 1, 2], ax=ax[3])
         plot_landclass(l_array_lc[i], ax=ax[4], fig=fig)
+        if get_stat:
+            maj_class=batch_stat_df.iloc[i][LISTE_LAND_CLASS].sort_values(ascending=False).apply(lambda row: round(row,3))[:3].to_dict()
+            ax[4].set_title(" ".join(["{} {}".format(maj_class[i],maj_class[maj_class[i]]) for i in range(len(maj_class))]))
         if batch_pred is not None:
             display_final_tile(batch_pred[i, :, :, :], band=[0, 1, 2], ax=ax[5])
             display_final_tile(batch_pred[i, :, :, :], band=[3, 1, 2], ax=ax[6])
