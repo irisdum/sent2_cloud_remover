@@ -376,7 +376,7 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
         display_final_tile(batch_label[i, :, :, :], band=[3, 1, 2], ax=ax[3])
         plot_landclass(l_array_lc[i], ax=ax[4], fig=fig)
         if get_stat:
-            maj_class=batch_stat_df.iloc[i][LISTE_LAND_CLASS].sort_values(ascending=False).apply(lambda row: round(row,3)).to_dict() #[:3]
+            maj_class=batch_stat_df.iloc[i][LISTE_LAND_CLASS].sort_values(ascending=False).apply(lambda row: round(row,3))[:3].to_dict()
             #print(maj_class)
             print(",".join(["{} {}".format(elem,maj_class[elem]) for elem in maj_class]))
             #ax[4].set_title(",".join(["{} {}".format(elem,maj_class[elem]) for elem in maj_class]))
