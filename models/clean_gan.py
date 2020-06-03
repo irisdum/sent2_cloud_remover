@@ -15,8 +15,7 @@ from tensorflow.keras.callbacks import TensorBoard
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE
 from models.callbacks import write_log
 from models.losses import L1_loss
-from processing import create_safe_directory
-from utils.display_image import find_image_indir
+from utils.image_find_tbx import create_safe_directory, find_image_indir
 from utils.load_dataset import load_data, save_images, load_from_dir
 from utils.open_yaml import open_yaml, saving_yaml
 from utils.metrics import batch_psnr, ssim_batch, compute_metric

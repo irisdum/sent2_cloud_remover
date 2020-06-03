@@ -3,13 +3,13 @@ import glob
 import argparse
 from osgeo import gdal
 import numpy as np
-import os
 from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR, TOT_ZERO_PIXEL
 import random
 from sklearn.model_selection import train_test_split
 
 
 from utils.display_image import display_final_tile
+from utils.image_find_tbx import extract_relative_path, extract_tile_id, get_all_tiles_path
 
 
 def is_no_data(raster, sent):
@@ -68,25 +68,6 @@ def is_s2_cloud(s2_raster_array, cloud_thr=CLOUD_THR):
         return False
 
 
-def extract_relative_path(path_tif):
-    """Given the path to an tif tile returns its relative path within the Sentineli_tj directory"""
-    l = path_tif.split("/")
-    return "/".join(l[-3:-1])
-
-
-def extract_tile_id(path_tif):
-    return path_tif.split("/")[-1][-9:]
-
-
-def get_all_tiles_path(path_sent_dir):
-    """Given the path to Sentineli_tj directory returns a list of all the paths to all the tiles of the image"""
-    assert os.path.isdir(path_sent_dir), "The dir {} does not exist".format(path_sent_dir)
-    print("research :  {}**/*.tif".format(path_sent_dir))
-    l = glob.glob("{}**/*.tif".format(path_sent_dir), recursive=True)
-    assert len(l) > 0, "No image found in {}".format(path_sent_dir)
-    return l
-
-
 def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
     random.seed(seed)
     if nb_sample>len(list_all_tiles):
@@ -120,17 +101,6 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
     tot=len(lid_val)+len(lid_train)+len(lid_test)
     print("[INFO] total {} split train : {} test {} val {}".format(tot,len(lid_train)/tot,len(lid_test)/tot,len(lid_val)/tot))
     return {"train/":lid_train,"val/":lid_val,"test/":lid_test}
-
-def find_path(sent_dir, image_id):
-    """:returns a string which is the path of the image with the id image_id
-    """
-    assert os.path.isdir(sent_dir),"Wrong path to dir, path  {} does not exist ".format(sent_dir)
-    print(sent_dir + "**/*{}".format(image_id))
-    assert ".tif" in image_id, "The id {} is not an image ".format(image_id)
-    l = glob.glob(sent_dir + "**/*{}".format(image_id), recursive=True)
-    assert len(l) > 0, "No image found with id {} at {}".format(image_id, sent_dir)
-    assert os.path.isfile(l[0]), "No file found at {}".format(l[0])
-    return l[0]
 
 
 def is_conform(path_tile,plot=False):

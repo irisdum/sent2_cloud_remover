@@ -4,7 +4,8 @@ from models import clean_gan
 import glob
 import os
 
-from utils.display_image import find_image_indir, plot_all_compar
+from utils.display_image import plot_all_compar
+from utils.image_find_tbx import find_image_indir
 from utils.open_yaml import open_yaml
 
 def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plot=True):

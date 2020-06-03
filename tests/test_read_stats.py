@@ -3,9 +3,8 @@ import sys
 sys.path.append("..")
 import argparse
 import numpy as np
-from scanning_dataset import extract_tile_id
+from utils.image_find_tbx import extract_tile_id, find_image_indir
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR
-from utils.display_image import find_image_indir
 from utils.load_dataset import load_from_dir, load_data
 from utils.normalize import get_minmax_fromcsv, find_csv
 

@@ -4,8 +4,8 @@ import os
 import numpy as np
 from constant.gee_constant import EPSG_LANDCLASS, EPSG
 from utils.geojson import create_geojson, load_grid_geojson
-from processing import crop_image, tiling,  create_safe_directory
-from scanning_dataset import extract_tile_id
+from processing import crop_image, tiling
+from utils.image_find_tbx import extract_tile_id, create_safe_directory
 from utils.converter import geojson_2_strcoordo_ul_lr, add_batch_str_coorodo
 import buzzard as buzz
 

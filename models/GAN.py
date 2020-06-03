@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Input, Dense, Add, Reshape, Flatten, Dropout
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from constant.model_constant import CHANNEL
-from processing import create_safe_directory
+from utils.image_find_tbx import create_safe_directory
 from utils.load_dataset import load_data, save_images
 import numpy as np
 from models.losses import modified_discriminator_loss, modified_generator_loss, total_generator_loss, \

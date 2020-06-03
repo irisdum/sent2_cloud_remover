@@ -2,11 +2,10 @@
 import argparse
 import glob
 import os
-import shutil
-import click
 from osgeo import gdal
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from constant.gee_constant import VAR_NAME, LISTE_BANDE, OVERLAP, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
+from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
+from utils.image_find_tbx import create_safe_directory
 
 
 def find_cloud_mask(input_dir): ##UNUSED
@@ -80,14 +79,6 @@ def combine_band(list_path_vrt, output_dir):
     return output_name
 
 
-def compute_the_intersection(image_path, zone_path):
-    """:param image_path : path to the image
-    :param zone_path to the zone geometry"""
-    pass
-
-
-def orthorectification(image_path, output_path):
-    pass
 
 
 def get_path_tile(band, input_dir):
@@ -142,18 +133,6 @@ def reproject_sent(path_image, output_dir, path_geojson):
     # print("AFTER WARP {}")
     # os.system("gdalinfo {}".format(output_dir+name))
     return output_dir + name
-
-
-def create_safe_directory(output_dir):
-    if os.path.isdir(output_dir):
-        if click.confirm(
-                'The directory {} already exists, it will remove it do you want to continue?'.format(output_dir),
-                default=True):
-            print('Ok remove')
-            shutil.rmtree(output_dir)
-        else:
-            return False
-    os.makedirs(output_dir)
 
 
 def _argparser():

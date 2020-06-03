@@ -4,7 +4,7 @@ import ee
 from find_image import get_filter_collection, define_geometry
 from constant.gee_constant import DICT_EVI_PARAM, GEE_S2_BAND, GEE_DRIVE_FOLDER, EVI_BAND, \
     NDVI_BAND, DICT_TRANSLATE_BAND, NB_VI_CSV, CONVERTOR
-from scanning_dataset import extract_tile_id
+from utils.image_find_tbx import extract_tile_id
 import pandas as pd
 
 from utils.geojson import create_geojson, load_grid_geojson

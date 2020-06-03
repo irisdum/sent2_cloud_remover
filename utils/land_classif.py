@@ -3,7 +3,7 @@ import os
 import numpy as np
 from constant.gee_constant import XDIR, DICT_ORGA
 from constant.landclass_constant import LISTE_LAND_CLASS
-from scanning_dataset import find_path
+from utils.image_find_tbx import find_path
 import pandas as pd
 
 

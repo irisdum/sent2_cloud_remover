@@ -1,10 +1,8 @@
 # All the functions used to load the tiles
-from processing import create_safe_directory
 import os
 from constant.gee_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE
 from constant.model_constant import TRAINING_DIR
-from scanning_dataset import find_path
-from utils.display_image import find_image_indir
+from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
 from utils.display_image import convert_array
 from osgeo import gdal
 import numpy as np

@@ -1,17 +1,15 @@
 # File with all the functions used to display mages in jupyter Notebook are written
 
-import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 # from skimage.exposure import is_low_contrast,equalize_hist
-from constant.gee_constant import BOUND_X, BOUND_Y, LISTE_BANDE, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
+from constant.gee_constant import BOUND_X, BOUND_Y, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
 from utils.land_classif import load_tile_classif, compute_batch_land_class_stat
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
 import matplotlib.colors as colors
-import matplotlib.patches as mpatches
 
 
 def plot_allbands_hist(path_tif, ax):
@@ -126,15 +124,6 @@ def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
     plot_subset_array(raster_array, ax, bound_x=bound_x, bound_y=bound_y)
     if ax is None:
         plt.show()
-
-
-def find_image_indir(path_dir, image_format):
-    """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
-    dir"""
-    assert image_format in ["vrt", "tif", "SAFE/",
-                            "npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
-    assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
-    return glob.glob("{}*.{}".format(path_dir, image_format))
 
 
 def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):

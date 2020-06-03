@@ -5,7 +5,7 @@ import os
 
 from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_RESCALE, DICT_METHOD, DICT_TRANSLATE_BAND, \
     CONVERTOR
-from scanning_dataset import extract_tile_id
+from utils.image_find_tbx import extract_tile_id
 from utils.display_image import plot_one_band
 import matplotlib.pyplot as plt
 import numpy as np
