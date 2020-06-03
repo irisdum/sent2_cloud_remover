@@ -224,7 +224,7 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     # print("CCP val : {} type :{}".format(ccp,type(ccp)))
     # print({"ccp": ccp})
     zone_sent2_init = gjson_2_eegeom(path_zone)
-    print(zone_sent2_init)
+    print(type(zone_sent2_init))
     dic_name_t1_sent1, dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
     print("{} {}".format(bd2, ed2))
     print(dic_name_t1_sent1, dic_name_t1_sent2, )

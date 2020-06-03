@@ -55,6 +55,7 @@ def gjson_2_eegeom(path_geojson):
         data = json.load(f)
     assert len(data["features"]) == 1, "More than one feature is stored {}".format(data["features"])
     list_coords = data["features"][0]["geometry"]["coordinates"]
+    print(list_coords)
     return define_geometry(list_coords)
 
 
