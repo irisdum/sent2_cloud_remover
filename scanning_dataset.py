@@ -104,6 +104,7 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
 
 
 def is_conform(path_tile,plot=False):
+    print(plot)
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
     assert raster_array.shape[0] in [2,
