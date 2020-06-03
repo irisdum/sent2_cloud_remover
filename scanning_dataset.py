@@ -8,7 +8,7 @@ import random
 from sklearn.model_selection import train_test_split
 
 import matplotlib.pyplot as plt
-from utils.display_image import display_final_tile
+from utils.display_image import display_final_tile, plot_one_band
 from utils.image_find_tbx import extract_relative_path, extract_tile_id, get_all_tiles_path
 
 
@@ -118,7 +118,7 @@ def is_conform(path_tile,plot=False):
     if is_no_signal(raster_array):
         print("Image {} only 0 ".format(path_tile.split("/")[-1]))
         if plot:
-            display_final_tile(raster_array)
+            plot_one_band(raster_array[0,:,:,], title=path_tile.split("/")[-1])
             plt.show()
         return False
 
@@ -126,20 +126,20 @@ def is_conform(path_tile,plot=False):
         if is_s2_cloud(raster_array):
             print("Image {} clouds ".format(path_tile.split("/")[-1]))
             if plot:
-                display_final_tile(raster_array)
+                plot_one_band(raster_array[0,:,:,], title=path_tile.split("/")[-1])
                 plt.show()
             return False
         if is_no_data(raster, 2):
             print("Image {} no data ".format(path_tile.split("/")[-1]))
             if plot:
-                display_final_tile(raster_array)
+                plot_one_band(raster_array[0,:,:,], title=path_tile.split("/")[-1])
                 plt.show()
             return False
     else:
         if is_no_data(raster, 1):
             print("Image {} no_data ".format(path_tile.split("/")[-1]))
             if plot:
-                display_final_tile(raster_array)
+                plot_one_band(raster_array[0,:,:,], title=path_tile.split("/")[-1])
                 plt.show()
             return False
 
