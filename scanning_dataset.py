@@ -8,6 +8,10 @@ from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR, TOT_Z
 import random
 from sklearn.model_selection import train_test_split
 
+
+from utils.display_image import display_final_tile
+
+
 def is_no_data(raster, sent):
     """Given a raster check if there are no data:
     :returns bool true is there are n data value in one of the band of the raster"""
@@ -92,8 +96,8 @@ def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
     return [extract_tile_id(path) for path in sample_path]
 
 
-def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/"):
-    l_unconformed_id = get_unconformed(path_final_dataset)
+def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/",plot=False):
+    l_unconformed_id = get_unconformed(path_final_dataset,plot)
     list_all_tiles = glob.glob(path_final_dataset + sent_dir + "**/*.tif", recursive=True)
     print("Initial dataset size {}".format(len(list_all_tiles)))
     l_all_id = [extract_tile_id(path) for path in list_all_tiles]
@@ -129,7 +133,7 @@ def find_path(sent_dir, image_id):
     return l[0]
 
 
-def is_conform(path_tile):
+def is_conform(path_tile,plot=False):
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
     assert raster_array.shape[0] in [2,
@@ -150,23 +154,27 @@ def is_conform(path_tile):
             return False
         if is_no_data(raster, 2):
             print("Image {} no data ".format(path_tile.split("/")[-1]))
+            if plot:
+                display_final_tile(raster_array, band=[0, 1, 2])
             return False
     else:
         if is_no_data(raster, 1):
             print("Image {} no_data ".format(path_tile.split("/")[-1]))
+            if plot:
+                display_final_tile(raster_array, band=[0, 1, 2])
             return False
 
     return True
 
 
-def get_unconformed(path_final_dataset):
+def get_unconformed(path_final_dataset,plot=False):
     list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0/", path_final_dataset + XDIR + "Sentinel1_t1/",
                      path_final_dataset + XDIR + "Sentinel2_t0/", path_final_dataset + LABEL_DIR + "Sentinel2_t1/"]
     list_not_conform = []
     for path_sent_dir in list_sent_dir:
         list_tiles = get_all_tiles_path(path_sent_dir)
         for path_tile in list_tiles:
-            if is_conform(path_tile):
+            if is_conform(path_tile,plot):
                 pass
             else:
                 # add it to the list of all the not appropriate tiles
