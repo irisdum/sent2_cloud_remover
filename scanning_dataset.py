@@ -104,7 +104,7 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
 
 
 def is_conform(path_tile,plot=False):
-    print(plot)
+    #print(plot)
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
     assert raster_array.shape[0] in [2,
@@ -124,6 +124,8 @@ def is_conform(path_tile,plot=False):
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
         if is_s2_cloud(raster_array):
             print("Image {} clouds ".format(path_tile.split("/")[-1]))
+            if plot:
+                display_final_tile(raster_array, band=[0, 1, 2])
             return False
         if is_no_data(raster, 2):
             print("Image {} no data ".format(path_tile.split("/")[-1]))

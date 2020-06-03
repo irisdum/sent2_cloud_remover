@@ -260,7 +260,7 @@ def plot_all_compar(batch_predict, batch_gt, max_im=100, title=""):
 
 def display_final_tile(raster_array, band=None, ax=None):
     # raster_array=np.load(path_npy)
-    # print(raster_array.shape)
+    print(raster_array.shape)
     if ax is None:
         fig, ax = plt.subplots()
     if band is None:
