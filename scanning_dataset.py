@@ -7,7 +7,7 @@ from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR, TOT_Z
 import random
 from sklearn.model_selection import train_test_split
 
-
+import matplotlib.pyplot as plt
 from utils.display_image import display_final_tile
 from utils.image_find_tbx import extract_relative_path, extract_tile_id, get_all_tiles_path
 
@@ -119,6 +119,7 @@ def is_conform(path_tile,plot=False):
         print("Image {} only 0 ".format(path_tile.split("/")[-1]))
         if plot:
             display_final_tile(raster_array, band=[0, 1, 2])
+            plt.show()
         return False
 
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
@@ -126,17 +127,20 @@ def is_conform(path_tile,plot=False):
             print("Image {} clouds ".format(path_tile.split("/")[-1]))
             if plot:
                 display_final_tile(raster_array, band=[0, 1, 2])
+                plt.show()
             return False
         if is_no_data(raster, 2):
             print("Image {} no data ".format(path_tile.split("/")[-1]))
             if plot:
                 display_final_tile(raster_array, band=[0, 1, 2])
+                plt.show()
             return False
     else:
         if is_no_data(raster, 1):
             print("Image {} no_data ".format(path_tile.split("/")[-1]))
             if plot:
                 display_final_tile(raster_array, band=[0, 1, 2])
+                plt.show()
             return False
 
     return True
