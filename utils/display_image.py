@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 # from skimage.exposure import is_low_contrast,equalize_hist
-from constant.gee_constant import BOUND_X, BOUND_Y, CONVERTOR, SCALE_S1, DICT_BAND_X, DICT_BAND_LABEL
+from constant.gee_constant import BOUND_X, BOUND_Y, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
+from utils.converter import convert_array
 from utils.land_classif import load_tile_classif, compute_batch_land_class_stat
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
@@ -32,25 +33,6 @@ def plot_allbands_hist(path_tif, ax):
         ax.legend(l_legend)
     if ax is None:
         plt.show()
-
-
-def convert_array(raster_array, scale_s1=SCALE_S1, mode=None):
-    if raster_array.dtype == np.uint16:  # sentinel 2 data needs to be converted and rescale
-        return uin16_2_float32(raster_array)
-    elif raster_array.dtype == np.float32:
-        return np.divide(raster_array, scale_s1).astype(np.float32)
-    elif mode == "CLOUD_MASK":
-        np.where(raster_array == 1, 0, raster_array)  # clear land pixel
-        np.where(raster_array == 4, 0, raster_array)  # snow (cf http://www.pythonfmask.org/en/latest/fmask_fmask.html)
-        np.where(raster_array == 5, 0, raster_array)  # water
-        return np.divide(raster_array, 5).astype(np.float32)
-    else:
-        return np.divide(raster_array, np.max(raster_array))
-
-
-def uin16_2_float32(raster_array, max_scale=CONVERTOR):
-    scaled_array = np.divide(raster_array, max_scale)
-    return scaled_array.astype(np.float32)
 
 
 def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0, cm_band=True, ax=None):

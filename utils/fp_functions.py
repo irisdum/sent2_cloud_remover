@@ -87,7 +87,7 @@ def sub_collection_tiles(collection, zone, sent=2):
         # assert collection.filter(ee.Filter.eq(ORBIT_ID[sent], tile_id)).toList(10).length().getInfo()>0,"Subcollection tile {}filter does not work list empty ".format(tile_id.getInfo())
         image_fp = extract_fp(collection.filter(ee.Filter.eq(ORBIT_ID[sent], tile_id)).first(), sent)
         if is_contained(zone, image_fp):
-            # print("SENT{} tile contains entirely the zone ".format(sent))
+            print("SENT{} tile contains entirely the zone ".format(sent))
             return [collection.filter(ee.Filter.eq(ORBIT_ID[sent], tile_id))]
         sub_collection = collection.filter(ee.Filter.eq(ORBIT_ID[sent], tile_id))  # filter by the tilesid
         list_subcollection += [sub_collection]

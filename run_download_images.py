@@ -184,8 +184,8 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
         name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
                                                                    ccp, zone)  # returns the image with less clouds
         # on the specific zone which is the intersection of the two
-        print("zone {}".format(type(zone)))
-        print("zone  sent2 {}".format(type(zone)))
+        #print("zone {}".format(type(zone)))
+        #print("zone  sent2 {}".format(type(zone)))
         new_zone = check_clip_area(zone,
                                    zone_sent2)  # corresponds to the intersection of the sent2 fp and the zone to download
 
