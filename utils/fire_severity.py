@@ -2,7 +2,7 @@ from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 import numpy as np
 
 
-def get_fire_severity(array_dndvi, dict_classe):
+def get_fire_severity(array_dndvi, dict_classe=None):
     """:param array_dndvi : numpy array:
      :returns an array with value from 1 to len(dict_class)"""
     print("The min {} the max {}".format(np.min(array_dndvi), np.max(array_dndvi)))
