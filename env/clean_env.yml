@@ -26,4 +26,5 @@ dependencies:
       - sklearn
       - pandas
       - ruamel.yaml
+      - seaborn
   #- tensorflow-estimator=2*
