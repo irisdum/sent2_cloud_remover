@@ -12,8 +12,6 @@ model_path="$1"
 # second parameter is a path to a parameter file
 train_path="$2"
 
-path_conda_env="$3"
-
 module load miniconda3/4.3.13
 unset PYTHONHOME
 source activate /datastore/dum031/envs/s2_c_remover
