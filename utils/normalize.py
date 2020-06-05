@@ -6,11 +6,20 @@ import os
 from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_RESCALE, DICT_METHOD, DICT_TRANSLATE_BAND, \
     CONVERTOR
 from utils.image_find_tbx import extract_tile_id
-from utils.display_image import plot_one_band
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+
+def plot_one_band(raster_array, fig, ax, title=""):
+    # print("Imagse shape {}".format(raster_array))
+    if ax is None:
+        fig, ax = plt.subplots()
+    im = ax.imshow(raster_array, cmap='bone')
+    ax.set_title(title)
+    fig.colorbar(im, ax=ax, orientation='vertical')
+    if ax is None:
+        plt.show()
 
 def compute_image_stats(arrayX, arraylabel, dict_bandX=None, dictlabel=None, plot=False, stats="mean_std"):
     """Compute the statistics using the X array and its label. Statistics are computed for each band descried in dict_band"""
