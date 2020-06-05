@@ -4,14 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 # from skimage.exposure import is_low_contrast,equalize_hist
+from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 from constant.gee_constant import BOUND_X, BOUND_Y, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
 from utils.converter import convert_array
+from utils.fire_severity import get_fire_severity, normalize_cf
 from utils.land_classif import load_tile_classif, compute_batch_land_class_stat
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
 import matplotlib.colors as colors
-
+import pandas as pd
+import seaborn as sn
 
 def plot_allbands_hist(path_tif, ax):
     raster = gdal.Open(path_tif)
@@ -355,3 +358,104 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
             display_final_tile(batch_pred[i, :, :, :], band=[0, 1, 2], ax=ax[5])
             display_final_tile(batch_pred[i, :, :, :], band=[3, 1, 2], ax=ax[6])
         plt.show()
+
+
+def display_dvi_class(dvi, ax=None, fig=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+    im = ax.imshow(dvi, cmap=plt.cm.get_cmap('afmhot_r', 10), vmin=0, vmax=1)
+    fig.colorbar(im, ax=ax, orientation="vertical")
+    # plt.colorbar()
+    # im.clim(0, 1)
+    if ax is None:
+        plt.show()
+
+def display_fire_severity(fire_array,ax=None,fig=None):
+    if ax is None:
+        fig,ax=plt.subplots()
+    im=ax.imshow(fire_array, cmap=plt.cm.get_cmap('afmhot_r',7),vmin=0,vmax=5)
+    cbar=fig.colorbar(im, ax=ax, orientation="vertical")
+    cbar.ax.set_yticklabels(DICT_FIRE_SEV_CLASS.keys())
+
+
+def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None):
+    if dict_burned is None:
+        dict_burned=DICT_FIRE_SEV_CLASS
+    n = batch_predict.shape[0]
+    if n < max_im:
+        max_im = n
+    output_shape = (batch_gt.shape[0], batch_gt.shape[1], batch_gt.shape[1])
+    batch_output_sev = np.ones(output_shape)
+    batch_pred_sev = np.ones(output_shape)
+    for i in range(max_im):
+        image_pre_fire = batch_x[i, :, :, :]
+        image_post = batch_gt[i, :, :, :]
+        image_pred = batch_predict[i, :, :, ]
+        # print(image_pre_fire.shape,image_post.shape,image_pred.shape)
+        plot_pre_post_pred(image_pre_fire, image_post, image_pred)
+        fig, ax = plt.subplots(1, 3, figsize=(40, 20))
+        display_one_image_vi(image_pre_fire, fig, ax[0], vi, dict_band={"R": [4], "NIR": [7]}, title='Pre fire',
+                             cmap=None, vminmax=(-1, 1))
+        display_one_image_vi(image_post, fig, ax[1], vi, dict_band=None, title='GT post fire', cmap=None,
+                             vminmax=(-1, 1))
+
+        # print("NDVI pred")
+        display_one_image_vi(image_pred, fig, ax[2], vi, dict_band=None, title='Prediction post fire', cmap=None,
+                             vminmax=(-1, 2))
+        # print("after NDVI pred")
+        plt.show()
+        fig2, ax2 = plt.subplots(4, 2, figsize=(40, 20))
+        # print_array_stat(image_pred)
+        gt_dvi = diff_metric(image_pre_fire, image_post, vi, dict_band_pre={"R": [4], "NIR": [7]},
+                             dict_band_post=DICT_BAND_LABEL)
+        # print('PRED DIF ')
+        pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre={"R": [4], "NIR": [7]},
+                               dict_band_post=DICT_BAND_LABEL)
+        # print("AFTER PRED DIFF")
+        display_one_image_vi(gt_dvi, fig2, ax2[0, 0], "identity", dict_band=None, title='GT Relative difference',
+                             cmap="OrRd")
+        display_one_image_vi(pred_dvi, fig2, ax2[0, 1], "identity", dict_band=None, title='Pred Relative difference',
+                             cmap="OrRd")
+        display_dvi_class(gt_dvi, ax=ax2[1, 0], fig=fig2)
+        display_dvi_class(pred_dvi, ax=ax2[1, 1], fig=fig2)
+        # print_array_stat(gt_dvi)
+        # print_array_stat(pred_dvi)
+        fire_sev_pred = get_fire_severity(pred_dvi, dict_burned)
+        fire_sev_gt = get_fire_severity(gt_dvi, dict_burned)
+        batch_output_sev[i, :, :] = fire_sev_gt
+        batch_pred_sev[i, :, :] = fire_sev_pred
+        one_band_hist(gt_dvi, ax=ax2[2, 0])
+        one_band_hist(pred_dvi, ax=ax2[2, 1])
+        display_fire_severity(fire_sev_gt, ax2[3, 0], fig2)
+        display_fire_severity(fire_sev_pred, ax2[3, 1], fig2)
+        plt.show()
+
+    return batch_output_sev, batch_pred_sev
+
+def one_band_hist(b_array,ax=None):
+    if ax is None:
+        fig,ax=plt.subplot()
+    ax.hist(b_array.ravel(), bins=256, color="red", alpha=0.5)
+    ax.set_xlabel('Intensity Value')
+    ax.set_ylabel('Count')
+    if ax is None:
+        plt.show()
+
+
+def plot_cfmat(cf_mat,class_firesev=None,title=""):
+    if class_firesev is None:
+        class_firesev=DICT_FIRE_SEV_CLASS.keys()
+    df_cm=pd.DataFrame(cf_mat, index=class_firesev,
+                 columns=class_firesev)
+    fig,ax=plt.subplots()
+    sn.heatmap(df_cm, annot=True,cmap="Blues")
+    ax.set_ylabel('True label')
+    ax.set_xlabel('Predicted label')
+    fig.suptitle(title)
+    plt.show()
+
+
+def plot_all_cfmat(cf_mat,class_firesev=None):
+    plot_cfmat(cf_mat,class_firesev,"Confusion matrix not normalized")
+    plot_cfmat(normalize_cf(cf_mat,0), class_firesev,"Confusion matrix normalized by line")
+    plot_cfmat(normalize_cf(cf_mat, 1), class_firesev,"Confusion matrix normalized by column")

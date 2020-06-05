@@ -16,7 +16,14 @@ def compute_ndvi(image,dict_band=None):
     assert len(image.shape)==3,"Wrong dimension of the image should be 3 not {}".format(image.shape)
     assert image.shape[-1]<image.shape[0],"Check the dimension of the image should be channel last. {}".format(image.shape)
     band_red,band_nir=extract_red_nir(image,dict_band)
-    return np.divide(band_nir-band_red,band_nir+band_red)
+    #print("NDVI")
+    mask = (band_nir+band_red)==0
+    ndvi = np.zeros(band_nir.shape)
+    ndvi[  mask ] = 0
+    print(np.count_nonzero(ndvi))
+    ndvi[ ~mask ] = ((band_nir-band_red)/(band_nir+band_red))[ ~mask ]
+    #print_array_stat(band_nir+band_red)
+    return ndvi
 
 def compute_bai(image,dict_band=None):
     if dict_band is None:
