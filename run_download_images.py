@@ -206,7 +206,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
     return dict_image_dwnld1, dict_image_dwnld2
 
 
-def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile, click=None,s2_t0=None,s2_t1=None):
+def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, s2_t0=None,s2_t1=None):
     """
     :param bd2:
     :param ccp: cloud pixel coverage percentage
@@ -253,4 +253,4 @@ if __name__ == '__main__':
     args = _argparser()
     main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
          args.save,
-         args.output_path, args.shp,args.s2_t0,args.s2_t1)
+         args.output_path,args.s2_t0,args.s2_t1)
