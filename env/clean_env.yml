@@ -24,7 +24,7 @@ dependencies:
       - click
       - tensorboard>=2.0
       - sklearn
-      - pandas
+      - pandas==0.21.0
       - ruamel.yaml
       - seaborn
   #- tensorflow-estimator=2*
