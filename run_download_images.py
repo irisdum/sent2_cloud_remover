@@ -178,7 +178,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
     # Extract the List of subcollection with one subcollection = image between the range date
     # at one special tile
     print(type(global_collection_sent2_t1))
-    print(global_collection_sent2_t1.toList(100).length.getInfo())
+    print(global_collection_sent2_t1.toList(100).length().getInfo())
     list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, zone, 2)
     list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
     list_name_sent1 = []
