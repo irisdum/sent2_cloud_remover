@@ -16,10 +16,11 @@ dependencies:
   - opencv>=3.1.0
   - rtree
   - anaconda::ipykernel
-  - anaconda::pandas
+  - anaconda::pandas>0.20
   - anaconda::tensorflow-gpu>=2.0.0
   - seaborn
   - scikit-learn
+  - tensorboad
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
