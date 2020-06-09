@@ -1,21 +1,32 @@
-name: proj_env
+name: proj_env2
 
 channels:
+  - conda-forge/label/cf201901 #for gdal
   - conda-forge
   - defaults
-  #- anaconda
-  - conda-forge/label/cf201901
+  - anaconda
   - conda-forge/label/broken
 
 dependencies:
-  #- python=3.6
-  #- pip
-  - gdal=2.4.0 #=py36hf242f0b_1005 gdal=3.1.0=py38h172510d_2
- # - tensorflow=2.0.0 #=h0d30ee6_0
- # - tensorboard=2.0.0 #build anaconda
- # - python-fmask=0.5.4
-  #- pip:
-  #    -keras=2.2.4
-
-
+  - python=3.6
+  - conda-forge/label/cf201901::gdal>=2.3.3
+  - pip=20.*
+  - python-fmask
+  - shapely>=1.6.1
+  - opencv>=3.1.0
+  - rtree
+  - anaconda::ipykernel
+  - pandas=0.20
+  - seaborn
+  - scikit-learn
+  - tensorboad
+  - pip :
+      - geojson==2.5.0
+      - buzzard==0.6.0
+      - earthengine-api
+      - click
+      - ruamel.yaml
+      -tensorflow==2.0.0a0
+  - tensorflow-estimator=1.14
+  - tensorbard=1.13
 

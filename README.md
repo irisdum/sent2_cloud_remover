@@ -92,7 +92,7 @@ For Sentinel 1 :
 - Terrain Correction
 - Write as TIFF
 
-xml v2 : 
+xml v2 : (Recommended)
 - Apply Orbit File
 - Subset 
 - Thermal Noise
@@ -100,10 +100,10 @@ xml v2 :
 - Calibration
 - Speckle (Refined Lee)
 - Terrain Correction
--Linear from db
+- Linear from db
 - Write as TIFF
 
-xml v3 : 
+xml v3 : Be careful if multiple S1 the gdal mosaic does not work
 - Apply Orbit File
 - Subset 
 - Thermal Noise
@@ -111,7 +111,7 @@ xml v3 :
 - Calibration
 - Speckle (Refined Lee)
 - Terrain Correction, setting the grid with the S2 grid
--Linear from db
+- Linear from db
 - Write as TIFF
 
 For Sentinel 2 : 
