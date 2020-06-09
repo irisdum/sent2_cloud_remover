@@ -19,12 +19,13 @@ dependencies:
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
+      - pyaml==3.13
       - tensorflow==2.0.0a0
       - earthengine-api
       - click
       - tensorboard>=2.0
       - sklearn
-      - pandas==0.21.0
+      - pandas==0.22.0
       - ruamel.yaml
       - seaborn
   #- tensorflow-estimator=2*

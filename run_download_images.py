@@ -36,6 +36,8 @@ def _argparser():
     parser.add_argument("--output_path", default=True, help="where the image preprocess and ordered are going "
                                                             "to be stored")
     parser.add_argument("--shp", default=True, help="path to the shapefile")
+    parser.add_argument("--s2_t0",default=None,help="If known name of the S2 image at t0 to download")
+    parser.add_argument("--s2_t1",default=None,help="If known name of the S2 image at t0 to download")
 
     return parser.parse_args()
 
@@ -201,7 +203,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     return dict_image_dwnld1, dict_image_dwnld2
 
 
-def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile, click=None):
+def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, path_shapefile, click=None,s2_t0=None,s2_t1=None):
     """
     :param bd2:
     :param ccp: cloud pixel coverage percentage
@@ -248,4 +250,4 @@ if __name__ == '__main__':
     args = _argparser()
     main(args.bd1, args.ed1, args.bd2, args.ed2, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
          args.save,
-         args.output_path, args.shp)
+         args.output_path, args.shp,args.s2_t0,args.s2_t1)
