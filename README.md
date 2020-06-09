@@ -16,7 +16,7 @@ Many of the different computation steps are easily available from the Makefile.
  - Esa SNAP (command gpt will be used)
  The conda env yaml  is in env/clean_env.yml. It enables to use google earth engine api, gdal (2.4), buzzard (0.6), tensorfow2, 
  jupyter notebook, Fmask.
- Only tensorboard does not seems to work within this environmnent.
+ Tensorboard does not seems to work within this environmnent.
  `conda-env create -f env/clean_env.yml -name proj_env`
  `conda activate proj_env`
  To run jupyter notebook within this conda env : 

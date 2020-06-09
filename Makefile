@@ -23,7 +23,7 @@ s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T56HKG_20200204T011552
 s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T56HKG_20191022T012314
 
 download_images_from_s2name:
-	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" -s2_t0 ${s2_im_t0} -s2_t1 ${s2_im_t1}
+	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
 
 
 conda_rasterio:

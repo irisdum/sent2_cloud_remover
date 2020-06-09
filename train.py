@@ -1,9 +1,8 @@
 # file to train the GAN
 from models import clean_gan
 from ruamel import yaml
-import tensorflow as tf
 import os
-from utils.image_find_tbx import create_safe_directory
+
 import argparse
 
 
