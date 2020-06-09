@@ -13,7 +13,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
 from constant.gee_constant import LABEL_DIR, DICT_SHAPE
-from models.callbacks import write_log
+from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
 from utils.load_dataset import load_data, save_images, load_from_dir
@@ -94,6 +94,7 @@ class GAN():
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
+        self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
     def build_model(self):
 
         # We use the discriminator
@@ -242,7 +243,7 @@ class GAN():
             create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch = 0
-        self.define_callback()
+        #self.define_callback()
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -308,10 +309,11 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-
-                    write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
-                              val_logs + l_value_metrics + l_val_value_metrics,
-                              self.num_batches * epoch + idx)
+                    write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
+                                  val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
+                   # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
+                    #          val_logs + l_value_metrics + l_val_value_metrics,
+                     #         self.num_batches * epoch + idx)
 
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
