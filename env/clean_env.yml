@@ -16,15 +16,19 @@ dependencies:
   - opencv>=3.1.0
   - rtree
   - anaconda::ipykernel
+  - anaconda::pandas
+  - anaconda::tensorflow-gpu>=2.0.0
+  - seaborn
+  - scikit-learn
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
-      - pyaml
-      - tensorflow==2.0.0a0
       - earthengine-api
       - click
-      - sklearn
-      - pandas==0.22.0
       - ruamel.yaml
-      - seaborn
+      #- pyaml
+      #- sklearn
+      #- seaborn
+      #- pandas==0.22.0
+      #- tensorflow==2.0.0a0
   #- tensorflow-estimator=2*
