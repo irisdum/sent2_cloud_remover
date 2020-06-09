@@ -173,6 +173,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
     dict_image_dwnld2 = {}
     list_sent1_sent2_name = []
     # Extract the Image collection of sentinel 2 between the range dates
+    print("With {} - {} looking for {}".format(bd,ed,name_s2))
     global_collection_sent2_t1 = get_filter_collection(bd, ed, zone, 2, opt_param={
         "ccp": ccp},name_s2=name_s2)
     # Extract the List of subcollection with one subcollection = image between the range date
