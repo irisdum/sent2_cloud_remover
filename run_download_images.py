@@ -163,7 +163,7 @@ def extract_name_date_first(collection, sent):
     return name, date_coll, zone  # TODO take care of the zone format read
 
 
-def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
+def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
     """    :param ccp:
     :param optparam1:
     :param sent2criteria:
@@ -174,7 +174,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp):
     list_sent1_sent2_name = []
     # Extract the Image collection of sentinel 2 between the range dates
     global_collection_sent2_t1 = get_filter_collection(bd, ed, zone, 2, opt_param={
-        "ccp": ccp})
+        "ccp": ccp},name_s2=name_s2)
     # Extract the List of subcollection with one subcollection = image between the range date
     # at one special tile
     list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, zone, 2)
@@ -227,11 +227,11 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     # print({"ccp": ccp})
     zone_sent2_init = gjson_2_eegeom(path_zone)
     print(type(zone_sent2_init))
-    dic_name_t1_sent1, dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp)
+    dic_name_t1_sent1, dic_name_t1_sent2 = download_sent2_sent1(bd, ed, zone_sent2_init, sent2criteria, optparam1, ccp,s2_t0)
     print("{} {}".format(bd2, ed2))
     print(dic_name_t1_sent1, dic_name_t1_sent2, )
     dic_name_t2_sent1, dic_name_t2_sent2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1,
-                                                                ccp)
+                                                                ccp,s2_t1)
     print(dic_name_t2_sent1, dic_name_t2_sent2, )
 
     if save:

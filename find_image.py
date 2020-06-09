@@ -74,10 +74,11 @@ def display_search(begin_date, ending_date, zone, collection):
     pass
 
 
-def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
+def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={},name_s2=None):
     """    :param opt_param:
 :param collection sent1 or sent2 collections
     :param zone : an ee.Geometry
+    :param name_s2 : a string corrresponds to the name of the s2 image PRODUCT_ID in GEE
     :return an Image collection"""
     # print("begin {} ending {}".format(begin_date,ending_date))
     if type(begin_date) != type("u"):
@@ -88,7 +89,10 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}):
     #print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
     print(type(collection))
     if sent == 2:
-        return filter_clouds(collection,zone)
+        if name_s2 is not None:
+            return collection.filter(ee.Filter.eq("PRODUCT_ID",name_s2))
+        else:
+            return filter_clouds(collection,zone)
     else:
         return opt_filter(collection, opt_param, sent)
 
