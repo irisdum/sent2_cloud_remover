@@ -19,7 +19,6 @@ dependencies:
   - pandas=0.20
   - seaborn
   - scikit-learn
-  - tensorboad
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
@@ -28,5 +27,5 @@ dependencies:
       - ruamel.yaml
       - tensorflow==2.0.0a0
   - tensorflow-estimator=1.14
-  - tensorbard=1.13
+  - tensorbard=1.13.0
 
