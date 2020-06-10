@@ -374,12 +374,14 @@ def display_dvi_class(dvi, ax=None, fig=None):
     if ax is None:
         plt.show()
 
-def display_fire_severity(fire_array,ax=None,fig=None):
+def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None):
+    if dict_burned is None:
+        dict_burned=DICT_FIRE_SEV_CLASS
     if ax is None:
         fig,ax=plt.subplots()
     im=ax.imshow(fire_array, cmap=plt.cm.get_cmap('afmhot_r',7),vmin=0,vmax=5)
     cbar=fig.colorbar(im, ax=ax, orientation="vertical")
-    cbar.ax.set_yticklabels(DICT_FIRE_SEV_CLASS.keys())
+    cbar.ax.set_yticklabels(dict_burned.keys())
 
 
 def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None):
