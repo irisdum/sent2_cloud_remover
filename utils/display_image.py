@@ -393,9 +393,6 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
     batch_pred_sev = np.ones(output_shape)
     for i in range(max_im):
         image_pre_fire = batch_x[i, :, :, :]
-        image_post = batch_gt[i, :, :, :]
-        image_pred = batch_predict[i, :, :, ]
-        image_pre_fire = batch_x[i, :, :, :]
         image_post_fire = batch_gt[i, :, :, :]
         image_pred = batch_predict[i, :, :, ]
         print(image_pre_fire.shape, image_post_fire.shape, image_pred.shape)
@@ -405,7 +402,7 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
         pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
                                dict_band_post=DICT_BAND_LABEL)
         plot_compare_dvi(gt_dvi, pred_dvi)
-        fig2,ax2=plt.subplots(3,1,figsize=(30,10))
+        fig2,ax2=plt.subplots(3,2,figsize=(30,20))
         display_dvi_class(gt_dvi, ax=ax2[0, 0], fig=fig2)
         display_dvi_class(pred_dvi, ax=ax2[0, 1], fig=fig2)
         # print_array_stat(gt_dvi)
