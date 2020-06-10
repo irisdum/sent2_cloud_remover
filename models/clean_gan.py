@@ -240,7 +240,7 @@ class GAN():
             start_epoch = int(self.previous_checkpoint) + 1
             self.load_from_checkpoint(self.previous_checkpoint)
         else:
-            create_safe_directory(self.saving_logs_path)
+            #create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch = 0
         #self.define_callback()
