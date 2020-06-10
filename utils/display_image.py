@@ -415,8 +415,8 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
         batch_pred_sev[i, :, :] = fire_sev_pred
         one_band_hist(gt_dvi, ax=ax2[1, 0])
         one_band_hist(pred_dvi, ax=ax2[1, 1])
-        display_fire_severity(fire_sev_gt, ax2[2, 0], fig2)
-        display_fire_severity(fire_sev_pred, ax2[2, 1], fig2)
+        display_fire_severity(fire_sev_gt, ax2[2, 0], fig2,dict_burned=dict_burned)
+        display_fire_severity(fire_sev_pred, ax2[2, 1], fig2,dict_burned=dict_burned)
         plt.show()
 
     return batch_output_sev, batch_pred_sev
