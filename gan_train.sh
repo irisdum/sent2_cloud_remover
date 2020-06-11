@@ -14,5 +14,6 @@ train_path="$2"
 
 module load miniconda3/4.3.13
 unset PYTHONHOME
-source activate /datastore/dum031/envs/s2_c_remover
+unset PYTHONPATH
+source activate /datastore/dum031/envs/env_tf_gpu
 python train.py --model_path ${model_path} --train_path ${train_path}
