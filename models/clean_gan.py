@@ -310,8 +310,9 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-                    write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
-                                  val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
+                    print(dict(zip(name_logs + l_name_metrics + name_val_metric,val_logs + l_value_metrics + l_val_value_metrics)))
+                    #write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
+                                  #val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
                    # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
                     #          val_logs + l_value_metrics + l_val_value_metrics,
                      #         self.num_batches * epoch + idx)
