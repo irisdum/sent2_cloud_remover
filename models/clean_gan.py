@@ -26,6 +26,8 @@ import numpy as np
 class GAN():
     def __init__(self, model_yaml, train_yaml):
         tf.test.gpu_device_name()
+        print("GPU INFO {}".format(tf.test.is_gpu_available(
+            cuda_only=False, min_cuda_compute_capability=None)))
         self.sigma_val = 0
         self.model_yaml = model_yaml
         self.img_rows = 28
