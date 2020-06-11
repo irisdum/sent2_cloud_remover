@@ -1,11 +1,10 @@
 # a python file where all the functions likned withe the preprocessing of the data just before the networks are implemented
 # different methods are encode : normalization, centering or standardized values
-import glob
 import os
 
 from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_RESCALE, DICT_METHOD, DICT_TRANSLATE_BAND, \
     CONVERTOR
-from utils.image_find_tbx import extract_tile_id
+from utils.image_find_tbx import extract_tile_id, find_csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -259,19 +258,13 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     for band in dict_translate_band:
         #print("Working with band {}".format(band))
         band_name=dict_translate_band[band]
-        min,max=get_minmax_fromcsv(image_id,find_csv(dir_csv,band),band)
+        min,max=get_minmax_fromcsv(image_id, find_csv(dir_csv, band), band)
         dict_stat.update({band_name:(min,max)})
     #print("The stats found from csv are {}".format(dict_stat))
     return dict_stat
 
     #apply a normalization without computing the stats !
 
-
-def find_csv(path_dir,band):
-    """:returns a string path to the csv [band]*.csv"""
-    path_band_csv = glob.glob("{}*{}*.csv".format(path_dir, band))
-    assert len(path_band_csv) > 0, "No csv found at {}*{}*.csv".format(path_dir, band)
-    return path_band_csv[0]
 
 def get_minmax_fromcsv(tile_id,path_csv,band,convert=CONVERTOR):
     """:param : tile_id a string

@@ -53,3 +53,10 @@ def find_image_indir(path_dir, image_format):
                             "npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
     return glob.glob("{}*.{}".format(path_dir, image_format))
+
+
+def find_csv(path_dir,band):
+    """:returns a string path to the csv [band]*.csv"""
+    path_band_csv = glob.glob("{}*{}*.csv".format(path_dir, band))
+    assert len(path_band_csv) > 0, "No csv found at {}*{}*.csv".format(path_dir, band)
+    return path_band_csv[0]
