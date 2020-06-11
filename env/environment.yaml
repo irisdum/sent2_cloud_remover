@@ -19,6 +19,7 @@ dependencies:
   - pandas=0.20
   - seaborn
   - scikit-learn
+
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
