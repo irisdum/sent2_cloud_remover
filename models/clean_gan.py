@@ -25,9 +25,6 @@ import numpy as np
 
 class GAN():
     def __init__(self, model_yaml, train_yaml):
-        tf.test.gpu_device_name()
-        print("GPU INFO {}".format(tf.test.is_gpu_available(
-            cuda_only=False, min_cuda_compute_capability=None)))
         self.sigma_val = 0
         self.model_yaml = model_yaml
         self.img_rows = 28
@@ -97,7 +94,7 @@ class GAN():
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
-        #self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
+        self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
     def build_model(self):
 
         # We use the discriminator
@@ -312,9 +309,8 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-                    print(dict(zip(name_logs + l_name_metrics + name_val_metric,val_logs + l_value_metrics + l_val_value_metrics)))
-                    #write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
-                                  #val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
+                    write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
+                                  val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
                    # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
                     #          val_logs + l_value_metrics + l_val_value_metrics,
                      #         self.num_batches * epoch + idx)
