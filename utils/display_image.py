@@ -388,7 +388,7 @@ def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None):
     cbar.ax.set_yticklabels(dict_burned.keys())
 
 
-def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None):
+def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None,liste_image_id=None,path_csv=None):
     if dict_burned is None:
         dict_burned=DICT_FIRE_SEV_CLASS
     n = batch_predict.shape[0]
@@ -397,6 +397,8 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
     output_shape = (batch_gt.shape[0], batch_gt.shape[1], batch_gt.shape[1])
     batch_output_sev = np.ones(output_shape)
     batch_pred_sev = np.ones(output_shape)
+    if liste_image_id is None:
+        liste_image_id=[None for i in range(max_im)]
     for i in range(max_im):
         image_pre_fire = batch_x[i, :, :, :]
         image_post_fire = batch_gt[i, :, :, :]
@@ -404,9 +406,9 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
         print(image_pre_fire.shape, image_post_fire.shape, image_pred.shape)
         plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi)
         gt_dvi = diff_metric(image_pre_fire, image_post_fire, vi, dict_band_pre={"R": [4], "NIR": [7]},
-                             dict_band_post=DICT_BAND_LABEL)
+                             dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
         pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
-                               dict_band_post=DICT_BAND_LABEL)
+                               dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
         plot_compare_dvi(gt_dvi, pred_dvi)
         fig2,ax2=plt.subplots(3,2,figsize=(30,20))
         display_dvi_class(gt_dvi, ax=ax2[0, 0], fig=fig2)
