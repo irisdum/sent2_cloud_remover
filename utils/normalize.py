@@ -270,6 +270,9 @@ def get_minmax_fromcsv(tile_id,path_csv,band,convert=CONVERTOR):
     """:param : tile_id a string
     :param path_csv : the directory which contains the csv
     :returns band_min,band_max"""
+    id_col="tile_id"
+    if band=="ndvi":
+        id_col="name"
     assert type(band)==type("u"),"The input should be a string not a {}".format(band)
     df=pd.read_csv(path_csv,sep=",",header=0)
     df.head(5)
@@ -277,7 +280,7 @@ def get_minmax_fromcsv(tile_id,path_csv,band,convert=CONVERTOR):
     #print(df.columns)
     name_col=["{}_min".format(band),"{}_max".format(band)]
     #print("Looking for {}".format(tile_id))
-    subf_df = df[df["tile_id"] == tile_id]
+    subf_df = df[df[id_col] == tile_id]
     assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
     dict_res = subf_df.iloc[0].to_dict()
     #print("Resultat min, max from {} : {}".format(path_csv,dict_res))
