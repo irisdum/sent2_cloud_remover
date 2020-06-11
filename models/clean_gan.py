@@ -25,8 +25,7 @@ import numpy as np
 
 class GAN():
     def __init__(self, model_yaml, train_yaml):
-        print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-
+        tf.test.gpu_device_name()
         self.sigma_val = 0
         self.model_yaml = model_yaml
         self.img_rows = 28
