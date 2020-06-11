@@ -322,6 +322,7 @@ class GAN():
                 self.save_model(epoch)
 
     def save_model(self, step):
+        print("Saving model at {} step {}".format(self.checkpoint_dir,step))
         checkpoint_dir = self.checkpoint_dir
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)

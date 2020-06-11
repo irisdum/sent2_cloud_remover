@@ -182,8 +182,9 @@ def plot_one_band(raster_array, fig, ax, title=""):
         plt.show()
 
 
-def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, cmap=None, vminmax=(0, 1)):
-    raster_vi = compute_vi(raster_array, vi, dict_band)
+def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, cmap=None, vminmax=(0, 1),
+                         path_csv=None, image_id=None):
+    raster_vi = compute_vi(raster_array, vi, dict_band,path_csv=path_csv,image_id=image_id)
     if cmap is None:
         cmap = "RdYlGn"
     if ax is None:
@@ -198,7 +199,7 @@ def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, 
 
 
 def display_compare_vi(image_pre, image_post, vi, fig, ax, dict_band_pre, dict_band_post, figuresize=None,
-                       vminmax=(0, 1)):
+                       vminmax=(0, 1), path_csv=None, image_id=None):
     if figuresize is None:
         figuresize = (20, 20)
     if ax is None:
@@ -206,8 +207,8 @@ def display_compare_vi(image_pre, image_post, vi, fig, ax, dict_band_pre, dict_b
     display_one_image_vi(image_pre, fig, ax[0], vi, dict_band_pre, title="vi {} image pre".format(vi), vminmax=vminmax)
     display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi),
                          vminmax=vminmax)
-    dr_vi = diff_relative_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post)
-    d_vi = diff_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post)
+    dr_vi = diff_relative_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post,path_csv=path_csv,image_id=image_id)
+    d_vi = diff_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post,path_csv=path_csv,image_id=image_id)
     d_im = ax[2].imshow(d_vi, cmap="bwr", vmin=vminmax[0], vmax=vminmax[1])
     ax[2].set_title("differenced {}".format(vi))
     fig.colorbar(d_im, ax=ax[2], orientation="vertical")
@@ -258,8 +259,8 @@ def plot_compare_vi(image_pre_fire,image_post_fire,image_pred,vi):
     plot_pre_post_pred(image_pre_fire, image_post_fire, image_pred)
     fig, ax = plt.subplots(1, 3, figsize=(40, 10))
     # vi_pre=compute_vi(image_pre_fire,vi)
-    display_one_image_vi(image_pre_fire, fig, ax[0], vi, dict_band={"R": [4], "NIR": [7]}, title='Pre fire',
-                         cmap=None, vminmax=(-1, 1))
+    display_one_image_vi(image_pre_fire, fig, ax[0], vi, dict_band={"R": [4], "NIR": [7]}, title='Pre fire', cmap=None,
+                         vminmax=(-1, 1))
     # vi_post=compute_vi(image_post,vi)
     display_one_image_vi(image_post_fire, fig, ax[1], vi, dict_band=None, title='GT post fire', cmap=None,
                          vminmax=(-1, 1))
@@ -270,16 +271,18 @@ def plot_compare_vi(image_pre_fire,image_post_fire,image_pred,vi):
 
 def plot_compare_dvi(gt_dvi,pred_dvi):
     fig2, ax2 = plt.subplots(1, 2, figsize=(20, 30))
-    display_one_image_vi(gt_dvi, fig2, ax2[0], "identity", dict_band=None, title='GT Relative difference',
-                         cmap="OrRd")
+    display_one_image_vi(gt_dvi, fig2, ax2[0], "identity", dict_band=None, title='GT Relative difference', cmap="OrRd")
     display_one_image_vi(pred_dvi, fig2, ax2[1], "identity", dict_band=None, title='Pred Relative difference',
                          cmap="OrRd")
     plt.show()
 
-def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi"):
+def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi", liste_image_id=None, path_csv=None):
+    """:param path_csv path to the csv file which contains min and max value"""
     n = batch_predict.shape[0]
     if n < max_im:
         max_im = n
+    if liste_image_id is None:
+        liste_image_id=[None for i in range(max_im)]
     for i in range(max_im):
         image_pre_fire = batch_x[i, :, :, :]
         image_post_fire = batch_gt[i, :, :, :]
@@ -287,9 +290,9 @@ def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi"):
         print(image_pre_fire.shape, image_post_fire.shape, image_pred.shape)
         plot_compare_vi(image_pre_fire, image_post_fire, image_pred,vi)
         gt_dvi = diff_metric(image_pre_fire, image_post_fire, vi, dict_band_pre={"R": [4], "NIR": [7]},
-                             dict_band_post=DICT_BAND_LABEL)
+                             dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
         pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
-                               dict_band_post=DICT_BAND_LABEL)
+                               dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
         plot_compare_dvi(gt_dvi, pred_dvi)
 
 def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None):
@@ -438,7 +441,7 @@ def plot_cfmat(cf_mat,class_firesev=None,title=""):
         class_firesev=DICT_FIRE_SEV_CLASS.keys()
     df_cm=pd.DataFrame(cf_mat, index=class_firesev,
                  columns=class_firesev)
-    fig,ax=plt.subplots()
+    fig,ax=plt.subplots(figsize=(20,20))
     sn.heatmap(df_cm, annot=True,cmap="Blues")
     ax.set_ylabel('True label')
     ax.set_xlabel('Predicted label')

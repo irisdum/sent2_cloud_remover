@@ -2,6 +2,9 @@
 from constant.gee_constant import DICT_BAND_LABEL,DICT_BAND_X,DICT_EVI_PARAM
 import numpy as np
 
+from utils.normalize import get_minmax_fromcsv, normalization
+
+
 def extract_red_nir(image,dict_band):
     band_red = image[:, :, dict_band["R"][0]]
     band_nir = image[:, :, dict_band["NIR"][0]]
@@ -9,7 +12,12 @@ def extract_red_nir(image,dict_band):
 
 
 
-def compute_ndvi(image,dict_band=None):
+def compute_ndvi(image,dict_band=None,path_csv=None,image_id=None):
+    """:param image an array
+    :param dict_band a dict with the position of the band within the array
+    :param path_csv path to the csv which contains global max or min of the array
+    :param image_id string, needs to be set if path_csv not None
+    :returns the ndvi as an array"""
     if dict_band is None:
         print("We consider it is a predicted image with R G B NIR only ")
         dict_band=DICT_BAND_LABEL
@@ -22,8 +30,12 @@ def compute_ndvi(image,dict_band=None):
     ndvi[  mask ] = 0
     print(np.count_nonzero(ndvi))
     ndvi[ ~mask ] = ((band_nir-band_red)/(band_nir+band_red))[ ~mask ]
-    #print_array_stat(band_nir+band_red)
-    return ndvi
+    if path_csv is not None: #the normalization is going to occur
+        assert image_id is not None,"Normalized NDVI requested BUT image_id not given"
+        tile_min,tile_max=get_minmax_fromcsv(image_id,path_csv,"ndvi",1)
+        return normalization(ndvi,tile_min,tile_max)
+    else:
+        return ndvi
 
 def compute_bai(image,dict_band=None):
     if dict_band is None:
@@ -42,7 +54,7 @@ def compute_msavi(image,dict_band=None):
     sqrt_terme=np.square(2*band_nir+1)-8*(band_nir-band_red)
     return np.divide(2*band_nir+1-np.sqrt(sqrt_terme),2)
 
-def compute_vi(image,vi,dict_band=None,param=None):
+def compute_vi(image,vi,dict_band=None,param=None,path_csv=None,image_id=None):
     """vi a string of the vegetation index"""
     if vi!= "identity":
         assert len(image.shape)==3, "Image shape (n,n,channel) only accepted not {} ".format(image.shape)
@@ -51,7 +63,7 @@ def compute_vi(image,vi,dict_band=None,param=None):
         dict_band=DICT_BAND_LABEL
     assert vi in ["msavi","bai","ndvi","identity","evi"], "The vegetation index {} has no function defined. please define a function in utils.vi".format(vi)
     if vi=="ndvi":
-        return compute_ndvi(image,dict_band)
+        return compute_ndvi(image,dict_band,path_csv=path_csv,image_id=image_id)
     if vi=="bai":
         return compute_bai(image,dict_band)
     if vi=="msavi":
@@ -71,19 +83,21 @@ def compute_evi(image,dict_band,param=None):
     return np.resize(evi_res,(image.shape[0],image.shape[1]))
 
 
-def diff_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):
-    """:param image_pre the image before the event
+def diff_metric(image_pre, image_post, vi, dict_band_pre=None, dict_band_post=None, image_id=None, path_csv=None):
+    """:param image_id:
+    :param path_csv:
+    :param image_pre the image before the event
     :param image post the image post transformation
     :vi a vegetation index could be msavu,bai or ndvi"""
     if dict_band_pre is None:
         dict_band_pre=DICT_BAND_X
     if dict_band_post is None:
         dict_band_post=DICT_BAND_LABEL
-    pre_vi=compute_vi(image_pre,vi,dict_band_pre)
-    post_vi=compute_vi(image_post,vi,dict_band_post)
+    pre_vi=compute_vi(image_pre,vi,dict_band_pre,image_id=image_id,path_csv=path_csv)
+    post_vi=compute_vi(image_post,vi,dict_band_post,image_id=image_id,path_csv=path_csv)
     return pre_vi-post_vi
 
-def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None):
+def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None, image_id=None, path_csv=None):
     """:param image_pre the image before the event
         :param image post the image post transformation
         :vi a vegetation index could be msavu,bai or ndvi"""
@@ -91,6 +105,6 @@ def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_po
         dict_band_pre = DICT_BAND_X
     if dict_band_post is None:
         dict_band_post = DICT_BAND_LABEL
-    pre_vi = compute_vi(image_pre, vi, dict_band_pre)
-    post_vi = compute_vi(image_post, vi, dict_band_post)
+    pre_vi = compute_vi(image_pre, vi, dict_band_pre,image_id=image_id,path_csv=path_csv)
+    post_vi = compute_vi(image_post, vi, dict_band_post,image_id=image_id,path_csv=path_csv)
     return np.divide(pre_vi-post_vi,np.sqrt(np.abs(pre_vi)))

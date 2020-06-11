@@ -273,9 +273,10 @@ def find_csv(path_dir,band):
     assert len(path_band_csv) > 0, "No csv found at {}*{}*.csv".format(path_dir, band)
     return path_band_csv[0]
 
-def get_minmax_fromcsv(tile_id,path_csv,band):
+def get_minmax_fromcsv(tile_id,path_csv,band,convert=CONVERTOR):
     """:param : tile_id a string
-    :param path_csv : the directory which contains the csv"""
+    :param path_csv : the directory which contains the csv
+    :returns band_min,band_max"""
     assert type(band)==type("u"),"The input should be a string not a {}".format(band)
     df=pd.read_csv(path_csv,sep=",",header=0)
     df.head(5)
@@ -288,7 +289,8 @@ def get_minmax_fromcsv(tile_id,path_csv,band):
     dict_res = subf_df.iloc[0].to_dict()
     #print("Resultat min, max from {} : {}".format(path_csv,dict_res))
     #print("We divide the res by this {} as it was used to rescale the data in the dataset ".format(CONVERTOR))
-    return dict_res[name_col[0]]/CONVERTOR,dict_res[name_col[1]]/CONVERTOR
+    return dict_res[name_col[0]]/convert,dict_res[name_col[1]]/convert
+
 
 def get_ndvi_minmax_fromcsv(tile_id,path_csv,vi): #TODO make one isnge function to read the csv
     assert type(vi) == type("u"), "The input should be a string not a {}".format(vi)
