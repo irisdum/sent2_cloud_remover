@@ -95,7 +95,7 @@ class GAN():
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
-        self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
+        #self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
     def build_model(self):
 
         # We use the discriminator
