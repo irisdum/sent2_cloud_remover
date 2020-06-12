@@ -20,5 +20,5 @@ def main(path_model,training_nber,l_weight):
 
 if __name__ == '__main__':
     parser = _argparser()
-    main(parser.model_path,parser.tr_number,parser.weights)
+    main(parser.model_path,parser.tr_nber,parser.weights)
 
