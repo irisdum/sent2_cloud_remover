@@ -18,4 +18,4 @@ module load miniconda3/4.3.13
 unset PYTHONHOME
 unset PYTHONPATH
 source activate /datastore/dum031/envs/env_tf_gpu
-python predict.py --model_path ${model_path} --train_path ${train_path}
+python predict.py --model_path ${model_path}   --tr_nber ${train_nber} --weights ${weight}
