@@ -185,6 +185,7 @@ def plot_one_band(raster_array, fig, ax, title=""):
 def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, cmap=None, vminmax=(0, 1),
                          path_csv=None, image_id=None):
     raster_vi = compute_vi(raster_array, vi, dict_band,path_csv=path_csv,image_id=image_id)
+
     if cmap is None:
         cmap = "RdYlGn"
     if ax is None:

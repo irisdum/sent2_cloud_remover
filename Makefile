@@ -3,11 +3,11 @@ end_date1=2019-12-30
 begin_date2=2020-02-01
 end_date2=2020-04-01
 CCP=50
-geojson_file=confs/train_kangaroo.geojson
+geojson_file=confs/test_zone2.geojson
 geojson_utm_file=confs/train_kangaroo_utm2.geojson
-wkt_file=confs/train_kangaroo_wkt2.txt
+wkt_file=confs/train_zone_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
-source_directory=/datastore/dum031/data/dataset2/
+source_directory=/datastore/dum031/data/dataset5/
 target_directory=${source_directory}prepro2/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
@@ -19,8 +19,8 @@ split_val=0.05
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
-s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T56HKG_20200204T011552
-s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T56HKG_20191022T012314
+s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T55HGB_20200204T011552
+s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T55HGB_20191022T012314
 
 download_images_from_s2name:
 	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
