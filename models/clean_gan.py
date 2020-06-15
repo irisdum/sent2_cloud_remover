@@ -42,7 +42,6 @@ class GAN():
             assert type(self.dict_band_label) == type(
                 {"u": 1}), "The argument {} of dict band label is not a dictionnary  but {}".format(
                 self.dict_band_label, type(self.dict_band_label))
-            self.path_csv = train_yaml["path_csv"]
 
         if "path_csv" not in train_yaml:
             print("path°csv undefined do not use global band min and max to normalize the data")
@@ -365,11 +364,14 @@ class GAN():
         return compute_metric(self.val_Y, val_pred)
 
     def predict_on_iter(self, batch, path_save, l_image_id=None):
-        """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory"""
+        """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
+        :param dataset:
+        :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
+        """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
+                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
             l_image_id = find_image_indir(batch, "npy")
         else:
             if l_image_id is None:

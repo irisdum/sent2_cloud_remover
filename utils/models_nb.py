@@ -8,12 +8,19 @@ from utils.display_image import plot_all_compar
 from utils.image_find_tbx import find_image_indir
 from utils.open_yaml import open_yaml
 
-def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plot=True):
-    """Run a prediction of the model and save the images if required and plot them too"""
+def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val"):
+    """Run a prediction of the model and save the images if required and plot them too
+    :param dataset: 
+    """
     path_model_yaml, path_train_yaml=get_important_path(path_model,training_nber)
     gan = clean_gan.GAN(open_yaml(path_model_yaml), open_yaml(path_train_yaml))
     l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
-    path_val=gan.val_directory
+    if dataset is None:
+        path_val=gan.val_directory
+        val_dataX, val_dataY = gan.val_X, gan.val_Y
+    else:
+        path_val=dataset
+        val_dataX=dataset
     l_image_name=find_image_indir(path_val+XDIR, "npy")
     print("The val image founded are {}".format(l_image_name))
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
@@ -21,14 +28,11 @@ def predict_iter_on_val(path_model,training_nber,select_weight=100,save=True,plo
     assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
     gan_gen = gan.generator.load_weights(path_weight)
     if save:
-        path_save=path_model + "training_{}/image_val_iter_{}/".format(training_nber,select_weight)
-
+        path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
     else:
         path_save=None
-    val_dataX, val_dataY = gan.val_X, gan.val_Y
-    bath_res=gan.predict_on_iter(val_dataX,path_save,l_image_id=l_image_name)
-    if plot:
-        plot_all_compar(bath_res,val_dataY)
+    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name)
+
     return bath_res,gan
 
 

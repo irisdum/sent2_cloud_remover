@@ -4,7 +4,7 @@ begin_date2=2020-02-01
 end_date2=2020-04-01
 CCP=50
 geojson_file=confs/test_zone2.geojson
-geojson_utm_file=confs/train_kangaroo_utm2.geojson
+geojson_utm_file=confs/test_zone2_utm.geojson
 wkt_file=confs/train_zone_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
 source_directory=/datastore/dum031/data/dataset5/
@@ -58,22 +58,6 @@ convert_sent2:
 	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
 	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 
-start_env_processing:
-	@conda activate myenv
-quit_env_processing:
-	@conda deactivate
-
-create_env_processing:
-	@conda config --add channels conda-forge
-	@conda config --set channel_priority strict
-	@conda create -n myenv python-fmask
-
-convert_sent_inconda:
-	start_env_processing
-	convert_sent2
-	convert_sent1
-	quit_env_processing
-
 tiling:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file}
 
@@ -105,7 +89,6 @@ help:
 	@echo "To Download the image run make download_image"
 	@echo "To convert geojson to wkt_txt format make geojson_2_wkt"
 	@echo "To apply SNAP pipeline defined on xml for Sentinel i run  convert_senti, replace i by 1 or 2"
-	@echo "To apply SNAP pipeline within the conda env run make convert_sent_inconda"
 	@echo "To apply the tiling process coordinates system conversion, resampling 10 res .. make tiling"
 	@echo "To split the dataset between train, val and test folder make split_dataset"
 	@echo "To train a model make train_model, please check the value of the train yaml and model yaml before to do so, it will run with sbatch !"
