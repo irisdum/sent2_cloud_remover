@@ -3,7 +3,7 @@ import os
 import buzzard as buzz
 import argparse
 from utils.image_find_tbx import find_path, extract_tile_id, create_safe_directory
-from constant.gee_constant import DICT_ORGA, XDIR
+from constant.gee_constant import DICT_ORGA, XDIR,DICT_SHAPE,LABEL_DIR
 from utils.load_dataset import load_from_dir
 
 
@@ -20,9 +20,10 @@ def write_tif_from_fp(array, tile_id, build_dataset_dir, output_dir, prefix=""):
     assert ".tif" in tile_id, "wrong tile id should en with tif"
     ds_tile = buzz.Dataset()
     output_path = "{}{}_image{}".format(output_dir, prefix, tile_id)
-    with ds_tile.open_raster('tile', output_path).close:
-        fp_tile = get_fp(tile_id, build_dataset_dir)
-        ds_tile.tile.set_data(array, fp_tile)
+    fp_tile = get_fp(tile_id, build_dataset_dir)
+    with ds_tile.acreate_raster(output_path, fp_tile, 'float32', channel_count=DICT_SHAPE[LABEL_DIR][-1]).delete as cache:
+        cache.set_data(array)
+
     return output_path
 
 
@@ -39,7 +40,7 @@ def _argparser():
 
 def main(build_dataset_dir, predicted_dir, output_dir, im_prefix):
     create_safe_directory(output_dir)
-    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, (256, 256, 4))
+    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR])
     l_outpath = []
     for image_path in l_path_npy:
         tile_id = extract_tile_id(image_path).split(".")[0] + ".tif"
