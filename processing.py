@@ -19,17 +19,6 @@ def get_band_scale(raster, b):
 
 
 
-def get_scale(path_image):
-    str_scale = ""
-    raster = gdal.Open(path_image)
-    n_band = raster.RasterCount
-    for b in range(1, n_band + 1):
-        band_min, band_max = get_band_scale(raster, b)
-        str_scale += " -scale_{} {} {} 0 1 ".format(b, band_min, band_max)
-    print(str_scale)
-    return str_scale
-
-
 def crop_image(image_path, path_geojson, output_path):
     assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
@@ -38,7 +27,7 @@ def crop_image(image_path, path_geojson, output_path):
     # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
 
     os.system(
-        "gdal_translate {} {} -projwin  {} ".format(image_path, output_path, str_bbox))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
     return output_path
 
 
