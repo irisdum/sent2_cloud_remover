@@ -42,10 +42,10 @@ def main(build_dataset_dir, predicted_dir, output_dir, im_prefix):
     create_safe_directory(output_dir)
     batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR])
     l_outpath = []
-    for image_path in l_path_npy:
+    for i,image_path in enumerate(l_path_npy):
         tile_id = extract_tile_id(image_path).split(".")[0] + ".tif"
         l_outpath += [
-            write_tif_from_fp(batch_pred[0, :, :, :], tile_id, build_dataset_dir, output_dir, prefix=im_prefix)]
+            write_tif_from_fp(batch_pred[i, :, :, :], tile_id, build_dataset_dir, output_dir, prefix=im_prefix)]
     os.system("gdal_merge.py {} -o {}".format(" ".join(l_outpath), output_dir + "mosaic.tif"))
 
 
