@@ -1,1 +1,1 @@
--ps 256 256 -s_srs EPSG:4326 -v -useDirForEachRow
+-ps 256 256  -v -useDirForEachRow
