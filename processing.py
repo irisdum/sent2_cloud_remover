@@ -87,7 +87,7 @@ def tiling(image_vrt, output_dir, sent=1, date_t=0):
         name_shp="output_grid_build_dataset.shp"
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     # os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {}".format(image_vrt, output_dir,
+    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -r cubic ".format(image_vrt, output_dir,
                                                                                   name_shp,
                                                                                   "confs/retile_optfile.txt"))
     return output_dir + "tiling_fp.shp"
