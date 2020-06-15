@@ -38,7 +38,7 @@ def crop_image(image_path, path_geojson, output_path):
     # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
 
     os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10 ".format(image_path, output_path, str_bbox, EPSG))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -tr 10 10 -r cubic  ".format(image_path, output_path, str_bbox, EPSG))
     return output_path
 
 
