@@ -12,7 +12,7 @@ from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-from constant.gee_constant import LABEL_DIR, DICT_SHAPE
+from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR
 from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
@@ -370,7 +370,7 @@ class GAN():
         """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
-            l_image_id = find_image_indir(batch, "npy")
+            l_image_id = find_image_indir(batch+XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
         else:

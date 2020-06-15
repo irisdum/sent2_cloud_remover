@@ -8,19 +8,7 @@ from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LA
 from utils.image_find_tbx import create_safe_directory
 
 
-def find_cloud_mask(input_dir): ##UNUSED
-    """Find the path of the cloud mask in the Sent2 .SAFE directory"""
-    assert input_dir[-1] == "/", "Wrong input dir format should end with / {}".format(input_dir)
-    l = glob.glob("{}**/*{}".format(input_dir, NAME_CLOUD_MASK), recursive=True)
-    assert len(l) == 1, "Error finding the cloud mask len list should be one {}".format(l)
-    return l[0]
 
-
-
-def rasterize_cloud_mask(path_cloud, outpath): #UNUSED
-    """Given a file at path_could app, use gdal_rasterize"""
-    os.system("gdal_rasterize  -l MaskFeature {} -tr 10 10 - burn 255 {}".format(path_cloud, outpath))
-    return outpath
 
 
 def get_band_scale(raster, b):
@@ -29,12 +17,6 @@ def get_band_scale(raster, b):
         band.ComputeStatistics(0)
     return band.GetMinimum(), band.GetMaximum()
 
-
-# def convert2float32(path_image, output_dir):
-#     output_path = output_dir + path_image.split("/")[-1].split(".")[0] + "f32.vrt"
-#     str_scale = get_scale(path_image)
-#     os.system("gdal_translate {}  {} -ot Float32 {} ".format(path_image, output_path, str_scale))
-#     return output_path
 
 
 def get_scale(path_image):
