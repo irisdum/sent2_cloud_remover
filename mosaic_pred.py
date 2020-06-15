@@ -21,7 +21,7 @@ def write_tif_from_fp(array, tile_id, build_dataset_dir, output_dir, prefix=""):
     ds_tile = buzz.Dataset()
     output_path = "{}{}_image{}".format(output_dir, prefix, tile_id)
     fp_tile = get_fp(tile_id, build_dataset_dir)
-    with ds_tile.acreate_raster(output_path, fp_tile, 'float32', channel_count=DICT_SHAPE[LABEL_DIR][-1]).delete as cache:
+    with ds_tile.acreate_raster(output_path, fp_tile, 'float32', channel_count=DICT_SHAPE[LABEL_DIR][-1]).close as cache:
         cache.set_data(array)
 
     return output_path
