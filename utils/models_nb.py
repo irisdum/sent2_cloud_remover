@@ -19,6 +19,8 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
         path_val=gan.val_directory
         val_dataX, val_dataY = gan.val_X, gan.val_Y
     else:
+        assert os.path.isdir(dataset),"No dataset found at {}".format(dataset)
+        print("We predict on {}".format(dataset))
         path_val=dataset
         val_dataX=dataset
     l_image_name=find_image_indir(path_val+XDIR, "npy")
@@ -29,6 +31,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     gan_gen = gan.generator.load_weights(path_weight)
     if save:
         path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
+        print("saving image at {}".format(path_save))
     else:
         path_save=None
     bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name)
