@@ -29,7 +29,7 @@ def crop_image(image_path, path_geojson, output_path):
    # os.system(
     #    "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
     os.system(
-        "gdal_translate {} {} -a_ullr  {} -strict ".format(image_path, output_path, str_bbox))
+        "gdal_translate {} {} -a_ullr {} -a_srs {} -strict ".format(image_path, output_path, str_bbox,EPSG))
     return output_path
 
 
