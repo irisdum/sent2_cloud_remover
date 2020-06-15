@@ -25,9 +25,11 @@ def crop_image(image_path, path_geojson, output_path):
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
     # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
     # os.system("gdalwarp -cutline  {} {} {}".format(path_shapefile, image_path, output_path)
-
+    print(str_bbox)
+   # os.system(
+    #    "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
     os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
+        "gdal_translate {} {} -a_ullr  {} -strict ".format(image_path, output_path, str_bbox))
     return output_path
 
 
