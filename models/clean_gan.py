@@ -370,9 +370,9 @@ class GAN():
         """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
+            l_image_id = find_image_indir(batch, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
-            l_image_id = find_image_indir(batch, "npy")
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
