@@ -8,7 +8,7 @@ from utils.display_image import plot_all_compar
 from utils.image_find_tbx import find_image_indir
 from utils.open_yaml import open_yaml
 
-def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val"):
+def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val",path_csv=None):
     """Run a prediction of the model and save the images if required and plot them too
     :param dataset: 
     """
@@ -34,7 +34,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
         print("saving image at {}".format(path_save))
     else:
         path_save=None
-    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name)
+    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name,path_csv=path_csv)
 
     return bath_res,gan
 

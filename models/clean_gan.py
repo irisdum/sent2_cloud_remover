@@ -363,16 +363,19 @@ class GAN():
         val_pred = self.generator.predict(self.val_X)
         return compute_metric(self.val_Y, val_pred)
 
-    def predict_on_iter(self, batch, path_save, l_image_id=None):
+    def predict_on_iter(self, batch, path_save, l_image_id=None,path_csv=None):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
         :param dataset:
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
         """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
+            if path_csv is None:
+                print("WARNING we use the models path to the csv (only good for dataset from which the training tiles are from")
+                path_csv=self.path_csv
             l_image_id = find_image_indir(batch+XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
+                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=path_csv)
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
