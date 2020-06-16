@@ -8,9 +8,6 @@ from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LA
 from utils.image_find_tbx import create_safe_directory
 
 
-
-
-
 def get_band_scale(raster, b):
     band = raster.GetRasterBand(b)
     if band.GetMinimum() is None or band.GetMaximum() is None:
@@ -23,13 +20,13 @@ def crop_image(image_path, path_geojson, output_path):
     assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
-    path_shapefile=path_geojson.split(".")[0]+".shp"
-    assert os.path.isfile(path_shapefile),"No shp at {}".format(path_shapefile)
+    #path_shapefile=path_geojson.split(".")[0]+".shp"
+    #assert os.path.isfile(path_shapefile),"No shp at {}".format(path_shapefile)
     # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    os.system("gdalwarp -cutline  {}  {} {}".format(path_shapefile, image_path, output_path))
+    #os.system("gdalwarp -cutline  {}  {} {}".format(path_shapefile, image_path, output_path))
     #print(str_bbox)
-   # os.system(
-    #    "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
+    os.system(
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
     return output_path
 
 
@@ -71,16 +68,16 @@ def list_2_str(list):
     return ch
 
 
-def tiling(image_vrt, output_dir, sent=1, date_t=0):
+def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
     if sent in [1,2]:
         name_shp="tiling_sent{}_t{}_fp.shp".format(sent, date_t)
     else:
         name_shp="output_grid_build_dataset.shp"
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     # os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -r cubic ".format(image_vrt, output_dir,
+    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -overlap {} ".format(image_vrt, output_dir,
                                                                                   name_shp,
-                                                                                  "confs/retile_optfile.txt"))
+                                                                                  "confs/retile_optfile.txt",overlap))
     return output_dir + "tiling_fp.shp"
 
 
@@ -118,7 +115,7 @@ def _argparser():
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
-
+    parser.add_argument("--overlap",type=int, default=0, help="path to the zone geojson")
     return parser.parse_args()
 
 
@@ -130,26 +127,26 @@ def create_tiling_hierarchy(output_dir):
         create_safe_directory(output_dir + cst + TEMPORARY_DIR)
 
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
+def main(input_dir, output_dir, list_band2, list_band1, path_geojson,overlap):
     create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel1 at t1
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson)  # sentinel2 at t1
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson)  # sentinel1 at t2
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson,overlap=overlap)  # sentinel1 at t1
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson,overlap=overlap)  # sentinel2 at t1
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson,overlap=overlap)  # sentinel1 at t2
     ##LABEL FOLDER
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson)  # sentinel2 at t2
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson,overlap=overlap)  # sentinel2 at t2
 
 
-def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson):
+def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson,overlap):
     """Given a Sentinel and a time build the tiles """
     input_dir_t = input_dir + DIR_T[t]
     list_name_band = create_vrt(list_band, sent, input_dir_t, output_dir + sub_dir + TEMPORARY_DIR,
                                 path_geojson)
     output_dir_tile = output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
-    tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t)
+    tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t,overlap=overlap)
 
 
-def tiling_sent(list_image, sent, output_dir, path_geojson, t):
+def tiling_sent(list_image, sent, output_dir, path_geojson, t,overlap):
     create_safe_directory(output_dir)
     if sent==2:
         total_image = combine_band(list_image, output_dir) #for Sentinel 2 combien the images
@@ -161,7 +158,7 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t):
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
     # print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
-    shp_file_t1 = tiling(crop_image_name, output_dir, sent, t)
+    shp_file_t1 = tiling(crop_image_name, output_dir, sent, t,overlap=overlap)
 
 
 def tiling_aus18_map(path_tif,output_dir,path_geojson):
@@ -198,4 +195,4 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson,args.overlap)

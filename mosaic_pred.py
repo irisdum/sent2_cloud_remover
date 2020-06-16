@@ -30,7 +30,7 @@ def write_tif_from_fp(array, tile_id, build_dataset_dir, output_dir, prefix=""):
 def _argparser():
     parser = argparse.ArgumentParser(description='Short sample app')
     parser.add_argument('--bd_dir', type=str,
-                        help="path to input directory ")
+                        help="path to the build_dataset directory ")
     parser.add_argument('--pred_dir', type=str, help="path to the directory where the predictions have been made")
     parser.add_argument('--out_dir', type=str, help="path to the directory where the predictions have been made")
     parser.add_argument('--im_pref', type=str, default="", help="path to the directory where the predictions have been "

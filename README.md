@@ -165,6 +165,14 @@ In order to assess the burned area different vegetation index have been implemen
 
 ## Land classification
 
+# Analyszing the GAN output
+
+1) Run a prediction on a directory use gan_predict.sh 
+it will create a directory with the predicted image saved. This output will depend of the model trained and the iteration the model has been stopped
+
+2) Recreate the original image : using mosaic_pred.py : it will for each tile find its fp and recreate the global image 
+
+
 
 
 
