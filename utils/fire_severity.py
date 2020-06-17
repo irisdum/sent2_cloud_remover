@@ -75,4 +75,8 @@ def confusion_seg_map(y, y_pred, plot=False):
 
 
 def normalize_cf(cf, axis=0):
-    return cf / cf.astype(np.float).sum(axis=axis)
+    vect_sum=cf.astype(np.float).sum(axis=axis)[np.newaxis]
+    if axis==0:
+        return cf / vect_sum
+    else:
+        return cf / vect_sum.T

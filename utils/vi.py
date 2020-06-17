@@ -1,4 +1,5 @@
 # A file which contains all the information concerning the vegetation index functions
+from constant.fire_severity_constant import THR_VI_UNBURNED
 from constant.gee_constant import DICT_BAND_LABEL,DICT_BAND_X,DICT_EVI_PARAM
 import numpy as np
 
@@ -108,3 +109,32 @@ def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_po
     pre_vi = compute_vi(image_pre, vi, dict_band_pre,image_id=image_id,path_csv=path_csv)
     post_vi = compute_vi(image_post, vi, dict_band_post,image_id=image_id,path_csv=path_csv)
     return np.divide(pre_vi-post_vi,np.sqrt(np.abs(pre_vi)))
+
+
+def is_change(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None,path_csv=None,image_id=None,thr_vi=None):
+    """:returns a boolean True if burned has occured on this tile between image_pre, image_post"""
+    if thr_vi is None:
+        thr_vi=THR_VI_UNBURNED
+    dvi=diff_metric(image_pre, image_post, vi, dict_band_pre=dict_band_pre, dict_band_post=dict_band_post,
+                    image_id=image_id, path_csv=path_csv)
+    if np.median(dvi)<thr_vi:
+        return False
+    else:
+        return True
+
+
+def clean_changed_batch(batch_pre, batch_gt, batch_pred, vi, dict_band_pre=None, dict_band_post=None, path_csv=None, l_image_id=None, thr_vi=None):
+    assert batch_pre.shape[0] == batch_gt.shape[0], "Wrong input shape post {} gt : {}".format(batch_pre.shape, batch_gt.shape)
+    l_out_pre=[]
+    l_out_gt=[]
+    l_out_pred=[]
+    if l_image_id is None:
+        l_image_id=[None]*(batch_pre.shape[0])
+    for i in range(batch_gt.shape[0]):
+        if is_change(batch_pre[i, :, :, :],batch_gt[i,:,:,:], vi, dict_band_pre=dict_band_pre, dict_band_post=dict_band_post
+                         , path_csv=path_csv, image_id=l_image_id, thr_vi=thr_vi):
+            l_out_gt+=[batch_gt[i,:,:,:]]
+            l_out_pre+=[batch_pre[i, :, :, :]]
+            l_out_pred+=[batch_pred[i,:,:,:]]
+    return np.array(l_out_pre),np.array(l_out_gt),np.array(l_out_pred)
+
