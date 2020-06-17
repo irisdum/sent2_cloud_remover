@@ -459,5 +459,13 @@ def plot_cfmat(cf_mat,class_firesev=None,title=""):
 
 def plot_all_cfmat(cf_mat,class_firesev=None):
     plot_cfmat(cf_mat,class_firesev,"Confusion matrix not normalized")
-    plot_cfmat(normalize_cf(cf_mat,0), class_firesev,"Confusion matrix normalized by line")
-    plot_cfmat(normalize_cf(cf_mat, 1), class_firesev,"Confusion matrix normalized by column")
+    plot_cfmat(normalize_cf(cf_mat,0), class_firesev,"Confusion matrix normalized by column")
+    plot_cfmat(normalize_cf(cf_mat, 1), class_firesev,"Confusion matrix normalized by line")
+
+def print_stats(cf_mat,class_firesev):
+    print("Nber of True label on each categorie : ")
+    tot=cf_mat.astype(np.float).sum(axis=1)
+    for i,elem in enumerate(class_firesev):
+        print("Classe {} pixel percentage {:.2%}".format(elem,tot[i]/np.sum(tot)))
+    n=len(class_firesev)
+    print("Accuracy {} Recall {}".format(np.trace(normalize_cf(cf_mat,1))/n,np.trace(normalize_cf(cf_mat,0))/n))
