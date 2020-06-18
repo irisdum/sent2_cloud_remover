@@ -29,6 +29,13 @@ def load_tile_classif(input_dataset,list_id_tile,path_classif_tif,max_im):
             batch_landclass+=[tile_land_class]
     return batch_landclass
 
+def get_vegeconfusion(batch_landclass, batch_bool):
+    assert batch_landclass.shape == batch_bool.shape, "Input should have the same dim landclass {} bool {}".format(batch_landclass.shape,batch_bool.shape)
+    b_conf_landclass=batch_landclass[batch_bool]
+    return b_conf_landclass
+
+
+
 def compute_land_class_stats(array_lc):
     """:param array_lc a numpy array
     :returns a dictionnary with for all classes {class_vege : stat}"""
@@ -49,3 +56,4 @@ def compute_batch_land_class_stat(list_arr_lc,path_tileid):
         dic_stat.update({"tile_id":path_tileid[i]})
         df=df.append(dic_stat,ignore_index=True)
     return df
+

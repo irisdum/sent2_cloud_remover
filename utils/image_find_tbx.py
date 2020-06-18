@@ -7,7 +7,7 @@ def find_path(sent_dir, image_id):
     """:returns a string which is the path of the image with the id image_id
     """
     assert os.path.isdir(sent_dir),"Wrong path to dir, path  {} does not exist ".format(sent_dir)
-    print(sent_dir + "**/*{}".format(image_id))
+    #print(sent_dir + "**/*{}".format(image_id))
     assert ".tif" in image_id, "The id {} is not an image ".format(image_id)
     l = glob.glob(sent_dir + "**/*{}".format(image_id), recursive=True)
     assert len(l) > 0, "No image found with id {} at {}".format(image_id, sent_dir)

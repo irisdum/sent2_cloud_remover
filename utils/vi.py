@@ -29,7 +29,7 @@ def compute_ndvi(image,dict_band=None,path_csv=None,image_id=None):
     mask = (band_nir+band_red)==0
     ndvi = np.zeros(band_nir.shape)
     ndvi[  mask ] = 0
-    print(np.count_nonzero(ndvi))
+    #print(np.count_nonzero(ndvi))
     ndvi[ ~mask ] = ((band_nir-band_red)/(band_nir+band_red))[ ~mask ]
     if path_csv is not None: #the normalization is going to occur
         assert image_id is not None,"Normalized NDVI requested BUT image_id not given"
