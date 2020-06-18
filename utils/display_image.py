@@ -316,7 +316,7 @@ def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None
         plt.show()
 
 
-def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=0,vmax=23):
+def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=23):
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 10))
     cmap, norm, boundaries = define_colormap()
@@ -328,7 +328,7 @@ def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=0,vmax=23)
     cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(vmax-vmin+1))
     if l_land_class is None:
         l_land_class=LISTE_LAND_CLASS
-    cbar.ax.set_yticklabels(l_land_class)
+    #cbar.ax.set_yticklabels(l_land_class)
     # ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
     #           ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
     #           bbox_to_anchor=(1, 0.5))
