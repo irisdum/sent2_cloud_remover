@@ -325,10 +325,11 @@ def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=23)
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width, box.height])
     im = ax.imshow(array_lc, cmap=cmap, vmin=vmin, vmax=vmax)
-    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(vmax-vmin+1))
+    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(vmax-vmin))
     if l_land_class is None:
         l_land_class=LISTE_LAND_CLASS
-    #cbar.ax.set_yticklabels(l_land_class)
+    cbar.ax.set_yticks()
+    cbar.ax.set_yticklabels(l_land_class)
     # ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
     #           ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
     #           bbox_to_anchor=(1, 0.5))
@@ -471,3 +472,58 @@ def print_stats(cf_mat,class_firesev):
         print("Classe {} pixel percentage {:.2%}".format(elem,tot[i]/np.sum(tot)))
     n=len(class_firesev)
     print("Accuracy {} Recall {}".format(np.trace(normalize_cf(cf_mat,1))/n,np.trace(normalize_cf(cf_mat,0))/n))
+
+def plot_hist_vege(conf_vege,weights=None):
+    w,bins=np.histogram(np.array(conf_vege),range=(1,25),bins=24)
+    w=w/conf_vege.size
+    if weights is not None:
+        w=list(np.divide(np.array(w),np.array(weights)))
+    fix,ax=plt.subplots(figsize=(20,5))
+    counts, bins, patches=ax.hist(bins[:-1],bins,align="mid",rwidth=0.5,weights=w)
+    ax.set_xticks(bins)
+    plt.show()
+    return w
+
+
+def proba_wc_vege(batch_classif, batch_confusion, plot=True, N_tot=24, all_val=True, list_class=None):
+    unique, counts = np.unique(batch_classif, return_counts=True)
+    freq = list(counts / np.sum(counts))
+    dic_vege = dict(zip(unique, freq))
+    unique_inter, count_inter = np.unique(batch_confusion, return_counts=True)
+    unique_inter, count_inter = unique_inter[:-1], count_inter[:-1]
+    dic_temp = dict(zip(unique_inter, count_inter))
+    freq_final = []
+    sum_wc = np.sum(count_inter)
+    print(unique, unique_inter)
+    for i in range(1, N_tot):
+        if i not in unique_inter:
+            freq_final += [0]
+        else:
+            freq_inter = dic_temp[i] / sum_wc
+            if i not in dic_vege.keys():
+                freq_final += [0]
+            else:
+                freq_final += [freq_inter / dic_vege[i]]
+    print("Init {} Wrongly classified {}".format(np.sum(counts), sum_wc))
+    unique_inter, count_inter = np.array(unique_inter), np.array(count_inter)
+    dic_final = dict(zip([i for i in range(N_tot)], freq_final))
+    if plot:
+        histo_val(dic_vege)
+        histo_val(dict(zip(unique_inter, count_inter / np.sum(count_inter))))
+        histo_val(dic_final)
+    if all_val:
+        return dic_final, dic_vege, sum_wc, np.sum(counts)
+    else:
+        return dic_final
+
+
+def histo_val(dict_freq, ax=None, liste_classe=None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(20, 5))
+
+    ax.bar(dict_freq.keys(), dict_freq.values(), tick_label=liste_classe)
+    # ax.set_xticks(dict_freq.keys())
+    plt.show()
+
+
+print(proba_wc_vege(batch_landclass, conf_vege))

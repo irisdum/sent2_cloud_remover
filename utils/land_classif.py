@@ -57,3 +57,14 @@ def compute_batch_land_class_stat(list_arr_lc,path_tileid):
         df=df.append(dic_stat,ignore_index=True)
     return df
 
+def get_vege_confusion(batch_landclass, batch_bool,cst=24):
+    assert batch_landclass.shape == batch_bool.shape, "Input should have the same dim landclass {} bool {}".format(batch_landclass.shape,batch_bool.shape)
+    output=np.copy(batch_landclass)
+    output[batch_bool]=cst
+    return output
+def get_confusion(label_class,pred_class,thr=1):
+    print(label_class.shape)
+    conf=np.abs(label_class-pred_class)
+    return conf<thr
+
+

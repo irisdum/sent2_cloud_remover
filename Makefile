@@ -7,8 +7,8 @@ geojson_file=confs/test_zone2.geojson
 geojson_utm_file=confs/test_zone2_utm.geojson
 wkt_file=confs/train_zone_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_v2.xml
-source_directory=/datastore/dum031/data/dataset5/
-target_directory=${source_directory}prepro2/
+source_directory=/datastore/dum031/data/dataset6/
+target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2.xml
@@ -19,7 +19,7 @@ split_val=0.05
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
-s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T55HGB_20200204T011552
+s2_im_t1=S2B_MSIL1C_20191226T000239_N0208_R030_T55HGB_20191226T011333
 s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T55HGB_20191022T012314
 
 download_images_from_s2name:
