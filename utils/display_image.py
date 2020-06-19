@@ -333,7 +333,8 @@ def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=23)
     # ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
     #           ['{} - {}'.format(boundaries[i], LISTE_LAND_CLASS[i]) for i in range(23)], loc='center left',
     #           bbox_to_anchor=(1, 0.5))
-    plt.show()
+    if ax is None:
+        plt.show()
 
 
 def define_colormap(list_col=None):

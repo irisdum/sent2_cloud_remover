@@ -1,6 +1,8 @@
 import buzzard as buzz
 import os
 import numpy as np
+
+from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 from constant.gee_constant import XDIR, DICT_ORGA
 from constant.landclass_constant import LISTE_LAND_CLASS
 from utils.image_find_tbx import find_path
@@ -62,9 +64,20 @@ def get_vege_confusion(batch_landclass, batch_bool,cst=24):
     output=np.copy(batch_landclass)
     output[batch_bool]=cst
     return output
+
 def get_confusion(label_class,pred_class,thr=1):
     print(label_class.shape)
     conf=np.abs(label_class-pred_class)
     return conf<thr
 
+def get_precise_conf(label_class, pred_class, nb_classe_label, nb_class_pred):
+    """:param label_class a rray which contains fire sev class for label
+    :param pred_class array with fire sev
+    :param nb_class_pred an int
+    :param nb_classe_label an int
+    :returns a boolean where False is at the position where the two confusion between the two classes has been made"""
+    print("We are looking at class nber {} from pred and nb {} from label".format(nb_class_pred, nb_classe_label))
+    cond_1=(label_class != nb_classe_label)
+    cond_2=(pred_class != nb_class_pred)
+    return np.array(cond_1+cond_2,dtype=bool)
 
