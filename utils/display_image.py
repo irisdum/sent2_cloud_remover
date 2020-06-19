@@ -526,4 +526,4 @@ def histo_val(dict_freq, ax=None, liste_classe=None):
     plt.show()
 
 
-print(proba_wc_vege(batch_landclass, conf_vege))
+#print(proba_wc_vege(batch_landclass, conf_vege))
