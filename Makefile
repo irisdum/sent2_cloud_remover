@@ -16,11 +16,13 @@ output_split_dir_name=input_large_dataset
 split_test=0.15
 split_train=0.80
 split_val=0.05
+clouds=True
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
 s2_im_t1=S2B_MSIL1C_20191226T000239_N0208_R030_T55HGB_20191226T011333
 s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T55HGB_20191022T012314
+
 
 download_images_from_s2name:
 	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
@@ -64,7 +66,7 @@ tiling_overlap:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file} --overlap 50
 
 split_dataset:
-	@python split_dataset.py --input_dataset ${build_dataset_dir} --output_dir_name ${output_split_dir_name} --ptest ${split_test} --pval ${split_val} --ptrain ${split_train}
+	@python split_dataset.py --input_dataset ${build_dataset_dir} --output_dir_name ${output_split_dir_name} --ptest ${split_test} --pval ${split_val} --ptrain ${split_train} --keep_clouds ${clouds}
 
 train_model:
 	@sbatch gan_train.sh ${path_model_yaml}  ${path_train_yaml}

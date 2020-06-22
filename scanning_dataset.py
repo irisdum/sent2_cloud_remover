@@ -77,8 +77,8 @@ def select_rdtiles(list_all_tiles, nb_sample=10, seed=2):
     return [extract_tile_id(path) for path in sample_path]
 
 
-def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/",plot=False):
-    l_unconformed_id = get_unconformed(path_final_dataset,plot)
+def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/",plot=False,keep_clouds=False):
+    l_unconformed_id = get_unconformed(path_final_dataset,plot,keep_clouds=keep_clouds)
     list_all_tiles = glob.glob(path_final_dataset + sent_dir + "**/*.tif", recursive=True)
     print("Initial dataset size {}".format(len(list_all_tiles)))
     l_all_id = [extract_tile_id(path) for path in list_all_tiles]
@@ -103,7 +103,7 @@ def split_train_test_val(l_path_id,ptrain,pval,ptest,random_state=2):
     return {"train/":lid_train,"val/":lid_val,"test/":lid_test}
 
 
-def is_conform(path_tile,plot=False):
+def is_conform(path_tile,plot=False,keep_clouds=False):
     #print(plot)
     raster = gdal.Open(path_tile)
     raster_array = raster.ReadAsArray()
@@ -123,12 +123,13 @@ def is_conform(path_tile,plot=False):
         return False
 
     if raster_array.shape[0] == 5:  # check sentinel 2 conformity
-        if is_s2_cloud(raster_array):
+        if is_s2_cloud(raster_array) and not keep_clouds :
             print("Image {} clouds ".format(path_tile.split("/")[-1]))
             if plot:
                 plot_one_band(raster_array[0,:,:],None,None, title=path_tile.split("/")[-1])
                 plt.show()
             return False
+
         if is_no_data(raster, 2):
             print("Image {} no data ".format(path_tile.split("/")[-1]))
             if plot:
@@ -146,14 +147,14 @@ def is_conform(path_tile,plot=False):
     return True
 
 
-def get_unconformed(path_final_dataset,plot=False):
+def get_unconformed(path_final_dataset,plot=False,keep_clouds=False):
     list_sent_dir = [path_final_dataset + XDIR + "Sentinel1_t0/", path_final_dataset + XDIR + "Sentinel1_t1/",
                      path_final_dataset + XDIR + "Sentinel2_t0/", path_final_dataset + LABEL_DIR + "Sentinel2_t1/"]
     list_not_conform = []
     for path_sent_dir in list_sent_dir:
         list_tiles = get_all_tiles_path(path_sent_dir)
         for path_tile in list_tiles:
-            if is_conform(path_tile,plot):
+            if is_conform(path_tile,plot,keep_clouds=keep_clouds):
                 pass
             else:
                 # add it to the list of all the not appropriate tiles
@@ -169,7 +170,7 @@ def main(path_final_dataset, opt_remove=False):
         list_tiles = get_all_tiles_path(path_sent_dir)
 
         for path_tile in list_tiles:
-            if is_conform(path_tile):
+            if is_conform(path_tile,keep_clouds=False):
                 pass
             else:
                 # add it to the list of all the not appropriate tiles
