@@ -98,7 +98,7 @@ predict_val:
 	sbatch gan_predict_val.sh ${training_dir} ${training_number} ${weight}
 
 mosaic_predictions:
-	python mosaic_pred --bd_dir ${build_dataset_dir} --pred_dir ${training_dir}/training_${training_number}/image_${pref_pred_image}/ --out_dir ${output_mosaic_dir} --im_pref tr${training_number}_i${weight}
+	python mosaic_pred.py --bd_dir ${build_dataset_dir} --pred_dir ${training_dir}/training_${training_number}/image_${pref_pred_image}/ --out_dir ${output_mosaic_dir} --im_pref tr${training_number}_i${weight}
 
 help:
 	@echo "[HELP] "
