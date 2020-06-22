@@ -316,7 +316,7 @@ def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None
         plt.show()
 
 
-def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=23):
+def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=25):
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 10))
     cmap, norm, boundaries = define_colormap()

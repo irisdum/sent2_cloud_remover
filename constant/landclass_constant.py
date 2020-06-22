@@ -1,4 +1,4 @@
-LISTE_LAND_CLASS=["Acacia","Callitris","Casuarina","Eucalypt Mallee Open","Eucalypt Mallee Woodland","Eucalypt Low Close"
+LISTE_LAND_CLASS=["","Acacia","Callitris","Casuarina","Eucalypt Mallee Open","Eucalypt Mallee Woodland","Eucalypt Low Close"
                   ,"Eucalypt Low Open","Eucalypt Low Woodland","Eucalypt Medium Close","Eucalypt Medium Open",
                   "Eucalypt Medium Woodland","Eucalypt Tall Close","Eucalypt Tall Open","Eucalypt Tall Woodland",
                   "Mangrove","Melaleuca","RainForest","Hardwood plantation","Softwood plantation",
