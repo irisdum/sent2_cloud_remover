@@ -14,11 +14,7 @@ train_nber="$2"
 
 weight="$3"
 
-dataset="$4"
 
-pref="$5"
-
-path_csv="$6"
 
 module load miniconda3/4.3.13
 unset PYTHONHOME
