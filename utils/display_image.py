@@ -398,6 +398,7 @@ def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None):
     cbar.ax.set_yticklabels(dict_burned.keys())
 
 
+
 def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None,liste_image_id=None,path_csv=None):
     if dict_burned is None:
         dict_burned=DICT_FIRE_SEV_CLASS

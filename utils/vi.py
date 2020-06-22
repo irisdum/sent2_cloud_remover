@@ -98,6 +98,18 @@ def diff_metric(image_pre, image_post, vi, dict_band_pre=None, dict_band_post=No
     post_vi=compute_vi(image_post,vi,dict_band_post,image_id=image_id,path_csv=path_csv)
     return pre_vi-post_vi
 
+def batch_diff_metric(batch_pre,batch_post,vi, dict_band_pre=None, dict_band_post=None,list_image_id=None, path_csv=None):
+    """compute dvi for each tile of the batch WARNING the 1st dim of the array correspond of the nber of tiles !!"""
+    assert batch_post.shape[0]==batch_pre.shape[0], "Batch pre has {} elem whereas batch post {} elem".format(batch_pre.shape[0],batch_post.shape[0])
+    batch_dvi=np.ones((batch_pre.shape[0],batch_pre.shape[1],batch_pre.shape[2]))
+    if list_image_id is None:
+        list_image_id=[None]*batch_post.shape[0]
+    for i in range(batch_pre.shape[0]):
+        batch_dvi[i,:,:]=diff_metric(batch_pre[i,:,:,:],batch_post[i,:,:,:],vi=vi,dict_band_pre=dict_band_pre,
+                                     dict_band_post=dict_band_post,image_id=list_image_id[i],path_csv=path_csv)
+    return batch_dvi
+
+
 def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None, image_id=None, path_csv=None):
     """:param image_pre the image before the event
         :param image post the image post transformation
