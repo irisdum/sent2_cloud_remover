@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"name": "train_kangaroo_utm",
+"features": [
+{ "type": "Feature", "properties": { "train": "bbox" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 217010,  6103210 ], [ 217010, 6143070  ], [ 280400, 6143070 ], [280400,  6103210], [ 217010,  6103210 ] ] ] } }
+]
+}

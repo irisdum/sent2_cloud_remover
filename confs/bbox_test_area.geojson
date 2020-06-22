@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "test_zone2_utm",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32756" } },
+"features": [ 
+{ "type": "Feature", "properties": { "test": "v2" }, "geometry": { "type": "Polygon", "coordinates": [ [ [230289.730107,  6103769.412871 ], [ 230289.730107,6091519.412871], [ 263849.730107,6091519.412871], [ 263849.730107,  6103769.412871 ], [230289.730107,  6103769.412871 ] ] ] } }
+]
+}
