@@ -15,6 +15,7 @@ def find_path(sent_dir, image_id):
     return l[0]
 
 
+
 def extract_relative_path(path_tif):
     """Given the path to an tif tile returns its relative path within the Sentineli_tj directory"""
     l = path_tif.split("/")

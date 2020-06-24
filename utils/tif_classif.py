@@ -1,3 +1,4 @@
+# Function to analyze the behavior of the Landclassification the slope and the aspect during the classification
 import buzzard as buzz
 import os
 import numpy as np
@@ -30,6 +31,7 @@ def load_tile_classif(input_dataset,list_id_tile,path_classif_tif,max_im):
             tile_land_class=ds.land_class.get_data(fp=fp_tile)
             batch_landclass+=[tile_land_class]
     return batch_landclass
+
 
 def get_vegeconfusion(batch_landclass, batch_bool):
     assert batch_landclass.shape == batch_bool.shape, "Input should have the same dim landclass {} bool {}".format(batch_landclass.shape,batch_bool.shape)

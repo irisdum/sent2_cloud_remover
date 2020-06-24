@@ -9,7 +9,7 @@ from constant.gee_constant import BOUND_X, BOUND_Y, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
 from utils.converter import convert_array
 from utils.fire_severity import get_fire_severity, normalize_cf
-from utils.land_classif import load_tile_classif, compute_batch_land_class_stat
+from utils.tif_classif import load_tile_classif, compute_batch_land_class_stat
 from utils.metrics import ssim_batch, batch_psnr, batch_sam
 from utils.vi import compute_vi, diff_metric, diff_relative_metric
 import matplotlib.colors as colors
