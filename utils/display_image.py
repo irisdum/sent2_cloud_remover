@@ -422,6 +422,7 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
                                dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
         plot_compare_dvi(gt_dvi, pred_dvi)
         fig2,ax2=plt.subplots(3,2,figsize=(30,20))
+        fig2.suptitle("Image {}".format(i))
         display_dvi_class(gt_dvi, ax=ax2[0, 0], fig=fig2)
         display_dvi_class(pred_dvi, ax=ax2[0, 1], fig=fig2)
         # print_array_stat(gt_dvi)
@@ -441,7 +442,7 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
 
 def one_band_hist(b_array,ax=None):
     if ax is None:
-        fig,ax=plt.subplot()
+        fig,ax=plt.subplots()
     ax.hist(b_array.ravel(), bins=256, color="red", alpha=0.5)
     ax.set_xlabel('Intensity Value')
     ax.set_ylabel('Count')
