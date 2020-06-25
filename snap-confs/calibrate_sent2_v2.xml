@@ -1,0 +1,30 @@
+ <graph id="Processing sentinel2">
+    <version>1.0</version>
+    <node id="Resample">
+      <operator>Resample</operator>
+      <sources>
+        <sourceProduct>${sourceProduct}</sourceProduct>
+      </sources>
+      <parameters>
+        <targetResolution>10</targetResolution>
+        <upsampling>Bilinear</upsampling>
+        <downsampling>Mean</downsampling>
+        <flagDownsampling>First</flagDownsampling>
+        <bandResamplings>${Bands}</bandResamplings>
+        <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+      </parameters>
+    </node>
+     <node id="WriteTIFF">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Resample"/>
+    </sources>
+    <parameters>
+      <file>${file}</file>
+      <formatName>GeoTIFF-BigTIFF</formatName>
+      <deleteOutputOnFailure>true</deleteOutputOnFailure>
+      <writeEntireTileRows>false</writeEntireTileRows>
+      <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
+    </parameters>
+  </node>
+  </graph>
