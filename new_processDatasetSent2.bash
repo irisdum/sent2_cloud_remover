@@ -1,4 +1,10 @@
 #!/bin/bash
+#SBATCH --job-name=process_sent1
+#SBATCH --qos=express
+#SBATCH --time=4:00:00
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=256g
+
 # enable next line for debugging purpose
 # set -x
 
