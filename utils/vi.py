@@ -110,6 +110,8 @@ def batch_diff_metric(batch_pre,batch_post,vi, dict_band_pre=None, dict_band_pos
     return batch_dvi
 
 
+
+
 def diff_relative_metric(image_pre,image_post,vi,dict_band_pre=None,dict_band_post=None, image_id=None, path_csv=None):
     """:param image_pre the image before the event
         :param image post the image post transformation

@@ -2,6 +2,7 @@
 from scipy import ndimage
 import  numpy as np
 from sklearn import cluster
+
 def denoise_img(img):
     return ndimage.median_filter(img, 3)
 
