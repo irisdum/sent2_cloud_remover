@@ -528,5 +528,27 @@ def histo_val(dict_freq, ax=None, liste_classe=None):
     # ax.set_xticks(dict_freq.keys())
     plt.show()
 
+def display_silhouette(labels,silhouette_vals,ax1=None):
+    if ax1 is None:
+        fig1,ax1=plt.subplots()
+    # Silhouette plot
+    y_ticks = []
+    y_lower, y_upper = 0, 0
+    for i, cluster in enumerate(np.unique(labels)):
+        cluster_silhouette_vals = silhouette_vals[labels == cluster]
+        cluster_silhouette_vals.sort()
+        y_upper += len(cluster_silhouette_vals)
+        ax1.barh(range(y_lower, y_upper), cluster_silhouette_vals, edgecolor='none', height=1)
+        ax1.text(-0.03, (y_lower + y_upper) / 2, str(i + 1))
+        y_lower += len(cluster_silhouette_vals)
+
+    # Get the average silhouette score and plot it
+    avg_score = np.mean(silhouette_vals)
+    ax1.axvline(avg_score, linestyle='--', linewidth=2, color='green')
+    ax1.set_yticks([])
+    ax1.set_xlim([-0.1, 1])
+    ax1.set_xlabel('Silhouette coefficient values')
+    ax1.set_ylabel('Cluster labels')
+    ax1.set_title('Silhouette plot for the various clusters', y=1.02)
 
 #print(proba_wc_vege(batch_landclass, conf_vege))

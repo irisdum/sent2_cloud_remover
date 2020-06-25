@@ -101,6 +101,9 @@ predict_val:
 mosaic_predictions:
 	python mosaic_pred.py --bd_dir ${build_dataset_dir} --pred_dir ${training_dir}training_${training_number}/image_${pref_pred_image}_iter_${weight}/ --out_dir ${output_mosaic_dir} --im_pref tr${training_number}_i${weight}
 
+mosaic_gt:
+	python mosaic_pred.py --bd_dir ${build_dataset_dir}  --pred_dir ${pred_dataset} --out_dir {target_directory}gt${training_number}_i${weight}/ --im_pref label_tr${training_number}_i${weight} --path_csv ${source_directory}
+
 help:
 	@echo "[HELP] "
 	@echo "To Download the image run make download_image"

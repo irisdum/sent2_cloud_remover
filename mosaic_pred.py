@@ -35,12 +35,13 @@ def _argparser():
     parser.add_argument('--out_dir', type=str, help="path to the directory where the predictions have been made")
     parser.add_argument('--im_pref', type=str, default="", help="path to the directory where the predictions have been "
                                                                 "made")
+    parser.add_argument('--path_csv', type=str, default=None, help="Only use to mosaic the gt, the path to the csv gt")
     return parser.parse_args()
 
 
-def main(build_dataset_dir, predicted_dir, output_dir, im_prefix):
+def main(build_dataset_dir, predicted_dir, output_dir, im_prefix,path_csv):
     create_safe_directory(output_dir)
-    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR])
+    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR],path_dir_csv=path_csv)
     l_outpath = []
     for i,image_path in enumerate(l_path_npy):
         tile_id = extract_tile_id(image_path).split(".")[0] + ".tif"
@@ -51,4 +52,4 @@ def main(build_dataset_dir, predicted_dir, output_dir, im_prefix):
 
 if __name__ == '__main__':
     args = _argparser()
-    main(args.bd_dir, args.pred_dir, args.out_dir, args.im_pref)
+    main(args.bd_dir, args.pred_dir, args.out_dir, args.im_pref,args.path_csv)
