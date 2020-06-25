@@ -3,6 +3,7 @@ import buzzard as buzz
 import os
 import numpy as np
 
+from constant.dem_constant import DICT_CLASSE_SLOPE
 from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 from constant.gee_constant import XDIR, DICT_ORGA
 from constant.landclass_constant import LISTE_LAND_CLASS
@@ -82,4 +83,13 @@ def get_precise_conf(label_class, pred_class, nb_classe_label, nb_class_pred):
     cond_1=(label_class != nb_classe_label)
     cond_2=(pred_class != nb_class_pred)
     return np.array(cond_1+cond_2,dtype=bool)
+
+def slope_thr(batch_slope,dict_slope=None):
+    thr_batch_slope=np.ones(batch_slope)
+    if dict_slope is None:
+        dict_slope=DICT_CLASSE_SLOPE
+    for i,slope_class in enumerate(dict_slope):
+        val_min,val_max=dict_slope[slope_class]
+        thr_batch_slope[(batch_slope>=val_max)&(batch_slope<val_max)]=i
+    return thr_batch_slope
 

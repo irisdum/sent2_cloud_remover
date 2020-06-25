@@ -11,21 +11,10 @@
       <continueOnFail>false</continueOnFail>
     </parameters>
   </node>
-  <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Apply-Orbit-File"/>
-    </sources>
-    <parameters>
-      <sourceBands/>
-      <geoRegion>${geometry}</geoRegion>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node>
     <node id="ThermalNoiseRemoval">
     <operator>ThermalNoiseRemoval</operator>
     <sources>
-      <sourceProduct refid="SUbset"/>
+      <sourceProduct refid="Subset"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <selectedPolarisations/>
