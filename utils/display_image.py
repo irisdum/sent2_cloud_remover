@@ -531,6 +531,8 @@ def histo_val(dict_freq, ax=None, list_class=None,title=""):
     #ax.set_xticks(dict_freq.keys())
     plt.show()
 
+
+
 def display_silhouette(labels,silhouette_vals,ax1=None):
     if ax1 is None:
         fig1,ax1=plt.subplots()
@@ -560,3 +562,4 @@ def create_histo(batch,dict_class,title=""):
     dict_histo=dict(zip(unique,counts/np.sum(counts)))
     print(dict_histo)
     histo_val(dict_histo, ax=None, list_class=dict_class.keys(),title=title)
+
