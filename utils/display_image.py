@@ -387,13 +387,13 @@ def display_dvi_class(dvi, ax=None, fig=None):
     if ax is None:
         plt.show()
 
-def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None):
+def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None,cmap='afmhot_r'):
     if dict_burned is None:
         dict_burned=DICT_FIRE_SEV_CLASS
     if ax is None:
         fig,ax=plt.subplots()
-    im=ax.imshow(fire_array, cmap=plt.cm.get_cmap('afmhot_r',len(dict_burned)),vmin=0,vmax=len(dict_burned))
-    cbar=fig.colorbar(im, ax=ax, orientation="vertical")
+    im=ax.imshow(fire_array, cmap=plt.cm.get_cmap(cmap,len(dict_burned)),vmin=0,vmax=len(dict_burned))
+    cbar=fig.colorbar(im, ax=ax, orientation="vertical",ticks=[i for i in range(len(dict_burned))])
     print(dict_burned.keys())
     cbar.ax.set_yticklabels(dict_burned.keys())
 
@@ -520,12 +520,15 @@ def proba_wc_vege(batch_classif, batch_confusion, plot=True, N_tot=24, all_val=T
         return dic_final
 
 
-def histo_val(dict_freq, ax=None, liste_classe=None):
+def histo_val(dict_freq, ax=None, list_class=None,title=""):
     if ax is None:
         fig, ax = plt.subplots(figsize=(20, 5))
-
-    ax.bar(dict_freq.keys(), dict_freq.values(), tick_label=liste_classe)
-    # ax.set_xticks(dict_freq.keys())
+        fig.suptitle(title)
+    ax.bar(dict_freq.keys(), dict_freq.values(), tick_label=list_class,width=0.8)
+    if list_class is not None:
+        ax.set_xticks([i for i in range(0,len(list_class)+1)],list_class)
+        ax.set_xticklabels(list_class,rotation=70)
+    #ax.set_xticks(dict_freq.keys())
     plt.show()
 
 def display_silhouette(labels,silhouette_vals,ax1=None):
@@ -551,4 +554,9 @@ def display_silhouette(labels,silhouette_vals,ax1=None):
     ax1.set_ylabel('Cluster labels')
     ax1.set_title('Silhouette plot for the various clusters', y=1.02)
 
-#print(proba_wc_vege(batch_landclass, conf_vege))
+
+def create_histo(batch,dict_class,title=""):
+    unique, counts = np.unique(batch, return_counts=True)
+    dict_histo=dict(zip(unique,counts/np.sum(counts)))
+    print(dict_histo)
+    histo_val(dict_histo, ax=None, list_class=dict_class.keys(),title=title)

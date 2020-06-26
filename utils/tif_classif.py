@@ -3,10 +3,11 @@ import buzzard as buzz
 import os
 import numpy as np
 
-from constant.dem_constant import DICT_CLASSE_SLOPE
+from constant.dem_constant import DICT_CLASSE_SLOPE, DICT_ORIENTATION_PRECISE
 from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 from constant.gee_constant import XDIR, DICT_ORGA
 from constant.landclass_constant import LISTE_LAND_CLASS
+from utils.display_image import histo_val
 from utils.image_find_tbx import find_path
 import pandas as pd
 
@@ -84,14 +85,34 @@ def get_precise_conf(label_class, pred_class, nb_classe_label, nb_class_pred):
     cond_2=(pred_class != nb_class_pred)
     return np.array(cond_1+cond_2,dtype=bool)
 
-def slope_thr(batch_slope,dict_slope=None):
-    thr_batch_slope=np.ones(batch_slope)
+def slope_thr(batch_slope,dict_slope=None,return_dict_class=False):
+    thr_batch_slope=np.ones(batch_slope.shape)
     if dict_slope is None:
         dict_slope=DICT_CLASSE_SLOPE
     for i,slope_class in enumerate(dict_slope):
+        print(dict_slope[slope_class])
         val_min,val_max=dict_slope[slope_class]
-        thr_batch_slope[(batch_slope>=val_max)&(batch_slope<val_max)]=i
-    return thr_batch_slope
+        thr_batch_slope[(batch_slope>=val_min)&(batch_slope<val_max)]=i
+    if return_dict_class:
+        return thr_batch_slope,dict(zip(list(dict_slope.keys()),[i for i in range(len(dict_slope))]))
+    else:
+        return thr_batch_slope
+
+def aspect_thr(batch_aspect,dict_r_aspect=None,return_dict_class=False):
+    thr_batch_aspect=np.ones(batch_aspect.shape)
+    if dict_r_aspect is None:
+        dict_r_aspect=DICT_ORIENTATION_PRECISE
+    for i,tuple_val in enumerate(dict_r_aspect):
+        if len(tuple_val)==1: #only one val is given (-1 case)
+            thr_batch_aspect[batch_aspect == tuple_val[0]]=i
+        else:
+            val_min, val_max=tuple_val
+            thr_batch_aspect[(batch_aspect >= val_min) & (batch_aspect< val_max)] = i
+    if return_dict_class:
+        return thr_batch_aspect,dict(zip(list(dict_r_aspect.values),[i for i in range(len(dict_r_aspect))]))
+    else:
+        return thr_batch_aspect
+
 
 def proba_wc_vege(batch_classif, batch_confusion, plot=True, N_tot=24, all_val=True, list_class=None):
     unique, counts = np.unique(batch_classif, return_counts=True)
