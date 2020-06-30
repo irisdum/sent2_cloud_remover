@@ -109,6 +109,15 @@ def batch_diff_metric(batch_pre,batch_post,vi, dict_band_pre=None, dict_band_pos
                                      dict_band_post=dict_band_post,image_id=list_image_id[i],path_csv=path_csv)
     return batch_dvi
 
+def batch_vi(batch,dict_band=None,param=None,path_csv=None,l_image_id=None,vi="ndvi"):
+    assert len(batch.shape)>=3,"Wrong input should be a batch of images RGBNIR not {}".format(batch.shape)
+    if l_image_id is None:
+        l_image_id=[None]*batch.shape[0]
+    output_vi=np.ones((batch.shape[0],batch.shape[1],batch.shape[2]))
+    for i in range(batch.shape[0]):
+        output_vi[i,:,:]=compute_vi(batch[i,:,:,:],vi=vi,dict_band=dict_band,param=param,path_csv=path_csv,
+                                    image_id=l_image_id[i])
+    return output_vi
 
 
 

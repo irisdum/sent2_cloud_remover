@@ -22,6 +22,7 @@ dependencies:
   - scikit-learn
   - conda-forge::statsmodels
   - scipy<=1.2.0
+  - conda-forge::pingouin
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
