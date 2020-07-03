@@ -15,7 +15,7 @@ padding: same
 
 last_layer: [4,3]
 last_activation: tanh
-
+a
 #batch norm momentum
 bn_momentum: 0.99
 #dropout rate

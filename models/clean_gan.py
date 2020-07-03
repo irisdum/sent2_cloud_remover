@@ -134,6 +134,8 @@ class GAN():
                                    name="g_block_{}_bn1".format(id))(x)
             x = ReLU(name="g_block_{}_relu1".format(id))(x)
             x = Dropout(rate=model_yaml["do_rate"], name="g_block_{}_do".format(id))(x)
+            x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
+                       strides=tuple(model_yaml["stride"]), name="g_block_{}_conv1".format(id))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                    name="g_block_{}_bn2".format(id))(x)
             x = Add(name="g_block_{}_add".format(id))([x, input])
