@@ -105,7 +105,7 @@ def centering(pixels, mean, std):
 
 
 def rescaling_function(methode):
-    print("we use {}".format(methode))
+    #print("we use {}".format(methode))
     if methode == "normalization":
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / (stat2 - stat1)
