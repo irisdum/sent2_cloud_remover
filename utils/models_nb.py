@@ -34,7 +34,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
         print("saving image at {}".format(path_save))
     else:
         path_save=None
-    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name,path_csv=path_csv)
+    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name,path_csv=path_csv,un_rescale=True)
 
     return bath_res,gan
 

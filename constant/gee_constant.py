@@ -53,9 +53,11 @@ DICT_BAND_LABEL={"R":[0],"G":[1],"B":[2],"NIR":[3]}
 DICT_BAND_X={"VV":[0,2],"VH":[1,3],"R":[4],"G":[5],"B":[6],"NIR":[7]}
 DICT_RESCALE={"R":"normalization11","G":"normalization11","B":"normalization11","NIR":"normalization11","VV":"centering",
               "VH":"centering"}
+DICT_RESCALE_REVERSE={"R":"normalization11_r","G":"normalization11_r","B":"normalization11_r","NIR":"normalization11_r","VV":"centering_r",
+              "VH":"centering_r"}
 
-
-DICT_METHOD={"standardization": "mean_std","standardization11": "mean_std", "centering": "mean_std", "normalization": "min_max","normalization11": "min_max","centering":"mean_std"}
+DICT_METHOD={"standardization": "mean_std","standardization11": "mean_std", "centering": "mean_std",
+             "normalization": "min_max","normalization11": "min_max","centering_r":"mean_std","normalization11_r":"min_max"}
 
 #TRAINING CONSTANT
 NAME_LOGS=[]

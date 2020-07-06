@@ -12,11 +12,12 @@ from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR
+from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR, DICT_RESCALE_REVERSE
 from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
-from utils.load_dataset import load_data, save_images, load_from_dir
+from utils.load_dataset import load_data, save_images, load_from_dir, csv_2_dictstat
+from utils.normalize import rescale_on_batch
 from utils.open_yaml import open_yaml, saving_yaml
 from utils.metrics import batch_psnr, ssim_batch, compute_metric
 
@@ -367,7 +368,7 @@ class GAN():
         val_pred = self.generator.predict(self.val_X)
         return compute_metric(self.val_Y, val_pred)
 
-    def predict_on_iter(self, batch, path_save, l_image_id=None,path_csv=None):
+    def predict_on_iter(self, batch, path_save, l_image_id=None,path_csv=None,un_rescale=True):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
         :param dataset:
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
@@ -393,6 +394,11 @@ class GAN():
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
+            if un_rescale: #remove the normalization made on the data
+                assert path_csv is not None, "Do not unrescale if path_csv  {}".format(path_csv)
+                ldict_stat=csv_2_dictstat(l_image_id,self.path_csv)
+                _,batch_res=rescale_on_batch(batch_res, batch_res, dict_band_X=self.dict_band_label, dict_band_label=self.dict_band_label,
+                                 l_s2_stat=ldict_stat, dict_method=None,dict_rescale_type=DICT_RESCALE_REVERSE)
             assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,batch.shape)
             if path_save is not None:
                 # we store the data at path_save

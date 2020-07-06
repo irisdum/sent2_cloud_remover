@@ -132,6 +132,20 @@ def rescaling_function(methode):
             return pixels - stat1
     return method
 
+def reverse_norm_function(methode):
+    assert methode in ["normalization11_r","normalization_r","centering_r"],"Reverse function not defined for {}".format(methode)
+    if methode=="normalization11_r":
+         def method(pixels, stat1, stat2):
+             pixels = (pixels+1)/2*(stat2-stat1)+1
+             return pixels
+    elif methode=="normalization_r":
+        def method(pixels, stat1, stat2):
+            pixels = pixels*(stat2-stat1)+stat1
+            return pixels
+    else:
+        def method(pixels, stat1, stat2):
+            return pixels + stat1
+    return methode
 
 def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization11", plot=False):
     dict_method = DICT_METHOD
@@ -172,7 +186,7 @@ def rescaling_combined_methods(array_dataX, array_label, dict_band_X, dict_band_
     return rescaled_arrayX,rescaled_label
 
 
-def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,dict_rescale_type=None,l_s2_stat=None):
+def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,dict_rescale_type=None,l_s2_stat=None,dict_method=None):
     """Rescale combined on a batch of images"""
     batch_size=batch_X.shape[0]
     if dict_band_label is None:
@@ -184,7 +198,7 @@ def rescale_on_batch(batch_X,batch_label,dict_band_X=None,dict_band_label=None,d
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE  # by band gives the method used
     #print("Before compute batch stat mean {} min {} max {}".format(np.mean(batch_X),np.min(batch_X),np.max(batch_X)))
-    dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=None)
+    dict_stat=compute_batch_stats(batch_X,batch_label,dict_band_X,dict_band_label,dict_rescale_type,dict_method=dict_method)
     for i in range(batch_size): #Rescale all the image on the batch
         if l_s2_stat is not None:  # TODO adapt to extract the mean for the batch
             # print("BEFORE UPDATE {}".format(dict_stat))
@@ -276,6 +290,7 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     return dict_stat
 
     #apply a normalization without computing the stats !
+
 
 
 def get_minmax_fromcsv(tile_id,path_csv,band,convert=CONVERTOR):
