@@ -29,6 +29,7 @@ dependencies:
       - earthengine-api
       - click
       - ruamel.yaml
+      - tensorflow-estimator==2.1.*
       #- pyaml
       #- sklearn
       #- seaborn

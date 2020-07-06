@@ -68,7 +68,7 @@ def compute_one_image_stat(array_image,dict_band,stats):
     return dict_stat
 
 
-def normalize_one_image(array_image,dict_band,rescale_type="normalization",dict_method=None):
+def normalize_one_image(array_image,dict_band,rescale_type="normalization11",dict_method=None):
     if dict_method is None:
         dict_method=DICT_METHOD
     dict_stat = compute_one_image_stat(array_image,dict_band=dict_band,stats=dict_method[rescale_type])
@@ -109,6 +109,12 @@ def rescaling_function(methode):
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / (stat2 - stat1)
             return pixels
+
+    elif methode=="normalization11": #normalize between -1 and 1
+        def method(pixels, stat1, stat2):
+            pixels=2*(pixels-stat1)/(stat2-stat1)+1
+            return pixels
+
     elif methode == "standardization":
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / stat2
@@ -121,8 +127,8 @@ def rescaling_function(methode):
     return method
 
 
-def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization", plot=False):
-    dict_method = {"standardization": "mean_std", "centering": "mean_std", "normalization": "min_max"}
+def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization11", plot=False):
+    dict_method = DICT_METHOD
     assert rescale_type in dict_method, "Rescaling undefined {} not in ".format(rescale_type, dict_method)
     dict_stat = compute_image_stats(array_dataX, array_label, dict_bandX=dict_band_X, dictlabel=dict_band_label,
                                     plot=plot, stats=dict_method[rescale_type])

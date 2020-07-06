@@ -151,19 +151,21 @@ class GAN():
 
         for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
             x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                       padding=model_yaml["padding"], name="g_conv{}".format(i), activation="relu")(x)
+                       padding=model_yaml["padding"], name="g_conv{}".format(i))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                    name="g_{}_bn".format(i))(x)
+            x=ReLU(name="g_{}_lay_relu".format(i))(x)
 
         for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
             x = build_resnet_block(x, id=j)
 
         for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
             x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                       padding=model_yaml["padding"], activation="relu",
+                       padding=model_yaml["padding"],
                        name="g_conv_after_resnetblock{}".format(i))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                    name="g_after_resnetblock{}_bn2".format(i))(x)
+            x=ReLU(name="g_after_resnetblock_relu_{}".format(i))(x)
         # The last layer
         x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
@@ -187,7 +189,7 @@ class GAN():
         x = ZeroPadding2D(
             padding=(1, 1), name="d_pad_0")(x)
         x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv1")(x)
-        x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn1")(x)
+        #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn1")(x) avoid BN to the input lay
         # layer 2
         x = ZeroPadding2D(padding=(1, 1), name="d_pad2")(x)
         x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv2")(x)
