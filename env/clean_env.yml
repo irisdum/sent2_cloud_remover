@@ -34,4 +34,4 @@ dependencies:
       #- seaborn
       #- pandas==0.22.0
       #- tensorflow==2.0.0a0
-  #- tensorflow-estimator=2*
+
