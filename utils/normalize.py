@@ -120,13 +120,23 @@ def rescaling_function(methode):
             pixels = (pixels - stat1) / stat2
             pixels = np.clip(pixels, -1.0, 1.0)
             return pixels
-
     elif methode == "standardization":
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / stat2
             pixels = np.clip(pixels, -1.0, 1.0)
             pixels = (pixels + 1.0) / 2.0
             return pixels
+    elif methode=="normalization11_r":
+         def method(pixels, stat1, stat2):
+             pixels = (pixels+1)/2*(stat2-stat1)+1
+             return pixels
+    elif methode=="normalization_r":
+        def method(pixels, stat1, stat2):
+            pixels = pixels*(stat2-stat1)+stat1
+            return pixels
+    elif methode == "centering_r":
+        def method(pixels, stat1, stat2):
+            return pixels + stat1
     else:
         def method(pixels, stat1, stat2):
             return pixels - stat1
@@ -145,7 +155,7 @@ def reverse_norm_function(methode):
     else:
         def method(pixels, stat1, stat2):
             return pixels + stat1
-    return methode
+    return method
 
 def rescaling(array_dataX, array_label, dict_band_X, dict_band_label, rescale_type="normalization11", plot=False):
     dict_method = DICT_METHOD
