@@ -127,7 +127,7 @@ def rescaling_function(methode):
             return pixels
     elif methode=="normalization11_r":
          def method(pixels, stat1, stat2):
-             pixels = (pixels+1)/2*(stat2-stat1)+1
+             pixels = (pixels+1)/2*(stat2-stat1)+stat1
              return pixels
     elif methode=="normalization_r":
         def method(pixels, stat1, stat2):
