@@ -112,13 +112,13 @@ def rescaling_function(methode):
 
     elif methode=="normalization11": #normalize between -1 and 1
         def method(pixels, stat1, stat2):
-            pixels=2*(pixels-stat1)/(stat2-stat1)+1
+            pixels=2*(pixels-stat1)/(stat2-stat1)-1
             return pixels
     elif methode == "standardization11":
 
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / stat2
-            pixels = np.clip(pixels, -1.0, 1.0)
+            #pixels = np.clip(pixels, -1.0, 1.0)
             return pixels
 
     elif methode == "standardization":
