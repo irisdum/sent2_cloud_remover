@@ -395,7 +395,7 @@ class GAN():
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
             if un_rescale: #remove the normalization made on the data
-                assert path_csv is not None, "Do not unrescale if path_csv  {}".format(path_csv)
+                assert self.path_csv is not None, "Do not unrescale if path_csv  {}".format(path_csv)
                 ldict_stat=csv_2_dictstat(l_image_id,self.path_csv)
                 _,batch_res=rescale_on_batch(batch_res, batch_res, dict_band_X=self.dict_band_label, dict_band_label=self.dict_band_label,
                                  l_s2_stat=ldict_stat, dict_method=None,dict_rescale_type=DICT_RESCALE_REVERSE)
