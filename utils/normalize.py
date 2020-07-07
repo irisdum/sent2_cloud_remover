@@ -114,6 +114,16 @@ def rescaling_function(methode):
         def method(pixels, stat1, stat2):
             pixels=2*(pixels-stat1)/(stat2-stat1)-1
             return pixels
+    elif methode=="center_norm11":
+        def method(pixels, stat1, stat2):
+            val=(stat2-stat1)/2
+            pixels=(pixels-val)/val
+            return pixels
+    elif methode=="center_norm11_r":
+        def method(pixels, stat1, stat2):
+            val = (stat2 - stat1) / 2
+            pixels = pixels*val+val
+            return pixels
     elif methode == "standardization11":
         def method(pixels, stat1, stat2):
             pixels = (pixels - stat1) / stat2
