@@ -397,9 +397,11 @@ class GAN():
             if un_rescale: #remove the normalization made on the data
                 assert self.path_csv is not None, "Do not unrescale if path_csv  {}".format(path_csv)
                 ldict_stat=csv_2_dictstat(l_image_id,self.path_csv)
-                _,batch_res=rescale_on_batch(batch_res, batch_res, dict_band_X=self.dict_band_label, dict_band_label=self.dict_band_label,
-                                 l_s2_stat=ldict_stat, dict_method=None,dict_rescale_type=DICT_RESCALE_REVERSE)
-            assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,batch.shape)
+                _,batch_res=rescale_on_batch(batch, batch_res, dict_band_X=self.dict_band_X,
+                                             dict_band_label=self.dict_band_label,l_s2_stat=ldict_stat,
+                                             dict_method=None,dict_rescale_type=DICT_RESCALE_REVERSE)
+            assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
+                                                                                                                      batch.shape)
             if path_save is not None:
                 # we store the data at path_save
                 for i in range(batch_res.shape[0]):
