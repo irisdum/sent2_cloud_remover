@@ -25,7 +25,7 @@
     <node id="ThermalNoiseRemoval">
     <operator>ThermalNoiseRemoval</operator>
     <sources>
-      <sourceProduct refid="SUbset"/>
+      <sourceProduct refid="Subset"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <selectedPolarisations/>

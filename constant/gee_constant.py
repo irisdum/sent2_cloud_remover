@@ -57,7 +57,7 @@ DICT_RESCALE_REVERSE={"R":"center_norm11_r","G":"center_norm11_r","B":"center_no
               "VH":"centering_r"}
 
 DICT_METHOD={"standardization": "mean_std","standardization11": "mean_std", "centering": "mean_std",
-             "normalization": "min_max","normalization11": "min_max","centering_r":"mean_std","normalization11_r":"min_max",
+             "normalization": "min_max"," ": "min_max","centering_r":"mean_std","normalization11_r":"min_max",
              "center_norm11":"min_max","center_norm11_r":"min_max"}
 
 #TRAINING CONSTANT
