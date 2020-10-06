@@ -111,7 +111,7 @@ def download_all(dic_download, sent, output_path,opt):
         dict_param = {"startDate": next_string_date(date, -1), "completionDate": next_string_date(date, 1)}
         zip_url = get_download_zip_url(image_name, dict_param, sent)
         print("DOWNLOAD_PATH")
-        download_url(zip_url, output_path,opt)
+        download_url(zip_url, output_path+image_name,opt)
 
 
 def main():
