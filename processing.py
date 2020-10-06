@@ -51,12 +51,12 @@ def combine_band(list_path_vrt, output_dir):
 
 
 
-def get_path_tile(band, input_dir):
+def get_path_tile(band, input_dir,opt="dim"):
     """Given the input directory returns a list of all the tiles which representes this band"""
     assert os.path.isdir(input_dir), "Wrong input directory {}".format(input_dir)
     assert input_dir[-1] == "/", "The path of the input dir should end with /"
-    l = glob.glob("{}{}*.tif".format(input_dir, band))
-    assert len(l) > 0, "No images {}{}*.tif found".format(input_dir, band)
+    l = glob.glob("{}{}*.{}".format(input_dir, band,opt))
+    assert len(l) > 0, "No images {}{}*.{} found".format(input_dir, band,opt)
     return l
 
 

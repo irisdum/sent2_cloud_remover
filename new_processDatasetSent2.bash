@@ -65,7 +65,7 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
   while IFS= read -r poly; do
     targetFilePrefix="process1_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B2,B3,B4,B8" -Pgeometry="${poly}" -t  ${targetFile} ${sourceFile}
+    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B2,B3,B4,B8" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
   echo "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
