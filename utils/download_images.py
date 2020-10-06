@@ -5,6 +5,7 @@ from auscophub.saraclient import searchSara, makeUrlOpener
 import pandas as pd
 import requests
 import zipfile
+import os
 
 from find_image import next_string_date
 from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM
@@ -96,7 +97,7 @@ def download_url(zip_file_url, output_path="",opt="zip"):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     print(z)
     if opt=="zip":
-        z.write(output_path+"."+opt)
+        os.system("wget {}".format(zip_file_url))
     else:
         z.extractall(output_path+opt)
 
