@@ -22,10 +22,12 @@ dependencies:
   - scikit-learn
   - conda-forge::statsmodels
   - scipy<=1.2.0
+  - cudnn
+  - earthengine-api
+  - six>=1.13.0
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
-      - earthengine-api
       - click
       - ruamel.yaml
       - tensorflow-estimator==2.1.*

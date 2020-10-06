@@ -6,12 +6,12 @@ CCP=50
 geojson_file=confs/train_kangaroo.geojson
 geojson_utm_file=confs/train_kangaroo_utm2.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
-graph_xml_sent1=snap-confs/calibrate_sent1_v3.xml
+graph_xml_sent1=snap-confs/calibrate_sent1_zs.xml
 source_directory=/datastore/dum031/data/dataset9/
 target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
-graph_xml_sent2=snap-confs/calibrate_sent2.xml
+graph_xml_sent2=snap-confs/calibrate_sent2_zs.xml
 output_split_dir_name=input_large_dataset
 split_test=0.99
 split_train=0.0005
@@ -77,7 +77,10 @@ train_model:
 	@sbatch gan_train.sh ${path_model_yaml}  ${path_train_yaml}
 
 install_snap:
-	@echo "Not implemented yet"
+	@wget http://step.esa.int/downloads/7.0/installers/esa-snap_all_unix_7_0.sh
+	chmod +x esa-snap_all_unix_7_0.sh
+	./esa-snap_all_unix_7_0.sh
+	@echo "Then run PATH=$PATH:path_to_snap_install/bin"
 
 download_to_split:
 	download_image
