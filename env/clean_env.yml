@@ -25,6 +25,7 @@ dependencies:
   - cudnn
   - earthengine-api
   - six>=1.13.0
+  - notebook
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0
