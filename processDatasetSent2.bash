@@ -48,7 +48,7 @@ removeExtension() {
 mkdir -p "${targetDirectory}"
 
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
-for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
+for F in $(ls -1d "${sourceDirectory}"/S2*.zip); do
   # echo "$F"
   sourceFile="${F}"
   # During the preprocess we split the images on smaller tiles
@@ -65,10 +65,9 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
     ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
     i=$((i+1))
   done<"${wktFile}"
-  echo "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
-  temp_cloud="temp_cloud_mask_$(removeExtension "$(basename ${F})").tif"
-  fmask_sentinel2Stacked.py -o "${targetDirectory}/${temp_cloud}" --safedir ${F} -v --mincloudsize 30 --cloudprobthreshold 5
-  gdal_translate "${targetDirectory}/${temp_cloud}" -ot Uint16 -tr 10 10 "${targetDirectory}/cm_$(removeExtension "$(basename ${F})")_prepro_.tif"
-
+  #echo "${targetDirectory}cloud_mask_$(removeExtension "$(basename ${F})").tif"
+  #temp_cloud="temp_cloud_mask_$(removeExtension "$(basename ${F})").tif"
+  #fmask_sentinel2Stacked.py -o "${targetDirectory}/${temp_cloud}" --safedir ${F} -v --mincloudsize 30 --cloudprobthreshold 5
+  #gdal_translate "${targetDirectory}/${temp_cloud}" -ot Uint16 -tr 10 10 "${targetDirectory}/cm_$(removeExtension "$(basename ${F})")_prepro_.tif"
 done
 
