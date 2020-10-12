@@ -22,12 +22,10 @@ dependencies:
   - scikit-learn
   - conda-forge::statsmodels
   - scipy<=1.2.0
-<<<<<<< HEAD
-=======
   - cudnn
   - earthengine-api
   - six>=1.13.0
->>>>>>> 41d75d529fea18d7fa1ae01e68fd15e98ccb3cfb
+  - notebook
   - pip :
       - geojson==2.5.0
       - buzzard==0.6.0

@@ -10,5 +10,6 @@
 /**/*.qpj
 /**/*.cpg
 /**/*.dbf
-
+/notebooks/
+/old_notebooks/
 
