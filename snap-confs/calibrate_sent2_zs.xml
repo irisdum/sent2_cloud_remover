@@ -21,21 +21,10 @@
         <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
       </parameters>
     </node>
-     <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Resample"/>
-    </sources>
-    <parameters>
-        <sourceBands>${Bands}</sourceBands>
-      <geoRegion>${geometry}</geoRegion>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node>
      <node id="Write">
     <operator>Write</operator>
     <sources>
-      <sourceProduct refid="Subset"/>
+      <sourceProduct refid="Resample"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <file>${file}</file>
