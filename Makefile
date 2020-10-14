@@ -6,9 +6,9 @@ CCP=50
 geojson_file=confs/train_kangaroo.geojson
 geojson_utm_file=confs/train_kangaroo_utm2.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
-source_directory=/home/idumeur/data/dataset1/
-graph_xml_sent1=snap-confs/calibrate_sent1_zs.xml
-target_directory=${source_directory}prepro2/
+source_directory=/home/idumeur/data/dataset2/
+graph_xml_sent1=snap-confs/calibrate_sent1_zs_sub.xml
+target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2_zs.xml
@@ -20,7 +20,7 @@ clouds=True
 path_train_yaml=GAN_confs/train.yaml
 path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
-s2_im_t1=S2A_MSIL1C_20191201T000241_N0208_R030_T55HGB_20191201T012129
+s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T55HGB_20200204T011552
 s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T55HGB_20191022T012314
 training_dir=/home/dum031/trainings/K0_GAN_DBN_SIG_LRELU/
 training_number=16
@@ -57,7 +57,7 @@ geojson_2_wkt:
 
 convert_sent1:
 		@echo "Starting preprocessing Sentinel 1"
-		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
+		#./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
 		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 convert_sent2:
 	@echo "Starting preprocessing Sentinel 2"
