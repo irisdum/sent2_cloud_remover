@@ -23,7 +23,7 @@ dependencies:
   - conda-forge::statsmodels
   - scipy<=1.2.0
   - cudnn
-  - earthengine-api
+  - earthengine-api>=0.1.231
   - six>=1.13.0
   - notebook
   - pip :
