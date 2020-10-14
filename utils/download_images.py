@@ -97,7 +97,7 @@ def download_url(zip_file_url, output_path="",opt="zip"):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     print(z)
     if opt=="zip":
-        os.system("wget {}".format(zip_file_url))
+        os.system("wget {} -P {}".format(zip_file_url,output_path))
     else:
         z.extractall(output_path+opt)
 
@@ -112,7 +112,7 @@ def download_all(dic_download, sent, output_path,opt):
         dict_param = {"startDate": next_string_date(date, -1), "completionDate": next_string_date(date, 1)}
         zip_url = get_download_zip_url(image_name, dict_param, sent)
         print("DOWNLOAD_PATH")
-        download_url(zip_url, output_path+image_name,opt)
+        download_url(zip_url, output_path,opt)
 
 
 def main():
