@@ -28,6 +28,7 @@ pred_dataset=${target_directory}${output_split_dir_name}/test/
 weight=295
 pref_pred_image=tr${training_number}_w_${weight}_test_d6
 output_mosaic_dir=${target_directory}pred_tr${training_number}_i${weight}/
+snap_property_file=/srv/osirim/snap/etc/snap.properties
 
 download_images_from_s2name:
 	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
@@ -57,8 +58,8 @@ geojson_2_wkt:
 
 convert_sent1:
 		@echo "Starting preprocessing Sentinel 1"
-		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
-		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
+		./new_processDatasetSent1.bash ${graph_xml_sent1} ${snap_property_file} ${source_directory}date1 ${target_directory}date1 ${wkt_file}
+		./new_processDatasetSent1.bash ${graph_xml_sent1} ${snap_property_file} ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 convert_sent2:
 	@echo "Starting preprocessing Sentinel 2"
 	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}

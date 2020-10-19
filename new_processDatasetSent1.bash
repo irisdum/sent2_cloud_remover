@@ -3,7 +3,7 @@
 # adapt this path to your needs
 
 export PATH=$PATH:/srv/osirim/idumeur/snap/bin
-gptPath="gpt -e"
+gptPath="gpt -e -c 16G -q 16 -x"
 ############################################
 # Command line handling
 ############################################
