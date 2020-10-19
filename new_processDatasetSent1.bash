@@ -4,7 +4,7 @@
 
 
 export PATH=$PATH:/srv/osirim/idumeur/snap/bin
-gptPath="gpt -e"
+gptPath="gpt -e -x -q 120"
 ############################################
 # Command line handling
 ############################################
