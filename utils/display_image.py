@@ -1,4 +1,5 @@
 # File with all the functions used to display mages in jupyter Notebook are written
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +16,7 @@ from utils.vi import compute_vi, diff_metric, diff_relative_metric
 import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sn
-
+import glob
 def plot_allbands_hist(path_tif, ax):
     raster = gdal.Open(path_tif)
     image = raster.ReadAsArray()
@@ -36,6 +37,22 @@ def plot_allbands_hist(path_tif, ax):
         ax.legend(l_legend)
     if ax is None:
         plt.show()
+
+
+def open_sentinel2(path_s2_dir, bands=None):
+    if bands is None:
+        bands = ["B4", "B3", "B2", "B8"]
+    l_arr = []
+    for b in bands:
+        lpath_img = glob.glob(path_s2_dir + "{}*.img".format(b))
+        assert len(lpath_img) > 0, "no image found at {}".format(path_s2_dir + "{}*.img".format(b))
+        path_img = lpath_img[0]
+        l_arr += open_array(path_img)
+    return np.array(l_arr)
+
+def open_array(path_img):
+    raster=gdal.Open(path_img,gdal.GA_ReadOnly)
+    return raster.ReadAsArray()
 
 
 def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=None, band=0, cm_band=True, ax=None):
@@ -78,9 +95,11 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
         plot_sent2(raster_array, mode, name_image=name_image, bound_y=bound_y, bound_x=bound_x, ax=ax)
 
 
-def info_image(path_tif):
-    raster = gdal.Open(path_tif)
+def info_image(path_img):
+    assert os.path.isfile(path_img),"No img found at {}".format(path_img)
+    raster = gdal.Open(path_img,gdal.GA_ReadOnly)
     n_band = raster.RasterCount
+    print("{} bands found ".format(n_band))
     for b in range(n_band):
         # Read the raster band as separate variable
         band = raster.GetRasterBand(b + 1)
@@ -171,11 +190,11 @@ def plot_s2(raster_array, opt="RGB"):
     plt.show()
 
 
-def plot_one_band(raster_array, fig, ax, title="",cmap="bone"):
+def plot_one_band(raster_array, fig, ax, title="",cmap="bone",vminmax=(None, None)):
     # print("Imagse shape {}".format(raster_array))
     if ax is None:
         fig, ax = plt.subplots()
-    im = ax.imshow(raster_array, cmap='bone')
+    im = ax.imshow(raster_array, cmap=cmap,vmin=vminmax[0], vmax=vminmax[1])
     ax.set_title(title)
     fig.colorbar(im, ax=ax, orientation='vertical')
     if ax is None:
@@ -440,10 +459,10 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
     return batch_output_sev, batch_pred_sev
 
 
-def one_band_hist(b_array,ax=None):
+def one_band_hist(b_array,ax=None,r=None):
     if ax is None:
         fig,ax=plt.subplots()
-    ax.hist(b_array.ravel(), bins=256, color="red", alpha=0.5)
+    ax.hist(b_array.ravel(), bins=256,range=r, color="red", alpha=0.5)
     ax.set_xlabel('Intensity Value')
     ax.set_ylabel('Count')
     if ax is None:

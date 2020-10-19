@@ -1,23 +1,4 @@
-#!/bin/bash
-#SBATCH --job-name=process_sent1
-#SBATCH --qos=express
-#SBATCH --time=4:00:00
-#SBATCH --ntasks-per-node=1
-#SBATCH --mem=256g
 
-# enable next line for debugging purpose
-# set -x
-
-############################################
-# User Configuration
-############################################
-
-# adapt this path to your needs
-#export PATH=~/progs/snap/bin:$PATH
-export PATH=$PATH:/datastore/dum031/code/snap/bin
-gptPath="gpt -e"
-export JAVA_OPTS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"
-export _JAVA_OPTIONS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"
 ############################################
 # Command line handling
 ############################################
