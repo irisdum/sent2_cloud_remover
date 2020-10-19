@@ -28,7 +28,7 @@ pred_dataset=${target_directory}${output_split_dir_name}/test/
 weight=295
 pref_pred_image=tr${training_number}_w_${weight}_test_d6
 output_mosaic_dir=${target_directory}pred_tr${training_number}_i${weight}/
-snap_property_file=/srv/osirim/snap/etc/snap.properties
+snap_property_file=/srv/osirim/idumeur/snap/etc/snap.properties
 
 download_images_from_s2name:
 	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
