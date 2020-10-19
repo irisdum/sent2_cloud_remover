@@ -1,34 +1,34 @@
- <graph id="Processing sentinel2">
+<graph id="Processing sentinel2">
     <version>1.0</version>
-     <node id="Read">
-    <operator>Read</operator>
-    <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${inputFile}</file>
-    </parameters>
-  </node>
-    <node id="Resample">
-      <operator>Resample</operator>
-      <sources>
-        <sourceProduct refid="Read"/>
-      </sources>
-      <parameters>
-        <targetResolution>10</targetResolution>
-        <upsampling>Bilinear</upsampling>
-        <downsampling>Mean</downsampling>
-        <flagDownsampling>First</flagDownsampling>
-        <bandResamplings>${Bands}</bandResamplings>
-        <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
-      </parameters>
+    <node id="Read">
+        <operator>Read</operator>
+        <sources/>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+            <file>${inputFile}</file>
+        </parameters>
     </node>
-     <node id="Write">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="Resample"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${file}</file>
-      <formatName>BEAM-DIMAP</formatName>
-    </parameters>
-  </node>
-  </graph>
+    <node id="Resample">
+        <operator>Resample</operator>
+        <sources>
+            <sourceProduct refid="Read"/>
+        </sources>
+        <parameters>
+            <targetResolution>10</targetResolution>
+            <upsampling>Bilinear</upsampling>
+            <downsampling>Mean</downsampling>
+            <flagDownsampling>First</flagDownsampling>
+            <bandResamplings>${Bands}</bandResamplings>
+            <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+        </parameters>
+    </node>
+    <node id="Write">
+        <operator>Write</operator>
+        <sources>
+            <sourceProduct refid="Resample"/>
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+            <file>${file}</file>
+            <formatName>BEAM-DIMAP</formatName>
+        </parameters>
+    </node>
+</graph>

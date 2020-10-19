@@ -17,6 +17,8 @@ import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sn
 import glob
+
+
 def plot_allbands_hist(path_tif, ax):
     raster = gdal.Open(path_tif)
     image = raster.ReadAsArray()
@@ -50,8 +52,9 @@ def open_sentinel2(path_s2_dir, bands=None):
         l_arr += open_array(path_img)
     return np.array(l_arr)
 
+
 def open_array(path_img):
-    raster=gdal.Open(path_img,gdal.GA_ReadOnly)
+    raster = gdal.Open(path_img, gdal.GA_ReadOnly)
     return raster.ReadAsArray()
 
 
@@ -96,8 +99,8 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
 
 
 def info_image(path_img):
-    assert os.path.isfile(path_img),"No img found at {}".format(path_img)
-    raster = gdal.Open(path_img,gdal.GA_ReadOnly)
+    assert os.path.isfile(path_img), "No img found at {}".format(path_img)
+    raster = gdal.Open(path_img, gdal.GA_ReadOnly)
     n_band = raster.RasterCount
     print("{} bands found ".format(n_band))
     for b in range(n_band):
@@ -190,11 +193,11 @@ def plot_s2(raster_array, opt="RGB"):
     plt.show()
 
 
-def plot_one_band(raster_array, fig, ax, title="",cmap="bone",vminmax=(None, None)):
+def plot_one_band(raster_array, fig, ax, title="", cmap="bone", vminmax=(None, None)):
     # print("Imagse shape {}".format(raster_array))
     if ax is None:
         fig, ax = plt.subplots()
-    im = ax.imshow(raster_array, cmap=cmap,vmin=vminmax[0], vmax=vminmax[1])
+    im = ax.imshow(raster_array, cmap=cmap, vmin=vminmax[0], vmax=vminmax[1])
     ax.set_title(title)
     fig.colorbar(im, ax=ax, orientation='vertical')
     if ax is None:
@@ -203,7 +206,7 @@ def plot_one_band(raster_array, fig, ax, title="",cmap="bone",vminmax=(None, Non
 
 def display_one_image_vi(raster_array, fig, ax, vi, dict_band=None, title=None, cmap=None, vminmax=(0, 1),
                          path_csv=None, image_id=None):
-    raster_vi = compute_vi(raster_array, vi, dict_band,path_csv=path_csv,image_id=image_id)
+    raster_vi = compute_vi(raster_array, vi, dict_band, path_csv=path_csv, image_id=image_id)
 
     if cmap is None:
         cmap = "RdYlGn"
@@ -225,11 +228,12 @@ def display_compare_vi(image_pre, image_post, vi, fig, ax, dict_band_pre, dict_b
     if ax is None:
         fig, ax = plt.subplots(1, 4, figsize=figuresize)
     display_one_image_vi(image_pre, fig, ax[0], vi, dict_band_pre, title="vi {} image pre".format(vi), vminmax=vminmax,
-                         path_csv=path_csv,image_id=image_id)
+                         path_csv=path_csv, image_id=image_id)
     display_one_image_vi(image_post, fig, ax[1], vi, dict_band_post, title="vi {} image post".format(vi),
-                         vminmax=vminmax,path_csv=path_csv,image_id=image_id)
-    dr_vi = diff_relative_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post,path_csv=path_csv,image_id=image_id)
-    d_vi = diff_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post,path_csv=path_csv,image_id=image_id)
+                         vminmax=vminmax, path_csv=path_csv, image_id=image_id)
+    dr_vi = diff_relative_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post, path_csv=path_csv,
+                                 image_id=image_id)
+    d_vi = diff_metric(image_pre, image_post, vi, dict_band_pre, dict_band_post, path_csv=path_csv, image_id=image_id)
     d_im = ax[2].imshow(d_vi, cmap="bwr", vmin=vminmax[0], vmax=vminmax[1])
     ax[2].set_title("differenced {}".format(vi))
     fig.colorbar(d_im, ax=ax[2], orientation="vertical")
@@ -276,30 +280,33 @@ def display_final_tile(raster_array, band=None, ax=None):
     if ax is None:
         plt.show()
 
+
 def plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi, image_id=None, path_csv=None):
     plot_pre_post_pred(image_pre_fire, image_post_fire, image_pred)
     fig, ax = plt.subplots(1, 3, figsize=(40, 10))
     # vi_pre=compute_vi(image_pre_fire,vi)
     if path_csv is not None:
-        vminmax=(0,1)
+        vminmax = (0, 1)
     else:
-        vminmax=(-1,1)
+        vminmax = (-1, 1)
     display_one_image_vi(image_pre_fire, fig, ax[0], vi, dict_band={"R": [4], "NIR": [7]}, title='Pre fire', cmap=None,
-                         vminmax=vminmax,path_csv=path_csv,image_id=image_id)
+                         vminmax=vminmax, path_csv=path_csv, image_id=image_id)
     # vi_post=compute_vi(image_post,vi)
     display_one_image_vi(image_post_fire, fig, ax[1], vi, dict_band=None, title='GT post fire', cmap=None,
-                         vminmax=vminmax,path_csv=path_csv,image_id=image_id)
+                         vminmax=vminmax, path_csv=path_csv, image_id=image_id)
     # vi_pred=compute_vi(image_pred,vi)
     display_one_image_vi(image_pred, fig, ax[2], vi, dict_band=None, title='Prediction post fire', cmap=None,
-                         vminmax=vminmax,path_csv=path_csv,image_id=image_id)
+                         vminmax=vminmax, path_csv=path_csv, image_id=image_id)
     plt.show()
 
-def plot_compare_dvi(gt_dvi,pred_dvi):
+
+def plot_compare_dvi(gt_dvi, pred_dvi):
     fig2, ax2 = plt.subplots(1, 2, figsize=(20, 30))
     display_one_image_vi(gt_dvi, fig2, ax2[0], "identity", dict_band=None, title='GT Relative difference', cmap="OrRd")
     display_one_image_vi(pred_dvi, fig2, ax2[1], "identity", dict_band=None, title='Pred Relative difference',
                          cmap="OrRd")
     plt.show()
+
 
 def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi", liste_image_id=None, path_csv=None):
     """:param path_csv path to the csv file which contains min and max value"""
@@ -307,18 +314,19 @@ def compute_batch_vi(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi", li
     if n < max_im:
         max_im = n
     if liste_image_id is None:
-        liste_image_id=[None for i in range(max_im)]
+        liste_image_id = [None for i in range(max_im)]
     for i in range(max_im):
         image_pre_fire = batch_x[i, :, :, :]
         image_post_fire = batch_gt[i, :, :, :]
         image_pred = batch_predict[i, :, :, ]
         print(image_pre_fire.shape, image_post_fire.shape, image_pred.shape)
-        plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi,image_id=liste_image_id[i],path_csv=path_csv)
+        plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi, image_id=liste_image_id[i], path_csv=path_csv)
         gt_dvi = diff_metric(image_pre_fire, image_post_fire, vi, dict_band_pre={"R": [4], "NIR": [7]},
-                             dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
+                             dict_band_post=DICT_BAND_LABEL, image_id=liste_image_id[i], path_csv=path_csv)
         pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
-                               dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
+                               dict_band_post=DICT_BAND_LABEL, image_id=liste_image_id[i], path_csv=path_csv)
         plot_compare_dvi(gt_dvi, pred_dvi)
+
 
 def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None):
     if l_ax is None:
@@ -335,7 +343,7 @@ def plot_pre_post_pred(image_pre, image_post, image_pred, l_ax=None, L_band=None
         plt.show()
 
 
-def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=25):
+def plot_landclass(array_lc, ax=None, fig=None, l_land_class=None, vmin=1, vmax=25):
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 10))
     cmap, norm, boundaries = define_colormap()
@@ -344,9 +352,9 @@ def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=25)
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width, box.height])
     im = ax.imshow(array_lc, cmap=cmap, vmin=vmin, vmax=vmax)
-    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(vmax-vmin))
+    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=range(vmax - vmin))
     if l_land_class is None:
-        l_land_class=LISTE_LAND_CLASS
+        l_land_class = LISTE_LAND_CLASS
     cbar.ax.set_yticks()
     cbar.ax.set_yticklabels(l_land_class)
     # ax.legend([mpatches.Patch(color=cmap(b)) for b in boundaries[:-1]],
@@ -358,14 +366,14 @@ def plot_landclass(array_lc, ax=None, fig=None,l_land_class=None,vmin=1,vmax=25)
 
 def define_colormap(list_col=None):
     if list_col is None:
-        list_col=LISTE_COLOR
+        list_col = LISTE_COLOR
     cmap = colors.ListedColormap(list_col)
     boundaries = [i for i in range(24)]
     norm = colors.BoundaryNorm(boundaries, cmap.N, clip=True)
     return cmap, norm, boundaries
 
 
-def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_pred=None,get_stat=True):
+def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_pred=None, get_stat=True):
     if batch_pred is None:
         ncol = 5
     else:
@@ -375,7 +383,7 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
                                                                                              batch_x.shape[0])
     l_array_lc = load_tile_classif(input_dataset, path_tile, path_lc, max_im=1000)
     if get_stat:
-        batch_stat_df = compute_batch_land_class_stat(l_array_lc,path_tile)
+        batch_stat_df = compute_batch_land_class_stat(l_array_lc, path_tile)
 
     for i in range(len(path_tile)):
         fig, ax = plt.subplots(1, ncol, figsize=(15, 15))
@@ -386,10 +394,11 @@ def analyze_vege(path_tile, batch_x, batch_label, path_lc, input_dataset, batch_
         display_final_tile(batch_label[i, :, :, :], band=[3, 1, 2], ax=ax[3])
         plot_landclass(l_array_lc[i], ax=ax[4], fig=fig)
         if get_stat:
-            maj_class=batch_stat_df.iloc[i][LISTE_LAND_CLASS].sort_values(ascending=False).apply(lambda row: round(row,3))[:3].to_dict()
-            #print(maj_class)
-            print(",".join(["{} {}".format(elem,maj_class[elem]) for elem in maj_class]))
-            #ax[4].set_title(",".join(["{} {}".format(elem,maj_class[elem]) for elem in maj_class]))
+            maj_class = batch_stat_df.iloc[i][LISTE_LAND_CLASS].sort_values(ascending=False).apply(
+                lambda row: round(row, 3))[:3].to_dict()
+            # print(maj_class)
+            print(",".join(["{} {}".format(elem, maj_class[elem]) for elem in maj_class]))
+            # ax[4].set_title(",".join(["{} {}".format(elem,maj_class[elem]) for elem in maj_class]))
         if batch_pred is not None:
             display_final_tile(batch_pred[i, :, :, :], band=[0, 1, 2], ax=ax[5])
             display_final_tile(batch_pred[i, :, :, :], band=[3, 1, 2], ax=ax[6])
@@ -406,21 +415,22 @@ def display_dvi_class(dvi, ax=None, fig=None):
     if ax is None:
         plt.show()
 
-def display_fire_severity(fire_array,ax=None,fig=None,dict_burned=None,cmap='afmhot_r'):
+
+def display_fire_severity(fire_array, ax=None, fig=None, dict_burned=None, cmap='afmhot_r'):
     if dict_burned is None:
-        dict_burned=DICT_FIRE_SEV_CLASS
+        dict_burned = DICT_FIRE_SEV_CLASS
     if ax is None:
-        fig,ax=plt.subplots()
-    im=ax.imshow(fire_array, cmap=plt.cm.get_cmap(cmap,len(dict_burned)),vmin=0,vmax=len(dict_burned))
-    cbar=fig.colorbar(im, ax=ax, orientation="vertical",ticks=[i for i in range(len(dict_burned))])
+        fig, ax = plt.subplots()
+    im = ax.imshow(fire_array, cmap=plt.cm.get_cmap(cmap, len(dict_burned)), vmin=0, vmax=len(dict_burned))
+    cbar = fig.colorbar(im, ax=ax, orientation="vertical", ticks=[i for i in range(len(dict_burned))])
     print(dict_burned.keys())
     cbar.ax.set_yticklabels(dict_burned.keys())
 
 
-
-def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi",dict_burned=None,liste_image_id=None,path_csv=None):
+def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, vi="ndvi", dict_burned=None,
+                                  liste_image_id=None, path_csv=None):
     if dict_burned is None:
-        dict_burned=DICT_FIRE_SEV_CLASS
+        dict_burned = DICT_FIRE_SEV_CLASS
     n = batch_predict.shape[0]
     if n < max_im:
         max_im = n
@@ -428,19 +438,19 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
     batch_output_sev = np.ones(output_shape)
     batch_pred_sev = np.ones(output_shape)
     if liste_image_id is None:
-        liste_image_id=[None for i in range(max_im)]
+        liste_image_id = [None for i in range(max_im)]
     for i in range(max_im):
         image_pre_fire = batch_x[i, :, :, :]
         image_post_fire = batch_gt[i, :, :, :]
         image_pred = batch_predict[i, :, :, ]
         print(image_pre_fire.shape, image_post_fire.shape, image_pred.shape)
-        plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi,image_id=liste_image_id[i],path_csv=path_csv)
+        plot_compare_vi(image_pre_fire, image_post_fire, image_pred, vi, image_id=liste_image_id[i], path_csv=path_csv)
         gt_dvi = diff_metric(image_pre_fire, image_post_fire, vi, dict_band_pre={"R": [4], "NIR": [7]},
-                             dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
+                             dict_band_post=DICT_BAND_LABEL, image_id=liste_image_id[i], path_csv=path_csv)
         pred_dvi = diff_metric(image_pre_fire, image_pred, vi, dict_band_pre=DICT_BAND_X,
-                               dict_band_post=DICT_BAND_LABEL,image_id=liste_image_id[i],path_csv=path_csv)
+                               dict_band_post=DICT_BAND_LABEL, image_id=liste_image_id[i], path_csv=path_csv)
         plot_compare_dvi(gt_dvi, pred_dvi)
-        fig2,ax2=plt.subplots(3,2,figsize=(30,20))
+        fig2, ax2 = plt.subplots(3, 2, figsize=(30, 20))
         fig2.suptitle("Image {}".format(i))
         display_dvi_class(gt_dvi, ax=ax2[0, 0], fig=fig2)
         display_dvi_class(pred_dvi, ax=ax2[0, 1], fig=fig2)
@@ -452,56 +462,58 @@ def display_fire_severity_bysteps(batch_x, batch_predict, batch_gt, max_im=100, 
         batch_pred_sev[i, :, :] = fire_sev_pred
         one_band_hist(gt_dvi, ax=ax2[1, 0])
         one_band_hist(pred_dvi, ax=ax2[1, 1])
-        display_fire_severity(fire_sev_gt, ax2[2, 0], fig2,dict_burned=dict_burned)
-        display_fire_severity(fire_sev_pred, ax2[2, 1], fig2,dict_burned=dict_burned)
+        display_fire_severity(fire_sev_gt, ax2[2, 0], fig2, dict_burned=dict_burned)
+        display_fire_severity(fire_sev_pred, ax2[2, 1], fig2, dict_burned=dict_burned)
         plt.show()
 
     return batch_output_sev, batch_pred_sev
 
 
-def one_band_hist(b_array,ax=None,r=None):
+def one_band_hist(b_array, ax=None, r=None):
     if ax is None:
-        fig,ax=plt.subplots()
-    ax.hist(b_array.ravel(), bins=256,range=r, color="red", alpha=0.5)
+        fig, ax = plt.subplots()
+    ax.hist(b_array.ravel(), bins=256, range=r, color="red", alpha=0.5)
     ax.set_xlabel('Intensity Value')
     ax.set_ylabel('Count')
     if ax is None:
         plt.show()
 
 
-def plot_cfmat(cf_mat,class_firesev=None,title=""):
+def plot_cfmat(cf_mat, class_firesev=None, title=""):
     if class_firesev is None:
-        class_firesev=DICT_FIRE_SEV_CLASS.keys()
-    df_cm=pd.DataFrame(cf_mat, index=class_firesev,
-                 columns=class_firesev)
-    fig,ax=plt.subplots(figsize=(20,20))
-    sn.heatmap(df_cm, annot=True,cmap="Blues")
+        class_firesev = DICT_FIRE_SEV_CLASS.keys()
+    df_cm = pd.DataFrame(cf_mat, index=class_firesev,
+                         columns=class_firesev)
+    fig, ax = plt.subplots(figsize=(20, 20))
+    sn.heatmap(df_cm, annot=True, cmap="Blues")
     ax.set_ylabel('True label')
     ax.set_xlabel('Predicted label')
     fig.suptitle(title)
     plt.show()
 
 
-def plot_all_cfmat(cf_mat,class_firesev=None):
-    plot_cfmat(cf_mat,class_firesev,"Confusion matrix not normalized")
-    plot_cfmat(normalize_cf(cf_mat,0), class_firesev,"Confusion matrix normalized by column")
-    plot_cfmat(normalize_cf(cf_mat, 1), class_firesev,"Confusion matrix normalized by line")
+def plot_all_cfmat(cf_mat, class_firesev=None):
+    plot_cfmat(cf_mat, class_firesev, "Confusion matrix not normalized")
+    plot_cfmat(normalize_cf(cf_mat, 0), class_firesev, "Confusion matrix normalized by column")
+    plot_cfmat(normalize_cf(cf_mat, 1), class_firesev, "Confusion matrix normalized by line")
 
-def print_stats(cf_mat,class_firesev):
+
+def print_stats(cf_mat, class_firesev):
     print("Nber of True label on each categorie : ")
-    tot=cf_mat.astype(np.float).sum(axis=1)
-    for i,elem in enumerate(class_firesev):
-        print("Classe {} pixel percentage {:.2%}".format(elem,tot[i]/np.sum(tot)))
-    n=len(class_firesev)
-    print("Accuracy {} Recall {}".format(np.trace(normalize_cf(cf_mat,1))/n,np.trace(normalize_cf(cf_mat,0))/n))
+    tot = cf_mat.astype(np.float).sum(axis=1)
+    for i, elem in enumerate(class_firesev):
+        print("Classe {} pixel percentage {:.2%}".format(elem, tot[i] / np.sum(tot)))
+    n = len(class_firesev)
+    print("Accuracy {} Recall {}".format(np.trace(normalize_cf(cf_mat, 1)) / n, np.trace(normalize_cf(cf_mat, 0)) / n))
 
-def plot_hist_vege(conf_vege,weights=None):
-    w,bins=np.histogram(np.array(conf_vege),range=(1,25),bins=24)
-    w=w/conf_vege.size
+
+def plot_hist_vege(conf_vege, weights=None):
+    w, bins = np.histogram(np.array(conf_vege), range=(1, 25), bins=24)
+    w = w / conf_vege.size
     if weights is not None:
-        w=list(np.divide(np.array(w),np.array(weights)))
-    fix,ax=plt.subplots(figsize=(20,5))
-    counts, bins, patches=ax.hist(bins[:-1],bins,align="mid",rwidth=0.5,weights=w)
+        w = list(np.divide(np.array(w), np.array(weights)))
+    fix, ax = plt.subplots(figsize=(20, 5))
+    counts, bins, patches = ax.hist(bins[:-1], bins, align="mid", rwidth=0.5, weights=w)
     ax.set_xticks(bins)
     plt.show()
     return w
@@ -539,22 +551,21 @@ def proba_wc_vege(batch_classif, batch_confusion, plot=True, N_tot=24, all_val=T
         return dic_final
 
 
-def histo_val(dict_freq, ax=None, list_class=None,title=""):
+def histo_val(dict_freq, ax=None, list_class=None, title=""):
     if ax is None:
         fig, ax = plt.subplots(figsize=(20, 5))
         fig.suptitle(title)
-    ax.bar(dict_freq.keys(), dict_freq.values(), tick_label=list_class,width=0.8)
+    ax.bar(dict_freq.keys(), dict_freq.values(), tick_label=list_class, width=0.8)
     if list_class is not None:
-        ax.set_xticks([i for i in range(0,len(list_class)+1)],list_class)
-        ax.set_xticklabels(list_class,rotation=70)
-    #ax.set_xticks(dict_freq.keys())
+        ax.set_xticks([i for i in range(0, len(list_class) + 1)], list_class)
+        ax.set_xticklabels(list_class, rotation=70)
+    # ax.set_xticks(dict_freq.keys())
     plt.show()
 
 
-
-def display_silhouette(labels,silhouette_vals,ax1=None):
+def display_silhouette(labels, silhouette_vals, ax1=None):
     if ax1 is None:
-        fig1,ax1=plt.subplots()
+        fig1, ax1 = plt.subplots()
     # Silhouette plot
     y_ticks = []
     y_lower, y_upper = 0, 0
@@ -576,9 +587,8 @@ def display_silhouette(labels,silhouette_vals,ax1=None):
     ax1.set_title('Silhouette plot for the various clusters', y=1.02)
 
 
-def create_histo(batch,dict_class,title=""):
+def create_histo(batch, dict_class, title=""):
     unique, counts = np.unique(batch, return_counts=True)
-    dict_histo=dict(zip(unique,counts/np.sum(counts)))
+    dict_histo = dict(zip(unique, counts / np.sum(counts)))
     print(dict_histo)
-    histo_val(dict_histo, ax=None, list_class=dict_class.keys(),title=title)
-
+    histo_val(dict_histo, ax=None, list_class=dict_class.keys(), title=title)
