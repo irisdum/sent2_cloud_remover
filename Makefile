@@ -1,14 +1,14 @@
 begin_date1=2019-10-20
 end_date1=2019-10-30
-begin_date2=2019-12-01
-end_date2=2019-12-02
+begin_date2=2020-02-01
+end_date2=2020-02-05
 CCP=50
 geojson_file=confs/train_kangaroo.geojson
 geojson_utm_file=confs/train_kangaroo_utm2.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
-source_directory=/home/idumeur/data/dataset2/
-graph_xml_sent1=snap-confs/calibrate_sent1_zs_sub.xml
-target_directory=${source_directory}prepro1/
+source_directory=/srv/osirim/idumeur/data/dataset2/
+graph_xml_sent1=snap-confs/calibrate_sent1_zs.xml
+target_directory=${source_directory}prepro2/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2_zs.xml
@@ -57,7 +57,7 @@ geojson_2_wkt:
 
 convert_sent1:
 		@echo "Starting preprocessing Sentinel 1"
-		#./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
+		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
 		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 convert_sent2:
 	@echo "Starting preprocessing Sentinel 2"

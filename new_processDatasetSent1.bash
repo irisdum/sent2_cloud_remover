@@ -2,7 +2,7 @@
 ################################
 # adapt this path to your needs
 
-export PATH=$PATH:/srv/osirim/idumeur/snap/bin
+export PATH=$PATH:/srv/osirim/idumeur/snap/bin/
 
 ############################################
 # Command line handling
