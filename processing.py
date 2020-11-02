@@ -51,11 +51,11 @@ def combine_band(list_path_vrt, output_dir):
 
 
 
-def get_path_tile(band, input_dir,opt="dim"):
+def get_path_tile(band, input_dir,opt="img"):
     """Given the input directory returns a list of all the tiles which representes this band"""
     assert os.path.isdir(input_dir), "Wrong input directory {}".format(input_dir)
     assert input_dir[-1] == "/", "The path of the input dir should end with /"
-    l = glob.glob("{}{}*.{}".format(input_dir, band,opt))
+    l = glob.glob("{}**{}*.{}".format(input_dir, band,opt),recursive=True) # In each .data dir take the img image
     assert len(l) > 0, "No images {}{}*.{} found".format(input_dir, band,opt)
     return l
 
@@ -147,6 +147,19 @@ def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_g
 
 
 def tiling_sent(list_image, sent, output_dir, path_geojson, t,overlap):
+    """
+
+    Args:
+        list_image:
+        sent:
+        output_dir:
+        path_geojson:
+        t:
+        overlap:
+
+    Returns:
+
+    """
     create_safe_directory(output_dir)
     if sent==2:
         total_image = combine_band(list_image, output_dir) #for Sentinel 2 combien the images
@@ -183,14 +196,17 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
     for b in list_band:
         # reprojection of sentinel 2 images and warp on the input_geojon
         list_image = get_path_tile(b, input_dir)
-        output_name = mosaic_image(list_image, input_dir)
+        print("[INFO] for sent {} we found {} for band {}".format(sent,list_image,b))
+        output_name = mosaic_image(list_image, input_dir) #just regroup the image if they belong to the same mosaic
         print("The image {} has been created".format(output_name))
-        output_name = reproject_sent(output_name, output_dir, path_geojson)
+        #output_name = reproject_sent(output_name, output_dir, path_geojson) #Not needed
         # if sentinel 2 : convert to Float 32
         # if sent==2:
         #     output_name=convert2float32(output_name, output_dir)
         list_band_vrt += [output_name]
     return list_band_vrt
+
+
 
 
 if __name__ == '__main__':
