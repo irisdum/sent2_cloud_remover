@@ -8,7 +8,7 @@ geojson_utm_file=confs/train_kangaroo_utm2.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
 source_directory=/srv/osirim/idumeur/data/dataset2/
 graph_xml_sent1=snap-confs/calibrate_sent1_zs_utm55s.xml
-target_directory=${source_directory}prepro3/
+target_directory=${source_directory}prepro5/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2_zs.xml
@@ -62,7 +62,7 @@ convert_sent1:
 		./new_processDatasetSent1.bash ${graph_xml_sent1} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 convert_sent2:
 	@echo "Starting preprocessing Sentinel 2"
-	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
+	#./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
 	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 
 tiling:
