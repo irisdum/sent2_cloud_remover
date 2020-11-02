@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
-# from skimage.exposure import is_low_contrast,equalize_hist
+from skimage.exposure import adjust_gamma
 from constant.fire_severity_constant import DICT_FIRE_SEV_CLASS
 from constant.gee_constant import BOUND_X, BOUND_Y, DICT_BAND_X, DICT_BAND_LABEL
 from constant.landclass_constant import LISTE_LAND_CLASS, LISTE_COLOR
@@ -76,6 +76,7 @@ def display_image(path_image, mode=None, name_image=None, bound_x=None, bound_y=
         name_image = path_image.split("/")[-1]
     raster_array = raster.ReadAsArray()
     raster_array = convert_array(raster_array, mode=mode)
+
     if mode is None:
         nband = raster_array.shape[0]
         if nband == 2:  # sentinel 1
@@ -133,7 +134,20 @@ def plot_gray(raster_array, name_image, bound_x=None, bound_y=None, ax=None):
         plt.show()
 
 
-def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None):
+def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, bound_y=None,gammaCorr=True):
+    """
+
+    Args:
+        raster_array: The array of S2 pixels to plot
+        mode: string could be RGB or NIR
+        name_image:
+        ax: matplotlib ax on which to plot the image
+        bound_x: limit bound x to the output image
+        bound_y: limit bound y to the output image
+        gammaCorr : bool if true the gamma correction is applied to the array.
+    Returns:
+
+    """
     assert mode in ["RGB", "NIR", "CLOUD_MASK"], "mode {} is undifined should be in RGB or NIR or CLOUD_MASK".format(
         mode)
     assert raster_array.shape[0] >= 3, "Wrong sentinel 2 input format should be at least 4 bands {}".format(
@@ -144,7 +158,8 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         bound_x = BOUND_X
     if bound_y is None:
         bound_y = BOUND_Y
-
+    if gammaCorr: #
+        raster_array=adjust_gamma(raster_array)
     if mode == "RGB":
         print("The plot is made with sent2 b4 as band 0, b3 as band 1 and b2 as band 2 in the raster array")
         ax.set_title("{} in RGB".format(name_image))
@@ -164,9 +179,7 @@ def plot_sent2(raster_array, mode="RGB", name_image="", ax=None, bound_x=None, b
         plt.show()
 
 
-def plot_subset_array(raster_array, ax, bound_x, bound_y, rescaled=False):
-    if rescaled:
-        raster_array = rescale_image(raster_array)
+def plot_subset_array(raster_array, ax, bound_x, bound_y):
     ax.imshow(raster_array[bound_x[0]:bound_x[1], bound_y[0]:bound_y[1]])
 
 

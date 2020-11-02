@@ -1,5 +1,6 @@
 # Functions to download images
 import io
+import shutil
 
 from auscophub.saraclient import searchSara, makeUrlOpener
 import pandas as pd
@@ -8,7 +9,7 @@ import zipfile
 import os
 
 from find_image import next_string_date
-from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM
+from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM, DIR_T
 
 
 def download_images(url_images):
@@ -137,3 +138,17 @@ if __name__ == '__main__':
     import sys
     sys.path.append("../")
     main()
+
+
+def create_download_dir(download_path):
+    if os.path.isdir(download_path):
+        if click.confirm('The directory already exists, it will remove it do you want to continue?', default=True):
+            print('Ok remove')
+            shutil.rmtree(download_path)
+        else:
+            return False
+
+    os.makedirs(download_path)
+    os.makedirs(download_path + DIR_T[0])
+    os.makedirs(download_path + DIR_T[1])
+    return True
