@@ -21,14 +21,28 @@
             <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
         </parameters>
     </node>
+    <node id="BandSelect">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="Resample"/>
+    </sources>
+    <parameters>
+      <selectedPolarisations/>
+      <sourceBands>${Bands}</sourceBands>
+      <bandNamePattern/>
+    </parameters>
+  </node>
     <node id="Write">
         <operator>Write</operator>
         <sources>
-            <sourceProduct refid="Resample"/>
+            <sourceProduct refid="BandSelect"/>
         </sources>
         <parameters class="com.bc.ceres.binding.dom.XppDomElement">
             <file>${file}</file>
             <formatName>BEAM-DIMAP</formatName>
+            <deleteOutputOnFailure>true</deleteOutputOnFailure>
+            <writeEntireTileRows>false</writeEntireTileRows>
+            <clearCacheAfterRowWrite>true</clearCacheAfterRowWrite>
         </parameters>
     </node>
 </graph>
