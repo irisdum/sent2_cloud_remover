@@ -76,6 +76,7 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
     # Merge for each image the band together.
     l_output_path = []
     for dir in list_directory:
+        dir=dir+"/"
         list_path_band = find_image_band(dir, list_band=list_band)
         assert len(list_path_band) > 0, "No bands {} found in {}".format(list_band, dir)
         merged_band_image = combine_band(list_path_band, output_dir + sub_dir + TEMPORARY_DIR)
