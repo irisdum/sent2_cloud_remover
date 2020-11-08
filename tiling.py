@@ -3,7 +3,6 @@ import glob
 import os
 
 from constant.gee_constant import TEMPORARY_DIR, DIR_T, XDIR, LABEL_DIR, VAR_NAME, EPSG, LISTE_BANDE
-from processing import list_2_str
 from utils.converter import geojson_2_strcoordo_ul_lr
 from utils.storing_data import create_tiling_hierarchy
 
@@ -18,7 +17,7 @@ def _argparser():
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
-    parser.add_argument("--overlap", type=int, default=0, help="path to the zone geojson")
+
     return parser.parse_args()
 
 
@@ -204,3 +203,11 @@ def crop_image(image_path, path_geojson, output_path):
 if __name__ == '__main__':
     args = _argparser()
     main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
+
+
+def list_2_str(list):
+    ch = ""
+    for p in list:
+        ch += "{} ".format(p)
+    print(ch)
+    return ch

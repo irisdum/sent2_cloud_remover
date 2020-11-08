@@ -26,14 +26,6 @@ def get_path_tile(band, input_dir,opt="img"):
     return l
 
 
-def list_2_str(list):
-    ch = ""
-    for p in list:
-        ch += "{} ".format(p)
-    print(ch)
-    return ch
-
-
 def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
     if sent in [1,2]:
         name_shp="tiling_sent{}_t{}_fp.shp".format(sent, date_t)
