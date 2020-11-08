@@ -118,6 +118,14 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
 
 
 def clip_on_geometry(geometry):
+    """
+
+    Args:
+        geometry: an ee.Geometry
+
+    Returns: a function
+
+    """
     def clip0(image):
         return image.clip(geometry)
 
