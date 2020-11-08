@@ -17,25 +17,27 @@ def get_band_scale(raster, b):
     return band.GetMinimum(), band.GetMaximum()
 
 
-def get_path_tile(band, input_dir,opt="img"):
+def get_path_tile(band, input_dir2, opt="img"):
     """Given the input directory returns a list of all the tiles which representes this band"""
-    assert os.path.isdir(input_dir), "Wrong input directory {}".format(input_dir)
-    assert input_dir[-1] == "/", "The path of the input dir should end with /"
-    l = glob.glob("{}**{}*.{}".format(input_dir, band,opt),recursive=True) # In each .data dir take the img image
-    assert len(l) > 0, "No images {}{}*.{} found".format(input_dir, band,opt)
+    assert os.path.isdir(input_dir2), "Wrong input directory {}".format(input_dir2)
+    assert input_dir2[-1] == "/", "The path of the input dir should end with /"
+    l = glob.glob("{}**{}*.{}".format(input_dir2, band, opt), recursive=True)  # In each .data dir take the img image
+    assert len(l) > 0, "No images {}{}*.{} found".format(input_dir2, band, opt)
     return l
 
 
-def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
-    if sent in [1,2]:
-        name_shp="tiling_sent{}_t{}_fp.shp".format(sent, date_t)
+def tiling(image_vrt, output_dir, sent=1, date_t=0, overlap=0):
+    if sent in [1, 2]:
+        name_shp = "tiling_sent{}_t{}_fp.shp".format(sent, date_t)
     else:
-        name_shp="output_grid_build_dataset.shp"
+        name_shp = "output_grid_build_dataset.shp"
     print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
     # os.system("gdalinfo {}".format(image_vrt))
-    os.system("gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -overlap {} -r cubic ".format(image_vrt, output_dir,
-                                                                                  name_shp,
-                                                                                  "confs/retile_optfile.txt",overlap))
+    os.system(
+        "gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -overlap {} -r cubic ".format(image_vrt, output_dir,
+                                                                                                  name_shp,
+                                                                                                  "confs/retile_optfile.txt",
+                                                                                                  overlap))
     return output_dir + "tiling_fp.shp"
 
 
@@ -71,30 +73,31 @@ def _argparser():
 
     parser.add_argument("--bands1", nargs="+", default=None, help="list of all the bands of sentinel1 format vv, vh")
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
-    parser.add_argument("--overlap",type=int, default=0, help="path to the zone geojson")
+    parser.add_argument("--overlap", type=int, default=0, help="path to the zone geojson")
     return parser.parse_args()
 
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson,overlap):
+def main(input_dir, output_dir, list_band2, list_band1, path_geojson, overlap):
     create_tiling_hierarchy(output_dir)
     ## Create the dataX folder
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson,overlap=overlap)  # sentinel1 at t1
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson,overlap=overlap)  # sentinel2 at t1
-    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson,overlap=overlap)  # sentinel1 at t2
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 0, path_geojson, overlap=overlap)  # sentinel1 at t1
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, XDIR, 0, path_geojson, overlap=overlap)  # sentinel2 at t1
+    build_tiling_sent(list_band1, 1, input_dir, output_dir, XDIR, 1, path_geojson, overlap=overlap)  # sentinel1 at t2
     ##LABEL FOLDER
-    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson,overlap=overlap)  # sentinel2 at t2
+    build_tiling_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, 1, path_geojson,
+                      overlap=overlap)  # sentinel2 at t2
 
 
-def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson,overlap):
+def build_tiling_sent(list_band, sent, input_dir, output_dir, sub_dir, t, path_geojson, overlap):
     """Given a Sentinel and a time build the tiles """
     input_dir_t = input_dir + DIR_T[t]
     list_name_band = create_vrt(list_band, sent, input_dir_t, output_dir + sub_dir + TEMPORARY_DIR,
                                 path_geojson)
     output_dir_tile = output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
-    tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t,overlap=overlap)
+    tiling_sent(list_name_band, sent, output_dir_tile, path_geojson, t, overlap=overlap)
 
 
-def tiling_sent(list_image, sent, output_dir, path_geojson, t,overlap):
+def tiling_sent(list_image, sent, output_dir, path_geojson, t, overlap):
     """
 
     Args:
@@ -109,27 +112,27 @@ def tiling_sent(list_image, sent, output_dir, path_geojson, t,overlap):
 
     """
     create_safe_directory(output_dir)
-    if sent==2:
-        total_image = combine_band(list_image, output_dir) #for Sentinel 2 combien the images
+    if sent == 2:
+        total_image = combine_band(list_image, output_dir)  # for Sentinel 2 combien the images
     else:
-        assert len(list_image)==1, "More than One image of S1 is found {}".format(list_image)
-        total_image=list_image[0]
+        assert len(list_image) == 1, "More than One image of S1 is found {}".format(list_image)
+        total_image = list_image[0]
     # print("BEFORE CROP")
     crop_image_name = crop_image(total_image, path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
     # print("AFTER CROP")
     os.system("gdalinfo {}".format(crop_image_name))
-    shp_file_t1 = tiling(crop_image_name, output_dir, sent, t,overlap=overlap)
+    shp_file_t1 = tiling(crop_image_name, output_dir, sent, t, overlap=overlap)
 
 
-def tiling_aus18_map(path_tif,output_dir,path_geojson):
+def tiling_aus18_map(path_tif, output_dir, path_geojson):
     """Function used to tile the maps of the australian forest vegetation, into the same tiling process of the build_dataset"""
 
     crop_image_name = crop_image(path_tif, path_geojson,
                                  output_dir + "crop_aus18.vrt")
 
     os.system("gdalinfo {}".format(crop_image_name))
-    shp_file_t1 = tiling(crop_image_name, output_dir, 4,0)
+    shp_file_t1 = tiling(crop_image_name, output_dir, 4, 0)
 
 
 def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
@@ -138,16 +141,16 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
     if list_band is None and sent == 2:
         list_band = [b.lower().replace("0", "") for b in
                      LISTE_BANDE[1]]  # liste band of sentinel 2, convert it from B02->b2
-        #list_band= LISTE_BANDE[1]
+        # list_band= LISTE_BANDE[1]
     if list_band is None and sent == 1:
         list_band = LISTE_BANDE[0]
     for b in list_band:
         # reprojection of sentinel 2 images and warp on the input_geojon
         list_image = get_path_tile(b, input_dir)
-        print("[INFO] for sent {} we found {} for band {}".format(sent,list_image,b))
-        output_name = mosaic_image(list_image, input_dir) #just regroup the image if they belong to the same mosaic
+        print("[INFO] for sent {} we found {} for band {}".format(sent, list_image, b))
+        output_name = mosaic_image(list_image, input_dir)  # just regroup the image if they belong to the same mosaic
         print("The image {} has been created".format(output_name))
-        #output_name = reproject_sent(output_name, output_dir, path_geojson) #Not needed
+        # output_name = reproject_sent(output_name, output_dir, path_geojson) #Not needed
         # if sentinel 2 : convert to Float 32
         # if sent==2:
         #     output_name=convert2float32(output_name, output_dir)
@@ -155,8 +158,6 @@ def create_vrt(list_band, sent, input_dir, output_dir, path_geojson):
     return list_band_vrt
 
 
-
-
 if __name__ == '__main__':
     args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson,args.overlap)
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson, args.overlap)
