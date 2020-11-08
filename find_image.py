@@ -4,10 +4,21 @@ import argparse
 from datetime import date, timedelta
 import json
 from utils.cloud_filters import filter_clouds
+
 ee.Initialize()
 
 
+# l
+
 def eedate_2_string(date):
+    """
+
+    Args:
+        date:
+
+    Returns:
+
+    """
     str_day = convert_int(str(date.get("day").format().getInfo()))
     str_month = convert_int(str(date.get("month").format().getInfo()))
     str_year = convert_int(str(date.get("year").format().getInfo()))
@@ -15,8 +26,8 @@ def eedate_2_string(date):
 
 
 def convert_int(str_value):
-    if type(str_value)==type(1):
-        str_value=str(str_value)
+    if type(str_value) == type(1):
+        str_value = str(str_value)
 
     if len(str_value) == 1:
         return "0" + str_value
@@ -37,8 +48,7 @@ def next_string_date(str_date, i):
 
 
 def datetime_2_string(ex_date):
-    return "-".join([convert_int(ex_date.year),convert_int(ex_date.month), convert_int(ex_date.day)])
-
+    return "-".join([convert_int(ex_date.year), convert_int(ex_date.month), convert_int(ex_date.day)])
 
 
 def next_day(str_date, add=1):
@@ -74,7 +84,7 @@ def display_search(begin_date, ending_date, zone, collection):
     pass
 
 
-def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={},name_s2=None):
+def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}, name_s2=None):
     """    :param opt_param:
 :param collection sent1 or sent2 collections
     :param zone : an ee.Geometry
@@ -86,13 +96,13 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={},na
     display_search(begin_date, ending_date, zone, sent)
     collection = ee.ImageCollection(DICT_COLLECTION[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
-    #print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
+    # print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
     print(type(collection))
     if sent == 2:
         if name_s2 is not None:
-            return collection.filter(ee.Filter.eq("PRODUCT_ID",name_s2))
+            return collection.filter(ee.Filter.eq("PRODUCT_ID", name_s2))
         else:
-            return filter_clouds(collection,zone)
+            return filter_clouds(collection, zone)
     else:
         return opt_filter(collection, opt_param, sent)
 
@@ -118,7 +128,7 @@ def opt_filter(collection, opt_param, sent):
             if True:
                 # print("Filter by orbit direction {}".format(opt_param["orbitDirection"].upper()))
                 collection = collection.filter(
-                    ee.Filter.eq('orbitProperties_pass',"DESCENDING")) #                    ee.Filter.eq('orbitProperties_pass', "")) #
+                    ee.Filter.eq('orbitProperties_pass', "DESCENDING"))  # ee.Filter.eq('orbitProperties_pass', "")) #
 
         else:
             # print("Sentinel 2 default mode are MSI and Level 1C !!! To change that change the constant parameters !!")
@@ -147,7 +157,7 @@ def list_image_name(image_collection, sent):
     :returns a list of the name of the image collection"""
     # get the len of the image collection
     print(type(image_collection))
-    n=image_collection.toList(1000).length().getInfo()
+    n = image_collection.toList(1000).length().getInfo()
 
     list_name = []
     list_image_collection = image_collection.toList(n)
@@ -162,12 +172,12 @@ def list_image_name(image_collection, sent):
 
 
 def main(begin_date, ending_date, path_zone, sent):
-    zone=gjson_2_eegeom(path_zone)
+    zone = gjson_2_eegeom(path_zone)
     collection = get_filter_collection(begin_date, ending_date, zone, sent)
     print("get the collection")
-    #name = ee.Image(collection.first()).get("PRODUCT_ID")
-        #.getInfo()
-    #print(ee.String(name).getInfo())
+    # name = ee.Image(collection.first()).get("PRODUCT_ID")
+    # .getInfo()
+    # print(ee.String(name).getInfo())
     print(list_image_name(collection, sent))
 
 

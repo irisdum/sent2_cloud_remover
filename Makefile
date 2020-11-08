@@ -68,6 +68,10 @@ convert_sent2:
 tiling:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file}
 
+test_tiling:
+    gdal_translate ${target_directory} {build_dataset_dir} -projwin  [ [ 218196.011642091325484, 6103208.538475595414639 ], [ 217013.219376644585282, 6141352.387456230819225 ], [ 279482.044629201351199, 6143068.001517615281045 ], [ 280403.262222143472172, 6104931.66976785287261 ], [ 218196.011642091325484, 6103208.538475595414639 ] ] -projwin_srs {} -strict
+
+
 tiling_overlap:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file} --overlap 50
 

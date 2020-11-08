@@ -2,10 +2,10 @@
 import argparse
 import glob
 import os
-from osgeo import gdal
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
 from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
+from utils.storing_data import create_tiling_hierarchy
 
 
 def get_band_scale(raster, b):
@@ -117,14 +117,6 @@ def _argparser():
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
     parser.add_argument("--overlap",type=int, default=0, help="path to the zone geojson")
     return parser.parse_args()
-
-
-def create_tiling_hierarchy(output_dir):
-    create_safe_directory(output_dir)
-    for cst in [XDIR, LABEL_DIR]:
-        #     print("BUILDING DATA {}".format(cst))
-        create_safe_directory(output_dir + cst)
-        create_safe_directory(output_dir + cst + TEMPORARY_DIR)
 
 
 def main(input_dir, output_dir, list_band2, list_band1, path_geojson,overlap):
