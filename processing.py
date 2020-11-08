@@ -2,10 +2,12 @@
 import argparse
 import glob
 import os
-from osgeo import gdal
-from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
+
+from tiling import mosaic_image, combine_band, crop_image
+from utils.converter import geojson_2_bboxcoordo
+from constant.gee_constant import LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
+from utils.storing_data import create_tiling_hierarchy
 
 
 def get_band_scale(raster, b):
@@ -15,42 +17,6 @@ def get_band_scale(raster, b):
     return band.GetMinimum(), band.GetMaximum()
 
 
-
-def crop_image(image_path, path_geojson, output_path):
-    assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
-    # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
-    str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
-    #path_shapefile=path_geojson.split(".")[0]+".shp"
-    #assert os.path.isfile(path_shapefile),"No shp at {}".format(path_shapefile)
-    # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    #os.system("gdalwarp -cutline  {}  {} {}".format(path_shapefile, image_path, output_path))
-    #print(str_bbox)
-    os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
-    return output_path
-
-
-def mosaic_image(list_path, output_dir):
-    """Given the path to multiple images of the same band create a mosaic"""
-    output_name = get_band_image_name(list_path[0], output_dir)
-
-    os.system("gdalbuildvrt  {} {}".format(output_name, list_2_str(list_path)))
-    assert os.path.isfile(output_name), "The file has not been created at {}".format(output_name)
-    return output_name
-
-
-def combine_band(list_path_vrt, output_dir):
-    """Given a list of all vrt file for a sentinel"""
-    output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
-    print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
-    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))  # Sent2 RGB NIR
-    print("AFTER COMBINE ")
-    # os.system("gdalinfo {}".format(output_name))
-    return output_name
-
-
-
-
 def get_path_tile(band, input_dir,opt="img"):
     """Given the input directory returns a list of all the tiles which representes this band"""
     assert os.path.isdir(input_dir), "Wrong input directory {}".format(input_dir)
@@ -58,14 +24,6 @@ def get_path_tile(band, input_dir,opt="img"):
     l = glob.glob("{}**{}*.{}".format(input_dir, band,opt),recursive=True) # In each .data dir take the img image
     assert len(l) > 0, "No images {}{}*.{} found".format(input_dir, band,opt)
     return l
-
-
-def list_2_str(list):
-    ch = ""
-    for p in list:
-        ch += "{} ".format(p)
-    print(ch)
-    return ch
 
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
@@ -81,19 +39,17 @@ def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
     return output_dir + "tiling_fp.shp"
 
 
-def get_band_image_name(image_path, output_dir):
-    assert output_dir[-1] == "/", "The path of output dir should end with / {}".format(output_dir)
-    image_name = image_path.split("/")[-1]
-    return output_dir + image_name.split(VAR_NAME)[0] + ".vrt"
-
-
-def get_name_sent_vrt(band_vrt, output_dir):
-    # print(band_vrt)
-    # print(band_vrt.split("/"))
-    return output_dir + band_vrt.split("/")[-1][3:]
-
-
 def reproject_sent(path_image, output_dir, path_geojson):
+    """
+
+    Args:
+        path_image: string, path
+        output_dir:
+        path_geojson:
+
+    Returns:
+
+    """
     name = path_image.split("/")[-1]
     str_bbox = geojson_2_bboxcoordo(path_geojson)
     # print("STR BBOX {}".format(str_bbox))
@@ -117,14 +73,6 @@ def _argparser():
     parser.add_argument("--geojson", default="./confs/train_kangaroo_utm2.geojson", help="path to the zone geojson")
     parser.add_argument("--overlap",type=int, default=0, help="path to the zone geojson")
     return parser.parse_args()
-
-
-def create_tiling_hierarchy(output_dir):
-    create_safe_directory(output_dir)
-    for cst in [XDIR, LABEL_DIR]:
-        #     print("BUILDING DATA {}".format(cst))
-        create_safe_directory(output_dir + cst)
-        create_safe_directory(output_dir + cst + TEMPORARY_DIR)
 
 
 def main(input_dir, output_dir, list_band2, list_band1, path_geojson,overlap):
@@ -178,7 +126,7 @@ def tiling_aus18_map(path_tif,output_dir,path_geojson):
     """Function used to tile the maps of the australian forest vegetation, into the same tiling process of the build_dataset"""
 
     crop_image_name = crop_image(path_tif, path_geojson,
-                                output_dir + "crop_aus18.vrt")
+                                 output_dir + "crop_aus18.vrt")
 
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4,0)

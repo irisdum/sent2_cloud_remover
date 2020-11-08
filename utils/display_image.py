@@ -54,6 +54,14 @@ def open_sentinel2(path_s2_dir, bands=None):
 
 
 def open_array(path_img):
+    """
+
+    Args:
+        path_img: a string path to the image
+
+    Returns:
+     a numpy array
+    """
     raster = gdal.Open(path_img, gdal.GA_ReadOnly)
     return raster.ReadAsArray()
 

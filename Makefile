@@ -68,6 +68,10 @@ convert_sent2:
 tiling:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file}
 
+test_tiling:
+    @python tiling.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file}
+
+
 tiling_overlap:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file} --overlap 50
 
