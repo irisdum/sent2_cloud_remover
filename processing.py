@@ -3,9 +3,9 @@ import argparse
 import glob
 import os
 
-from tiling import mosaic_image, combine_band
-from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
-from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
+from tiling import mosaic_image, combine_band, crop_image
+from utils.converter import geojson_2_bboxcoordo
+from constant.gee_constant import LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy
 
@@ -15,21 +15,6 @@ def get_band_scale(raster, b):
     if band.GetMinimum() is None or band.GetMaximum() is None:
         band.ComputeStatistics(0)
     return band.GetMinimum(), band.GetMaximum()
-
-
-
-def crop_image(image_path, path_geojson, output_path):
-    assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
-    # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
-    str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
-    #path_shapefile=path_geojson.split(".")[0]+".shp"
-    #assert os.path.isfile(path_shapefile),"No shp at {}".format(path_shapefile)
-    # print("gdalwarp -cutline  SHAPE_RESTORE_SHX=YES {} {} {}".format(path_shapefile, image_path, output_path))
-    #os.system("gdalwarp -cutline  {}  {} {}".format(path_shapefile, image_path, output_path))
-    #print(str_bbox)
-    os.system(
-        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
-    return output_path
 
 
 def get_path_tile(band, input_dir,opt="img"):
@@ -62,13 +47,17 @@ def tiling(image_vrt, output_dir, sent=1, date_t=0,overlap=0):
     return output_dir + "tiling_fp.shp"
 
 
-def get_band_image_name(image_path, output_dir):
-    assert output_dir[-1] == "/", "The path of output dir should end with / {}".format(output_dir)
-    image_name = image_path.split("/")[-1]
-    return output_dir + image_name.split(VAR_NAME)[0] + ".vrt"
-
-
 def reproject_sent(path_image, output_dir, path_geojson):
+    """
+
+    Args:
+        path_image: string, path
+        output_dir:
+        path_geojson:
+
+    Returns:
+
+    """
     name = path_image.split("/")[-1]
     str_bbox = geojson_2_bboxcoordo(path_geojson)
     # print("STR BBOX {}".format(str_bbox))
@@ -145,7 +134,7 @@ def tiling_aus18_map(path_tif,output_dir,path_geojson):
     """Function used to tile the maps of the australian forest vegetation, into the same tiling process of the build_dataset"""
 
     crop_image_name = crop_image(path_tif, path_geojson,
-                                output_dir + "crop_aus18.vrt")
+                                 output_dir + "crop_aus18.vrt")
 
     os.system("gdalinfo {}".format(crop_image_name))
     shp_file_t1 = tiling(crop_image_name, output_dir, 4,0)
