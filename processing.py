@@ -2,6 +2,8 @@
 import argparse
 import glob
 import os
+
+from tiling import mosaic_image, combine_band
 from utils.converter import geojson_2_bboxcoordo, geojson_2_strcoordo_ul_lr
 from constant.gee_constant import VAR_NAME, LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
@@ -28,27 +30,6 @@ def crop_image(image_path, path_geojson, output_path):
     os.system(
         "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict ".format(image_path, output_path, str_bbox, EPSG))
     return output_path
-
-
-def mosaic_image(list_path, output_dir):
-    """Given the path to multiple images of the same band create a mosaic"""
-    output_name = get_band_image_name(list_path[0], output_dir)
-
-    os.system("gdalbuildvrt  {} {}".format(output_name, list_2_str(list_path)))
-    assert os.path.isfile(output_name), "The file has not been created at {}".format(output_name)
-    return output_name
-
-
-def combine_band(list_path_vrt, output_dir):
-    """Given a list of all vrt file for a sentinel"""
-    output_name = get_name_sent_vrt(list_path_vrt[0], output_dir)
-    print("BAND COMBINATION  : gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))
-    os.system("gdalbuildvrt -separate {} {}".format(output_name, list_2_str(list_path_vrt)))  # Sent2 RGB NIR
-    print("AFTER COMBINE ")
-    # os.system("gdalinfo {}".format(output_name))
-    return output_name
-
-
 
 
 def get_path_tile(band, input_dir,opt="img"):
@@ -85,12 +66,6 @@ def get_band_image_name(image_path, output_dir):
     assert output_dir[-1] == "/", "The path of output dir should end with / {}".format(output_dir)
     image_name = image_path.split("/")[-1]
     return output_dir + image_name.split(VAR_NAME)[0] + ".vrt"
-
-
-def get_name_sent_vrt(band_vrt, output_dir):
-    # print(band_vrt)
-    # print(band_vrt.split("/"))
-    return output_dir + band_vrt.split("/")[-1][3:]
 
 
 def reproject_sent(path_image, output_dir, path_geojson):
