@@ -29,7 +29,7 @@ VAR_NAME="_prepro"
 OVERLAP=10  #overlap of the tiling
 
 ##PROJECTION SENTINEL 2
-EPSG="EPSG:32756"
+EPSG="EPSG:32755"
 #Land calssif EPSG
 EPSG_LANDCLASS="EPSG:3577"
 
