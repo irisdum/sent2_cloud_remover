@@ -14,7 +14,7 @@ XDIR="dataX/"
 LABEL_DIR="label/"
 OPT_DWND_IMAGE="zip" #the format of the file to dwnld avoid changing
 SENT_FORMAT=["tiff", "jp2"]
-LISTE_BANDE=[["VV,VH"],["B04", "B03", "B02","B08","cm"]] #for downloading the data avoid changing its value
+LISTE_BANDE=[["VV","VH"],["B04", "B03", "B02","B08","cm"]] #for downloading the data avoid changing its value
 GEE_S2_BAND=["B2","B3","B4","B8"]
     #[["vh","vv"],["B04", "B03", "B02","B08","cm"]]
 
