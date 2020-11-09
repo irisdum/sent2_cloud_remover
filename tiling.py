@@ -127,7 +127,7 @@ def find_image_band(input_directory, list_band, format="img"):
     """
     l_final = []
     for b in list_band:
-        lpath2band = glob.glob("{}*{}*{}".format(input_directory, b, format))
+        lpath2band = glob.glob("{}*{}*{}".format(input_directory, b,format))
         assert len(lpath2band) == 1, "Error None or Multiple image have been found {}, should be only one command {} ".format(
             lpath2band,"{}*{}*{}".format(input_directory, b, format))
         l_final += lpath2band
