@@ -133,7 +133,7 @@ def find_image_band(input_directory, list_band, format="img", sent=1):
                                     format)  # if sent1 band after prepro saved as .data/Gamma_VH.img
 
         else:
-            cmd = "{}{}*{}".format(input_directory, b, format)  # if sent2 band saved as .data/B2.img
+            cmd = "{}{}.{}".format(input_directory, b, format)  # if sent2 band saved as .data/B2.img
         lpath2band = glob.glob(cmd)
         assert len(
             lpath2band) == 1, "Error None or Multiple image have been found {}, should be only one command {} ".format(
