@@ -206,7 +206,7 @@ def crop_image(image_path, path_geojson, output_path):
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
     print("BBox {}".format(str_bbox))
     os.system(
-        "gdal_translate {} {} -projwin  {}  -strict ".format(image_path, output_path, str_bbox))
+        "gdal_translate {} {} -projwin  {} -projwin_srs {} -strict -tr 10 10".format(image_path, output_path, str_bbox,EPSG))
     return output_path
 
 
