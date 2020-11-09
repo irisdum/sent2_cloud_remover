@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "train_kangaroo_utm55s",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32755" } },
+"features": [
+{ "type": "Feature", "properties": { "train": "vf" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 764625.3114035968, 6103727.1770516932 ], [ 765735.8278961638, 6141868.7646335457 ], [ 828214.5224122861, 6139844.1421062201 ], [ 826842.0709296825, 6101693.6938453522 ], [ 764625.3114035968, 6103727.1770516932 ] ] ] } }
+]
+}
