@@ -143,8 +143,8 @@
   AXIS[&quot;Easting&quot;, EAST], 
   AXIS[&quot;Northing&quot;, NORTH]]</mapProjection>
       <alignToStandardGrid>true</alignToStandardGrid>
-      <standardGridOriginX>0.0</standardGridOriginX>
-      <standardGridOriginY>0.0</standardGridOriginY>
+      <standardGridOriginX>5.0</standardGridOriginX>
+      <standardGridOriginY>5.0</standardGridOriginY>
       <nodataValueAtSea>true</nodataValueAtSea>
       <saveDEM>false</saveDEM>
       <saveLatLon>false</saveLatLon>
