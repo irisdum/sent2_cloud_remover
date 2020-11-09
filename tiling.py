@@ -76,8 +76,8 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
     # Merge for each image the band together.
     l_output_path = []
     for dir in list_directory:
-        dir=dir+"/"
-        list_path_band = find_image_band(dir, list_band=list_band,sent=sent)
+        dir = dir + "/"
+        list_path_band = find_image_band(dir, list_band=list_band, sent=sent)
         assert len(list_path_band) > 0, "No bands {} found in {}".format(list_band, dir)
         merged_band_image = combine_band(list_path_band, output_dir + sub_dir + TEMPORARY_DIR)
         l_output_path += [merged_band_image]
@@ -128,14 +128,16 @@ def find_image_band(input_directory, list_band, format="img", sent=1):
     """
     l_final = []
     for b in list_band:
-        if sent==1:
-            cmd="{}*{}*{}".format(input_directory, b,format) #if sent1 band after prepro saved as .data/Gamma_VH.img
+        if sent == 1:
+            cmd = "{}*{}*{}".format(input_directory, b,
+                                    format)  # if sent1 band after prepro saved as .data/Gamma_VH.img
 
         else:
-            cmd="{}{}*{}".format(input_directory, b, format) # if sent2 band saved as .data/B2.img
-        lpath2band=glob.glob(cmd)
-        assert len(lpath2band) == 1, "Error None or Multiple image have been found {}, should be only one command {} ".format(
-            lpath2band,cmd)
+            cmd = "{}{}*{}".format(input_directory, b, format)  # if sent2 band saved as .data/B2.img
+        lpath2band = glob.glob(cmd)
+        assert len(
+            lpath2band) == 1, "Error None or Multiple image have been found {}, should be only one command {} ".format(
+            lpath2band, cmd)
         l_final += lpath2band
     return l_final
 
@@ -159,17 +161,18 @@ def combine_band(list_path_band, output_dir):
     return output_name
 
 
-def create_name_band(band_path, output_dir):
+def create_name_band(band_path, output_dir, format="vrt"):
     """
 
     Args:
+        format:
         band_path: string, path to the image
         output_dir: string, path to the output directory
 
-    Returns:
+    Returns: a string with the name and the format as vrt
 
     """
-    return output_dir + band_path.split("/")[-2][:-4]
+    return output_dir + band_path.split("/")[-2][:-4] + format
 
 
 def get_band_image_name(image_path, output_dir):
@@ -198,10 +201,10 @@ def crop_image(image_path, path_geojson, output_path):
     Returns: a string, path of the cropped image
 
     """
-    assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
+    #assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
-
+    print("BBox {}".format(str_bbox))
     os.system(
         "gdal_translate {} {} -projwin  {}  -strict ".format(image_path, output_path, str_bbox))
     return output_path
