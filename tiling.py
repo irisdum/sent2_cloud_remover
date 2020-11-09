@@ -77,7 +77,7 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
     l_output_path = []
     for dir in list_directory:
         dir=dir+"/"
-        list_path_band = find_image_band(dir, list_band=list_band)
+        list_path_band = find_image_band(dir, list_band=list_band,sent=sent)
         assert len(list_path_band) > 0, "No bands {} found in {}".format(list_band, dir)
         merged_band_image = combine_band(list_path_band, output_dir + sub_dir + TEMPORARY_DIR)
         l_output_path += [merged_band_image]
@@ -115,10 +115,11 @@ def mosaic_image(list_path, output_dir):
     return output_name
 
 
-def find_image_band(input_directory, list_band, format="img"):
+def find_image_band(input_directory, list_band, format="img", sent=1):
     """
 
     Args:
+        sent:
         input_directory: string, path to the directory
         list_band: list of the band to collect
 
@@ -127,9 +128,14 @@ def find_image_band(input_directory, list_band, format="img"):
     """
     l_final = []
     for b in list_band:
-        lpath2band = glob.glob("{}*{}*{}".format(input_directory, b,format))
+        if sent==1:
+            cmd="{}*{}*{}".format(input_directory, b,format) #if sent1 band after prepro saved as .data/Gamma_VH.img
+
+        else:
+            cmd="{}{}*{}".format(input_directory, b, format) # if sent2 band saved as .data/B2.img
+        lpath2band=glob.glob(cmd)
         assert len(lpath2band) == 1, "Error None or Multiple image have been found {}, should be only one command {} ".format(
-            lpath2band,"{}*{}*{}".format(input_directory, b, format))
+            lpath2band,cmd)
         l_final += lpath2band
     return l_final
 
