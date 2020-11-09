@@ -201,11 +201,6 @@ def crop_image(image_path, path_geojson, output_path):
     return output_path
 
 
-if __name__ == '__main__':
-    args = _argparser()
-    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
-
-
 def list_2_str(list):
     """
 
@@ -220,3 +215,8 @@ def list_2_str(list):
         ch += "{} ".format(p)
     print(ch)
     return ch
+
+
+if __name__ == '__main__':
+    args = _argparser()
+    main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
