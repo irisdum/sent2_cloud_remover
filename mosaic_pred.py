@@ -17,6 +17,18 @@ def get_fp(tile_id, build_dataset_dir):
 
 
 def write_tif_from_fp(array, tile_id, build_dataset_dir, output_dir, prefix=""):
+    """
+
+    Args:
+        array:
+        tile_id:
+        build_dataset_dir:
+        output_dir:
+        prefix:
+
+    Returns:
+
+    """
     assert ".tif" in tile_id, "wrong tile id should en with tif"
     ds_tile = buzz.Dataset()
     output_path = "{}{}_image{}".format(output_dir, prefix, tile_id)
@@ -37,7 +49,6 @@ def _argparser():
                                                                 "made")
     parser.add_argument('--path_csv', type=str, default=None, help="Only use to mosaic the gt, the path to the csv gt")
     return parser.parse_args()
-
 
 def main(build_dataset_dir, predicted_dir, output_dir, im_prefix,path_csv):
     create_safe_directory(output_dir)
