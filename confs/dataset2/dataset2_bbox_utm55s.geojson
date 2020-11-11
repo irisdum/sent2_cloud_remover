@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "dataset2_bbox_utm55s",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32755" } },
+"features": [
+{ "type": "Feature", "properties": { "dataset2": "bbox" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 755025.541091920807958, 6121318.69880716316402 ], [ 755025.54109192173928, 6199830.598453120328486 ], [ 808916.984402910573408, 6199830.598453123122454 ], [ 808916.984402912552468, 6121318.69880716316402 ], [ 755025.541091920807958, 6121318.69880716316402 ] ] ] ] } }
+]
+}
