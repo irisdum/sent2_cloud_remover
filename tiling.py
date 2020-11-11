@@ -92,11 +92,12 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         l_output_path) == 1, "Issue with the code should not end up with more than one image in the list {}".format(
         l_output_path)
     # Crop the image
+    output_dir_tile = output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
     crop_image_name = crop_image(l_output_path[0], path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
-    #tiling_shp=tiling(crop_image_name,output_dir,sent,t,overlap=0)
-    #print("[INFO] Image {} has been tiles, footprint of the tiles in {}".format(crop_image_name,tiling_shp))
-    #return tiling_shp
+    tiling_shp=tiling(crop_image_name,output_dir,sent,t,overlap=0)
+    print("[INFO] Image {} has been tiles, footprint of the tiles in {}".format(crop_image_name,tiling_shp))
+    return tiling_shp
 
 
 def mosaic_image(list_path, output_dir):
