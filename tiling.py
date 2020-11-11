@@ -230,3 +230,4 @@ def list_2_str(list):
 if __name__ == '__main__':
     args = _argparser()
     main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
+
