@@ -3,7 +3,7 @@ import argparse
 import glob
 import os
 
-from tiling import mosaic_image, combine_band, crop_image
+from tiling import mosaic_image, combine_band, crop_image, tiling
 from utils.converter import geojson_2_bboxcoordo
 from constant.gee_constant import LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
@@ -24,21 +24,6 @@ def get_path_tile(band, input_dir2, opt="img"):
     l = glob.glob("{}**{}*.{}".format(input_dir2, band, opt), recursive=True)  # In each .data dir take the img image
     assert len(l) > 0, "No images {}{}*.{} found".format(input_dir2, band, opt)
     return l
-
-
-def tiling(image_vrt, output_dir, sent=1, date_t=0, overlap=0):
-    if sent in [1, 2]:
-        name_shp = "tiling_sent{}_t{}_fp.shp".format(sent, date_t)
-    else:
-        name_shp = "output_grid_build_dataset.shp"
-    print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
-    # os.system("gdalinfo {}".format(image_vrt))
-    os.system(
-        "gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -overlap {} -r cubic ".format(image_vrt, output_dir,
-                                                                                                  name_shp,
-                                                                                                  "confs/retile_optfile.txt",
-                                                                                                  overlap))
-    return output_dir + "tiling_fp.shp"
 
 
 def reproject_sent(path_image, output_dir, path_geojson):

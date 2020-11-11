@@ -94,7 +94,9 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
     # Crop the image
     crop_image_name = crop_image(l_output_path[0], path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
-    return crop_image_name
+    tiling_shp=tiling(crop_image_name,output_dir,sent,t,overlap=0)
+    print("[INFO] Image {} has been tiles, footprint of the tiles in {}".format(crop_image_name,tiling_shp))
+    return tiling_shp
 
 
 def mosaic_image(list_path, output_dir):
@@ -190,6 +192,7 @@ def get_band_image_name(image_path, output_dir):
     return output_dir + image_name.split(VAR_NAME)[0] + "merged.vrt"
 
 
+
 def crop_image(image_path, path_geojson, output_path):
     """
 
@@ -227,7 +230,34 @@ def list_2_str(list):
     return ch
 
 
+
+def tiling(image_vrt, output_dir, sent=1, date_t=0, overlap=0):
+    """
+
+    Args:
+        image_vrt: string, path to the image fully preprcessed and cropped
+        output_dir: output directory name
+        sent: int, used to name the output files
+        date_t: int, used to name the output files 1,2, corresponds to the date of acquisition
+        overlap: int, option to create the tiling process
+
+    Returns: string, the name of the shapefile, which represents the tile dimension (created with geal_retile)
+
+    """
+    if sent in [1, 2]:
+        name_shp = "tiling_sent{}_t{}_fp.shp".format(sent, date_t)
+    else:
+        name_shp = "output_grid_build_dataset.shp"
+    print("IMAGE VRT which is going to be tiled {}".format(image_vrt))
+    # os.system("gdalinfo {}".format(image_vrt))
+    os.system(
+        "gdal_retile.py {} -targetDir {} -tileIndex {} --optfile {} -overlap {} -r cubic ".format(image_vrt, output_dir,
+                                                                                                  name_shp,
+                                                                                                  "confs/retile_optfile.txt",
+                                                                                                  overlap))
+    return output_dir + "tiling_fp.shp"
+
+
 if __name__ == '__main__':
     args = _argparser()
     main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
-
