@@ -9,7 +9,7 @@
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
 export PATH=$PATH:/srv/osirim/idumeur/snap/bin
-gptPath="gpt -e -c 70G -q 640"
+gptPath="gpt -e -c 130G -q 600"
 #export JAVA_OPTS="-Xmx30G -XX:CompressedClassSpaceSize=256m"
 #export _JAVA_OPTIONS="-Xmx30G -XX:CompressedClassSpaceSize=256m"
 
