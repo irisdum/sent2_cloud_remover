@@ -4,6 +4,7 @@ import os
 
 from constant.gee_constant import TEMPORARY_DIR, DIR_T, XDIR, LABEL_DIR, VAR_NAME, EPSG, LISTE_BANDE
 from utils.converter import geojson_2_strcoordo_ul_lr
+from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy
 
 
@@ -93,6 +94,7 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         l_output_path)
     # Crop the image
     output_dir= output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
+    create_safe_directory(output_dir)
     crop_image_name = crop_image(l_output_path[0], path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
     tiling_shp=tiling(crop_image_name,output_dir,sent,t,overlap=0)
