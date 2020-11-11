@@ -39,11 +39,11 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
     # Sentinel 1 at date 1 :
     process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 0)
     # Sentinel 1 at date 2 :
-    # process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 1)
+    process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 1)
     # Sentinel 2 at date 1 :
     process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, 0)
     # Sentinel 2 at date 2 :
-    # process_date_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, path_geojson, 1)
+    process_date_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, path_geojson, 1)
 
 
 def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geojson, t):
@@ -230,3 +230,4 @@ def list_2_str(list):
 if __name__ == '__main__':
     args = _argparser()
     main(args.input_dir, args.output_dir, args.bands2, args.bands1, args.geojson)
+

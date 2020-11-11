@@ -16,6 +16,9 @@ def _argparser():
                         help="Bool if set to true the tile with clouds are not removed from the dataset")
     return parser.parse_args()
 
+
+
+
 def main(input_dir,output_dir_name,ptrain,pval,ptest,rd_state,keep_clouds):
     path_output_dir="/".join(input_dir.split("/")[:-2]+[output_dir_name,""])
     l_tiles_tot = list_all_conformed_tiles(input_dir,keep_clouds=keep_clouds)
@@ -25,3 +28,4 @@ def main(input_dir,output_dir_name,ptrain,pval,ptest,rd_state,keep_clouds):
 if __name__ == '__main__':
     args=_argparser()
     main(args.input_dataset,args.output_dir_name,args.ptrain,args.pval,args.ptest,args.random_state,args.keep_clouds)
+
