@@ -4,7 +4,7 @@ import glob
 import os
 
 from tiling import mosaic_image, combine_band, crop_image, tiling
-from utils.converter import geojson_2_bboxcoordo
+from utils.converter import geojson_2_strcoordo_ul_lr
 from constant.gee_constant import LISTE_BANDE, TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, EPSG
 from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy

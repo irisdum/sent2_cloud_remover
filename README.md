@@ -26,11 +26,24 @@ Many of the different computation steps are easily available from the Makefile.
 
 
 ## Downloading the data
-
+The aim is to donwload the data which are going to be used for the training of the Generative Adversarial Network.
+For each Sentinel 2 image downloaded we want to have the corresponding Sentinel 1 images (the closest in time).
 ## LOOKING AT THE AREA OF INTEREST
  TODO : include the Google earth engine scripts
  
-### Finding cloud free images
+
+
+## Downloading the data
+The download of the image uses the library auscophub found https://github.com/CopernicusAustralasia/auscophub/releases`. 
+It enables to send request to the GeoscienceAustralia/NCI Copernicus Hub server and download the images. 
+The file `utils/download_image.py` gathers the functions useful to download the image. 
+### The automatic version
+(not recommended, not optimized and not truly recommended)
+Input : 
+- Name of the images 
+- date range
+- optional parameter filters
+#### Finding cloud free images
 
 
 Input : 
@@ -42,38 +55,28 @@ The script will connect to Google earth engine in order to find the Sentinel 2 i
 ccp thant max_ccp and cover the area. Given the date of acquisition of the Sentinel 2, the closest Sentinel 1 images (in time).
 The python script used `find_images.py`, an exemple of the use is shown on `bash_scripts/search_image.sh`.
 The cloud filter is python script adapted from  http://bit.ly/Sen2CloudFree
-
-## Downloading the data
-
-Input : 
-- Name of the images 
-- date range
-- optional parameter filters
-
-The download of the image uses the library auscophub found https://github.com/CopernicusAustralasia/auscophub/releases`. 
-It enables to send request to the GeoscienceAustralia/NCI Copernicus Hub server and download the images. 
-The file `utils/download_image.py` gathers the functions useful to download the image. 
-
-Eventually to download the image, first their name is found using the find_image.py script. The output of this script is then 
-used to download the images. The script that gathers both action is `run_download_images.py`.  
-An exemple of the use of this script is shown in `download_images.sh`
-
-## Storing the data
-
-In order to build or dataset, the images download needs to be stored in different files depending on their download date.
-The functions used are in `store_data.py`
+#### Run the download
+Modify the variable used in the command `download_image` in the Makefile
+Then run `make download_image
+### The manual version for selecting Sentinel 2 data
+First open google earth engine (GEE) and look at the intersted Sentinel 2 image. Select the area of interest as the 
+intersection of the Sentinel 2 image and the Sentinel 1 footprint. Export it to your Google Drive (GEOJSON format)
+ and visualize it with QGIS. Maybe modify the Bbox which you are going to use, then export it in two format : 
+ - The UTM format used for your Sentinel 2 data. Currently, we work with UTM55S (East Australia)
+ - The EPSG 4326 WSG 84 format
+Place the exported geojson files into the confs directory, and modify in the Makefile the value of `geojson_file`,
+ `geojson_utm_file`
+Then from GEE, extract the id of the Sentinel 2 images you want to work with and replace in the Makefile the 
+value of s2_im_t1, s2_im_t0
+Then run : `download_images_from_s2name`
 
 ## Preprocessing using SNAP gpt. 
 
 ### Requirements
-- The area geojson `confs/train_kangaroo.geojson`
-- The directory with Sentinel 1 and Sentinel 2 images.  
-- - For Sentinel 1 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent1.xml` or `snap-confs/calibrate_sent1_v2.xml`   
-   - For Sentinel 2 : `processDatasetSent1.bash`, `snap-confs/calibrate_sent2.xml`
-
-First the geojson needs to be converted in .txt file, where the area is written as WKT format. If there are many polygons 
-in the geojson, in the .txt file one line = one polygon in WKT format.  
-Thus RUN `python convert_geojson.py --input input_zone.geojson --output output_zone_wkt.txt`
+- The area geojson `confs/dataset2/dataset2_bbox_utm55s.geojson`
+- The directory with Sentinel 1 and Sentinel 2 images.
+- - For Sentinel 1 : `new_processDatasetSent1.bash`, `snap-confs/calibrate_sent1_zs_utm55s.xml` or `snap-confs/calibrate_sent1_zs.xml`   
+   - For Sentinel 2 : `new_processDatasetSent1.bash`, `snap-confs/calibrate_sent2_zs.xml`
 
 You may need to adapt the variable definition in the bash scripts, depending on how you installed SNAP. Pay attention to 
 PATH and gptPath variable. gptPath corresponds to the path where gpt executable is located. PATH needs to be updated with
@@ -83,48 +86,18 @@ the location of snap/bin
 
 The pipeline of the preprocessing is in the .xml files. 
 
-For Sentinel 1 : 
-
-- Apply Orbit File
-- Subset 
-- Calibration
-- Speckle (Refined Lee)
-- Terrain Correction
-- Write as TIFF
-
-xml v2 : (Recommended)
-- Apply Orbit File
-- Subset 
-- Thermal Noise
-- Remove GRD Noise
-- Calibration
-- Speckle (Refined Lee)
-- Terrain Correction
-- Linear from db
-- Write as TIFF
-
-xml v3 : Be careful if multiple S1 the gdal mosaic does not work
-- Apply Orbit File
-- Subset 
-- Thermal Noise
-- Remove GRD Noise
-- Calibration
-- Speckle (Refined Lee)
-- Terrain Correction, setting the grid with the S2 grid
-- Linear from db
-- Write as TIFF
-
-For Sentinel 2 : 
-- Resample at 10 meters
-- Subset 
-- Write TIFF
-
 
 ### bash script
 
 If there are numerous geometry in the .txt file For each geometry, the preprocessing of is done for each bands 
-(B2,B3,B4,B8) of Sentinel 2 and on both bands of Sentinel 1 VV,VH
+(B2,B3,B4,B8) of Sentinel 2 and on both bands of Sentinel 1 VV,VH. 
+Run `make convert_sent1` to preprocess Sentinel 1 images, Run `make convert_sent2`to preprocess the Sentinel 2 data.
+The code have been ran on HPC, however it might be interesting to modify some parameters 
+`gpt -c CACHE_NUMBER -q PARALLELISM` of gpt in the bash scripts : new_processDatasetSent1.bash an new_processDatasetSent2.bash
+The combination found might not be the best one, the code is still really slow. 
 
+## Tiling
+`make test_tiling`
 ## Build dataset 
 ### Requirements
 The preprocessed image are stored in two different directories depending on their date range. 
