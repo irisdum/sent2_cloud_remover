@@ -1,6 +1,7 @@
 # All the functions used to load the tiles
 import os
-from constant.gee_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE
+from constant.gee_constant import DICT_ORGA, DICT_SHAPE
+from constant.storing_constant import XDIR, LABEL_DIR
 from constant.model_constant import TRAINING_DIR
 from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
 from utils.converter import convert_array

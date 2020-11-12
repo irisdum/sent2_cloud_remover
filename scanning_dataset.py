@@ -3,7 +3,8 @@ import glob
 import argparse
 from osgeo import gdal
 import numpy as np
-from constant.gee_constant import LISTE_BANDE, XDIR, LABEL_DIR, CLOUD_THR, TOT_ZERO_PIXEL
+from constant.gee_constant import LISTE_BANDE, CLOUD_THR, TOT_ZERO_PIXEL
+from constant.storing_constant import XDIR, LABEL_DIR
 import random
 from sklearn.model_selection import train_test_split
 

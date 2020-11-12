@@ -9,7 +9,8 @@ import zipfile
 import os
 
 from find_image import next_string_date
-from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM, DIR_T
+from constant.gee_constant import S1_OPTPARAM, S2_OPTPARAM
+from constant.storing_constant import DIR_T
 
 
 def download_images(url_images):

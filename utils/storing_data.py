@@ -1,4 +1,4 @@
-from constant.gee_constant import XDIR, LABEL_DIR, TEMPORARY_DIR
+from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR
 from utils.image_find_tbx import create_safe_directory
 
 

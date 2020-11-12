@@ -12,7 +12,8 @@ from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR, DICT_RESCALE_REVERSE
+from constant.gee_constant import DICT_SHAPE, DICT_RESCALE_REVERSE
+from constant.storing_constant import XDIR, LABEL_DIR
 from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir

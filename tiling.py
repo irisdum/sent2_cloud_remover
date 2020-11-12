@@ -2,7 +2,8 @@ import argparse
 import glob
 import os
 
-from constant.gee_constant import TEMPORARY_DIR, DIR_T, XDIR, LABEL_DIR, VAR_NAME, EPSG, LISTE_BANDE
+from constant.gee_constant import VAR_NAME, EPSG, LISTE_BANDE
+from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
 from utils.converter import geojson_2_strcoordo_ul_lr
 from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy
