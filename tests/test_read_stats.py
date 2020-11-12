@@ -35,12 +35,11 @@ def main(test_name,dataset_dir,input_dataset):
         print(ldict_stat)
         assert type(ldict_stat[0])==type({}),"Inside the list should be dict not {}".format(ldict_stat[0])
         print("[TEST] load_data function")
-        dataX, data_label=load_data(input_dataset, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-                  dict_band_label=None, dict_rescale_type=None, dir_csv=dataset_dir)
+        dataX, data_label= load_data(input_dataset, x_shape=None, label_shape=None, normalization=True,
+                                     dict_band_X=None, dict_band_label=None, dict_rescale_type=None)
         print("Using the csv stats for s2 and normalize",np.mean(dataX[0,:,:,4]),np.mean(data_label[0,:,:,0]))
         dataX, data_label = load_data(input_dataset, x_shape=None, label_shape=None, normalization=True,
-                                      dict_band_X=None,
-                                      dict_band_label=None, dict_rescale_type=None, dir_csv=None)
+                                      dict_band_X=None, dict_band_label=None, dict_rescale_type=None)
         print("Using the previous normalization method",np.mean(dataX[0, :, :, 4]), np.mean(data_label[0, :, :, 0]))
 
 if __name__ == '__main__':
