@@ -171,6 +171,22 @@ def extract_name_date_first(collection, sent):
 
 
 def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
+    """
+
+    Args:
+        bd: string, begin date
+        ed: string, end date
+        zone: ee.Geometry
+        sent2criteria: string, could be less_clouds, ..
+        optparam1: string or None, optional filter top apply on s1 image
+        ccp: int, maximum cloud percentage in the image accepted
+        name_s2: string or None, name_id of the S2 image
+
+    Returns:
+        Two dictionnaries respectively for sentinel 1 and two. The keys of these dictionnaries are the image id and the
+        values are the date of the image
+
+    """
 
     dict_image_dwnld1 = {}
     dict_image_dwnld2 = {}
