@@ -3,12 +3,12 @@ end_date1=2019-10-30
 begin_date2=2020-02-01
 end_date2=2020-02-05
 CCP=50
-geojson_file=confs/dataset2/dataset2_fp_epsg4326.geojson
+geojson_file=confs/dataset2/dataset2_bbox_wsg84.geojson
 geojson_utm_file=confs/dataset2/dataset2_bbox_utm55s.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
-source_directory=/srv/osirim/idumeur/data/dataset2/
 graph_xml_sent1=snap-confs/calibrate_sent1_zs_utm55s.xml
-target_directory=${source_directory}prepro6/
+source_directory=/srv/osirim/idumeur/data/dataset3/
+target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
 graph_xml_sent2=snap-confs/calibrate_sent2_zs.xml
@@ -31,7 +31,7 @@ output_mosaic_dir=${target_directory}pred_tr${training_number}_i${weight}/
 snap_property_file=/srv/osirim/idumeur/snap/etc/snap.properties
 
 download_images_from_s2name:
-	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
+	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
 
 conda_rasterio:
 	conda config --add channels conda-forge
@@ -50,7 +50,7 @@ get_evi_minmax:
 	python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi evi --export GEE --path_csv ${source_directory}
 
 download_image:
-		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp"
+		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}
 
 geojson_2_wkt:
 		@echo "We convert ${geojson_file} into ${wkt_file}"
@@ -63,7 +63,7 @@ convert_sent1:
 convert_sent2:
 	@echo "Starting preprocessing Sentinel 2"
 	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date1 ${target_directory}date1 ${wkt_file}
-	#./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
+	./processDatasetSent2.bash ${graph_xml_sent2} snap-confs/orbite.properties ${source_directory}date2 ${target_directory}date2 ${wkt_file}
 
 tiling:
 	@python processing.py --input_dir ${target_directory} --output_dir ${build_dataset_dir} --geojson ${geojson_utm_file}

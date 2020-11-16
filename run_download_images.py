@@ -35,7 +35,6 @@ def _argparser():
     parser.add_argument("--save", default=True, help="wether or not we are going to store the images")
     parser.add_argument("--output_path", default=True, help="where the image preprocess and ordered are going "
                                                             "to be stored")
-    parser.add_argument("--shp", default=True, help="path to the shapefile")
     parser.add_argument("--s2_t0",default=None,help="If known name of the S2 image at t0 to download")
     parser.add_argument("--s2_t1",default=None,help="If known name of the S2 image at t0 to download")
 
@@ -172,11 +171,7 @@ def extract_name_date_first(collection, sent):
 
 
 def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
-    """    :param ccp:
-    :param optparam1:
-    :param sent2criteria:
-:param zone : ee.Geometry
-    """
+
     dict_image_dwnld1 = {}
     dict_image_dwnld2 = {}
     list_sent1_sent2_name = []
@@ -246,7 +241,6 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     print(dic_name_t2_sent1, dic_name_t2_sent2, )
 
     if save:
-        # TODO saving options + directory t1 and directory t2
         download_all(dic_name_t2_sent1, sent=1,output_path= output_path+DIR_T[1],opt=OPT_DWND_IMAGE)
         download_all(dic_name_t1_sent1, sent=1, output_path=output_path+DIR_T[0],opt=OPT_DWND_IMAGE)
         download_all(dic_name_t2_sent2, sent=2,output_path= output_path+DIR_T[1],opt=OPT_DWND_IMAGE)
