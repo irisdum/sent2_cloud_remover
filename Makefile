@@ -7,7 +7,7 @@ geojson_file=confs/dataset2/dataset2_fp_epsg4326.geojson
 geojson_utm_file=confs/dataset2/dataset2_bbox_utm55s.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_zs_sub.xml
-source_directory=/datastore/dum031/data/dataset9/
+source_directory=/datastore/dum031/data/dataset3/
 target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
@@ -31,7 +31,7 @@ output_mosaic_dir=${target_directory}pred_tr${training_number}_i${weight}/
 snap_property_file=/srv/osirim/idumeur/snap/etc/snap.properties
 
 download_images_from_s2name:
-	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp" --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
+	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
 
 conda_rasterio:
 	conda config --add channels conda-forge
@@ -50,7 +50,7 @@ get_evi_minmax:
 	python gee_ndvi_minmax.py --path_bdata ${build_dataset_dir} --path_input_data ${target_directory}${output_split_dir_name} --bd 2019-01-01 --ed 2019-12-31 --vi evi --export GEE --path_csv ${source_directory}
 
 download_image:
-		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}  --shp  "../confs/fp_kangaroo.shp"
+		@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save false --output_path ${source_directory}
 
 geojson_2_wkt:
 		@echo "We convert ${geojson_file} into ${wkt_file}"
