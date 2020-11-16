@@ -118,7 +118,6 @@ def define_geometry(list_coordinates):
     return geometry
 
 
-
 def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param=None, name_s2=None):
     """
 
