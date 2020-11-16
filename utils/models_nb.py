@@ -1,5 +1,5 @@
 # Some functions useful for jupyter notebooks used to study the models
-from constant.gee_constant import XDIR
+from constant.storing_constant import XDIR
 from models import clean_gan
 import glob
 import os

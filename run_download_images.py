@@ -8,7 +8,8 @@ import sys
 from utils.download_images import download_all, create_download_dir
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
 from utils.fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
-from constant.gee_constant import S1_OPTPARAM, DIR_T, OPT_DWND_IMAGE
+from constant.gee_constant import S1_OPTPARAM
+from constant.storing_constant import DIR_T, OPT_DWND_IMAGE
 
 
 def _argparser():

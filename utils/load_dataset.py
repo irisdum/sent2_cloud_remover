@@ -1,6 +1,7 @@
 # All the functions used to load the tiles
 import os
-from constant.gee_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE
+from constant.gee_constant import DICT_ORGA, DICT_SHAPE
+from constant.storing_constant import XDIR, LABEL_DIR
 from constant.model_constant import TRAINING_DIR
 from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
 from utils.converter import convert_array
@@ -91,16 +92,31 @@ def create_input_dataset(dict_tiles, input_dir, output_dir,norm=False):
         prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir,norm=norm)
 
 
-def load_data(path_directory, x_shape=None, label_shape=None, normalization=True,dict_band_X=None,dict_band_label=None,dict_rescale_type=None,dir_csv=None):
-    """:param path_directory : path to the directory (train,test or val) which contains two directory dataX and label """
+def load_data(path_directory, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
+              dict_band_label=None, dict_rescale_type=None):
+    """
+
+    Args:
+        path_directory: string, path to the directory which contains the tiles, (train,test or val)which contains two directory dataX and label
+        x_shape: tuple, dimension of the tiles for the tiles considered as the input in the NN (dataX)
+        label_shape: tuple, dimension of the tiles considered as label in the NN
+        normalization: #TODO modify this parameter
+        dict_band_X: dictionary, contains as the keys the band and values are the list of index on which the band are
+         placed in the tiles
+        dict_band_label:dictionary, as above for the label tiles
+        dict_rescale_type: dictionary, for each type of band gives the type of rescaling used
+
+    Returns:
+
+    """
     if x_shape is None:
         x_shape = DICT_SHAPE[XDIR]
     if label_shape is None:
         label_shape = DICT_SHAPE[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
-    dataX,path_tileX,ldict_stat= load_from_dir(path_directory + XDIR, x_shape,path_dir_csv=dir_csv) #only need to load once the s
-    data_label,path_tile_label,_ = load_from_dir(path_directory + LABEL_DIR, label_shape,path_dir_csv=None)
+    dataX,path_tileX,ldict_stat= load_from_dir(path_directory + XDIR, x_shape) #only need to load once the s
+    data_label,path_tile_label,_ = load_from_dir(path_directory + LABEL_DIR, label_shape)
     #print("L_dict_STAT {}".format(ldict_stat))
     if normalization:
         dataX,data_label=rescale_on_batch(dataX,data_label,dict_band_X=dict_band_X,dict_band_label=dict_band_label,
@@ -111,19 +127,25 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
     return dataX, data_label
 
 
-def load_from_dir(path_dir, image_shape, path_dir_csv=None):
+def load_from_dir(path_dir, image_shape):
+    """
+
+    Args:
+        path_dir: string, path to the directory
+        image_shape: tuple, shape of the image
+
+    Returns:
+
+    """
     assert os.path.isdir(path_dir),"Dir {} does not exist".format(path_dir)
     path_tile = find_image_indir(path_dir, "npy")
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     data_array = np.zeros(batch_x_shape)
-    if path_dir_csv is None:
-        for i, tile in enumerate(path_tile):
-            assert os.path.isfile(tile),"Wrong path to tile {}".format(tile)
-            data_array[i, :, :, :] = np.load(tile)
-        return data_array, path_tile,None
-    else:
-        ldict_stat=csv_2_dictstat(path_tile,path_dir_csv)
-        return data_array,path_tile,ldict_stat
+    for i, tile in enumerate(path_tile):
+        assert os.path.isfile(tile),"Wrong path to tile {}".format(tile)
+        data_array[i, :, :, :] = np.load(tile)
+    return data_array, path_tile,None
+
 
 def csv_2_dictstat(path_tile,path_dir_csv):
     ldict_stat = []

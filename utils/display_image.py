@@ -62,6 +62,7 @@ def open_array(path_img):
     Returns:
      a numpy array
     """
+    assert os.path.isfile(path_img),"No file found at this path {}".format(path_img)
     raster = gdal.Open(path_img, gdal.GA_ReadOnly)
     return raster.ReadAsArray()
 

@@ -12,7 +12,8 @@ from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-from constant.gee_constant import LABEL_DIR, DICT_SHAPE, XDIR, DICT_RESCALE_REVERSE
+from constant.gee_constant import DICT_SHAPE, DICT_RESCALE_REVERSE
+from constant.storing_constant import XDIR, LABEL_DIR
 from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
@@ -69,10 +70,11 @@ class GAN():
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
         self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization,
-                                             dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
+                                             dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
+                                             dict_rescale_type=self.dict_rescale_type)
         self.val_X, self.val_Y = load_data(self.val_directory, normalization=self.normalization,
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type,dir_csv=self.path_csv)
+                                           dict_rescale_type=self.dict_rescale_type)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -380,7 +382,7 @@ class GAN():
                 path_csv=self.path_csv
             l_image_id = find_image_indir(batch+XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,dir_csv=path_csv)
+                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
