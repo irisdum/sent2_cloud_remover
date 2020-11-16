@@ -14,10 +14,10 @@ def eedate_2_string(date):
     """
 
     Args:
-        date:
+        date: ee.Date
 
     Returns:
-
+        string
     """
     str_day = convert_int(str(date.get("day").format().getInfo()))
     str_month = convert_int(str(date.get("month").format().getInfo()))
@@ -26,6 +26,14 @@ def eedate_2_string(date):
 
 
 def convert_int(str_value):
+    """
+
+    Args:
+        str_value:
+
+    Returns:
+
+    """
     if type(str_value) == type(1):
         str_value = str(str_value)
 
@@ -76,14 +84,6 @@ def datetime_2_string(ex_date):
         string, the ee.Date converted into "year-month-day" format
     """
     return "-".join([convert_int(ex_date.year), convert_int(ex_date.month), convert_int(ex_date.day)])
-
-
-def next_day(str_date, add=1):
-    str_day = str_date.split("-")[-1]
-    str_next_day = str(int(str_day) + add)
-    str_next_date = "-".join(str_date.split("-")[:-1] + [str_next_day])
-    # print(str_next_day)
-    return str_next_date
 
 
 def gjson_2_eegeom(path_geojson):
