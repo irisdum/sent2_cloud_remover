@@ -38,7 +38,6 @@ SCALE_S1=1
 ## SCAN TILES THRESHOLD OF NUMBER OF CLOUD PIXEL ALLOWED TO KEEP THE TILE
 CLOUD_THR=20
 TOT_ZERO_PIXEL=0.7 #the minimum percentage of non 0 pixels that the tile should have to avoid being removed
-DICT_ORGA={XDIR:["Sentinel1_t0/", "Sentinel1_t1/", "Sentinel2_t0/"], LABEL_DIR:["Sentinel2_t1/"]}
 
 ## Dataset tiles shape
 DICT_SHAPE={XDIR:(256, 256, 8), LABEL_DIR:(256, 256, 4)}

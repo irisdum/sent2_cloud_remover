@@ -48,8 +48,15 @@ def create_safe_directory(output_dir):
 
 
 def find_image_indir(path_dir, image_format):
-    """Given a path to a directory and the final format returns a list of all the images which en by this format in the input
-    dir"""
+    """
+
+    Args:
+        path_dir: string, path to a directory
+        image_format: string image format should be in "vrt", "tif", "SAFE/","npy"
+
+    Returns:
+        a list of string, the output of glob.glob(path_dir*.format). The order of the element is the same as ls -U
+    """
     assert image_format in ["vrt", "tif", "SAFE/",
                             "npy"], "Wrong format should be vrt or tif SAFE/ npy but is {}".format(format)
     assert path_dir[-1] == "/", "path should en with / not {}".format(path_dir)
