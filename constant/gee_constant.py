@@ -45,14 +45,13 @@ DICT_SHAPE={XDIR:(256, 256, 8), LABEL_DIR:(256, 256, 4)}
 ##The data rescaling before going into the NN
 DICT_BAND_LABEL={"R":[0],"G":[1],"B":[2],"NIR":[3]}
 DICT_BAND_X={"VV":[0,2],"VH":[1,3],"R":[4],"G":[5],"B":[6],"NIR":[7]}
-DICT_RESCALE={"R":"center_norm11","G":"center_norm11","B":"center_norm11","NIR":"center_norm11","VV":"centering",
-              "VH":"centering"}
 DICT_RESCALE_REVERSE={"R":"center_norm11_r","G":"center_norm11_r","B":"center_norm11_r","NIR":"center_norm11_r","VV":"centering_r",
-              "VH":"centering_r"}
+              "VH":"centering_r"} #TODO remove
 
 DICT_METHOD={"standardization": "mean_std","standardization11": "mean_std", "centering": "mean_std",
              "normalization": "min_max"," ": "min_max","centering_r":"mean_std","normalization11_r":"min_max",
              "center_norm11":"min_max","center_norm11_r":"min_max"}
+#TODO remove think is unused
 
 #TRAINING CONSTANT
 NAME_LOGS=[]
