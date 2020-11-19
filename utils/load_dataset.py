@@ -141,7 +141,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
         label_shape = DICT_SHAPE[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
-    dataX, path_tileX,_ = load_from_dir(path_directory + XDIR, x_shape)  # only need to load once the s
+    dataX, path_tileX, _ = load_from_dir(path_directory + XDIR, x_shape)  # only need to load once the s
     data_label, path_tile_label, _ = load_from_dir(path_directory + LABEL_DIR, label_shape)
     # print("L_dict_STAT {}".format(ldict_stat))
     if normalization:
