@@ -2,8 +2,8 @@ import glob
 import json
 import os
 
-from constant.gee_constant import DICT_ORGA, EPSG
-from constant.storing_constant import XDIR
+from constant.gee_constant import EPSG
+from constant.storing_constant import XDIR, DICT_ORGA
 
 
 def create_geojson(path_build_dataset):

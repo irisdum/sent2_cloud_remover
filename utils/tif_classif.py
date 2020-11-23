@@ -4,8 +4,7 @@ import os
 import numpy as np
 
 from constant.dem_constant import DICT_CLASSE_SLOPE, DICT_ORIENTATION_PRECISE
-from constant.gee_constant import DICT_ORGA
-from constant.storing_constant import XDIR
+from constant.storing_constant import XDIR, DICT_ORGA
 from constant.landclass_constant import LISTE_LAND_CLASS
 from utils.image_find_tbx import find_path
 import pandas as pd

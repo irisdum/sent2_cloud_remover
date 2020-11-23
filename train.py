@@ -16,12 +16,29 @@ def main(path_train, path_model):
 
 
 def saving_yaml(path_yaml, output_dir):
+    """
+
+    Args:
+        path_yaml: string, path to yaml
+        output_dir: string, path to the directory where the yaml is going to be stored
+
+    Returns:
+
+    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     os.system("cp {} {}".format(path_yaml, output_dir))
 
 
 def open_yaml(path_yaml):
+    """
+
+    Args:
+        path_yaml: string path to the yaml
+
+    Returns:
+        
+    """
     with open(path_yaml) as f:
         return yaml.load(f)
 

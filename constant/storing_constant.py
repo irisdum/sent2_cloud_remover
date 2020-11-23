@@ -8,3 +8,4 @@ XDIR="dataX/"
 LABEL_DIR="label/"
 DIR_T=["date1/", "date2/"]
 OPT_DWND_IMAGE="zip" #the format of the file to dwnld avoid changing
+DICT_ORGA={XDIR:["Sentinel1_t0/", "Sentinel1_t1/", "Sentinel2_t0/"], LABEL_DIR:["Sentinel2_t1/"]}

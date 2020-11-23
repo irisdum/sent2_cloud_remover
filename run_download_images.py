@@ -58,6 +58,22 @@ def collection_lenght(collection):
 
 
 def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
+    """
+
+    Args:
+        date_t: ee.Date
+        zone: an ee.Geometry
+        sent: int could be 1 or 2
+        optparam1: dictionnary, sentinel 1 optional parameters
+        i: nber of days to look at before and after the date_t
+        opt_search: string, could be "before","after" or "both" respectively looks for image [date-i, date] or [date,date+i]
+        or [date-i,date+i]
+
+    Returns:
+         length : int length of the ImageCollection of S1 image
+         ImageCollection : The Sentinel 1 ImageCollection which respect the criteria of seach (input args)
+
+    """
     """:return the length of the sentinel  1 collection at date +-i from the given date depending of the opt_search"""
     collection_sent1_t1_before = get_filter_collection(date_t.advance(-i, "day"), date_t, zone, sent,
                                                        optparam1)  # get the sentinel 1 collection
@@ -77,13 +93,21 @@ def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
 
 
 def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
-    """    :param sent:
-    :param opt_search:
-    :param date_t : an ee.Date from which we want to find the closest sentinel 1 image
-    :param zone : correspond to the path to the geojson
-    :param optparam1 : corresponds to seninel1 optional filters
-    :return the name of the sentinel 1 images closer to date_t1 and an ee.Date which corresponds to the acquisition time
     """
+
+    Args:
+        date_t: ee.Date, the acquisition date of the Sentinel 2 image
+        zone:  ee.Geometry, the S1 images downloaded should cover this area
+        optparam1: dictionnary, Sentinel 1 optional filter
+        opt_search:string, could be "before","after" or "both" respectively looks for image [date-i, date] or [date,date+i]
+        sent:
+
+    Returns:
+    list_name_sent1: list of string, which corresponds to the id of the images contained in the final ImageCollection.
+    Image Collection found from searching S1 images closest to Sentinel 2
+     list_date_sent1: list of ee.Date
+    """
+
     print("Test day +- {} from {}".format(0, date_t.format().getInfo()))
     i = 1
     total_len, dayli_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
@@ -123,7 +147,7 @@ def clip_on_geometry(geometry):
     Args:
         geometry: an ee.Geometry
 
-    Returns: a function
+    Returns: a function which corresponds to clipping an ee.Image along the input geometry
 
     """
     def clip0(image):
@@ -133,9 +157,20 @@ def clip_on_geometry(geometry):
 
 
 def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
-    """ Given a ee.ImageCollection returns the name of the image with cloud pixel coverage below than ccp and that fit
-     sent2criteria
-     :param zone: """ #TODO check the use of this function, used the new one which claculate the ccp on the area !!!
+    """
+
+    Args:
+        collection: a ee.ImageCollection
+        sent2criteria: string should be begin, end, lessclouds :  respectively the image the closest to the begin date,
+        end date or the less clouds
+        ccp: int maximum cloud percentage accepted on the S2 image
+        zone: an ee.Geometry, define the BBOX
+
+    Returns:
+        Three argument which corresponds to a string name of the image of the first image of the collection, an ee.Date which
+        is the date of the first the Image of the output collection, the footprint of the first image of the collection
+    """
+   #TODO check the use of this function, used the new one which claculate the ccp on the area !!!
     print("before clipping length collection = {}".format(collection.toList(100).length().getInfo()))
 
     collection_zone = collection.map(clip_on_geometry(zone))
@@ -152,12 +187,23 @@ def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
         assert sent2criteria == "lessclouds", "Wrong parameter sent2criteria  {} should be in begin,end,lessclouds" \
             .format(sent2criteria)
         collection_zone = collection_zone.sort('CLOUDY_PERCENTAGE_ROI')
-    # assert collection.toList(100).length().getInfo()>0, "No sentinel 2 image found with the ccp {}".format(ccp)
+    # The image are sorted along one criteria, we returns the information for the first image of the sorted collection
     return extract_name_date_first(collection_zone, 2)
 
 
 def extract_name_date_first(collection, sent):
-    """Extract the name and the date of the first image of the collection"""
+    """
+
+    Args:
+        collection: an ee.ImageCollection (ee stands for earth engine library)
+        sent: int could be 1 or 2
+
+    Returns:
+        name : string name of the image of the first image of the collection
+        date_coll: an ee.Date, which is the date of acquisition of the first image of the collection
+        zone: a ee.Geometry which is the foortprint of the first image of the collectoion
+
+    """
     date_coll = collection.first().date()
     if sent == 1:
         name = collection.first().get("system:id").getInfo()
@@ -177,9 +223,10 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
         bd: string, begin date
         ed: string, end date
         zone: ee.Geometry
-        sent2criteria: string, could be less_clouds, ..
-        optparam1: string or None, optional filter top apply on s1 image
-        ccp: int, maximum cloud percentage in the image accepted
+        sent2criteria: string should be "begin", "end" or "lessclouds" : respectively  select s2  image the closest to
+        the begin date,end date or the less clouds
+        optparam1: dictionnary or None, optional filter top apply on s1 image
+        ccp: int, maximum cloud percentage in the image accepted, used only if name_s2 is not defined
         name_s2: string or None, name_id of the S2 image
 
     Returns:
@@ -227,16 +274,25 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
 
 def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, output_path, s2_t0=None,s2_t1=None):
     """
-    :param bd2:
-    :param ccp: cloud pixel coverage percentage
-    :param path_zone: path to the geojson which contains the zone description
-    :param ed2:
-    :param sent2criteria: used to choose wether sent2 images cloud free chosern should be closer to the begin date or
-    ending date
-    :param optparam1: None or a str which contains optional filter to be applied to the satellite data
-    :param bd : string begin date from where we are looking for sentinel 2
-    :param ed : string ending date
+
+    Args:
+        bd: string, begin date 1
+        ed: string, end date 1
+        bd2: string, begin date 2
+        ed2: string, end date 2
+        path_zone: string, path to a Polygon geometry geojson
+        sent2criteria: string, schoos if the sent2 cloud free images should be closer to the begin date or end date
+        optparam1: None or dictionnary, contains filter for Sentinel 1 ImageCollection
+        ccp: int, maximum cloud percentage accpeted for an s2 image (used if s2_t0 or s2_t1 are undefined)
+        save: bool, if set to True the image are saved
+        output_path: string, path to the directory where the images are going to be saved
+        s2_t0: string or None, sentinel 2 image id for date 1
+        s2_t1: string or None, sentinel 2 image id for date 2
+
+    Returns:
+
     """
+
 
     assert create_download_dir(output_path), "Download directory has not been well created"
 

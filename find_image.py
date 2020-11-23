@@ -14,10 +14,10 @@ def eedate_2_string(date):
     """
 
     Args:
-        date:
+        date: ee.Date
 
     Returns:
-
+        string
     """
     str_day = convert_int(str(date.get("day").format().getInfo()))
     str_month = convert_int(str(date.get("month").format().getInfo()))
@@ -26,6 +26,14 @@ def eedate_2_string(date):
 
 
 def convert_int(str_value):
+    """
+
+    Args:
+        str_value:
+
+    Returns:
+
+    """
     if type(str_value) == type(1):
         str_value = str(str_value)
 
@@ -36,31 +44,57 @@ def convert_int(str_value):
 
 
 def string_2_datetime(str_date):
+    """
+
+    Args:
+        str_date: string which describe the date year-month-day
+
+    Returns:
+        an ee.Date
+
+    """
     list_date = str_date.split("-")
     new_date = date(int(list_date[0]), int(list_date[1]), int(list_date[2]))
     return new_date
 
 
 def next_string_date(str_date, i):
+    """
+
+    Args:
+        str_date: string, date year-month-day
+        i: int
+
+    Returns:
+        a string, which is is the input date +i
+
+    """
     old_date = string_2_datetime(str_date)
     old_date = old_date + timedelta(days=i)
     return datetime_2_string(old_date)
 
 
 def datetime_2_string(ex_date):
+    """
+
+    Args:
+        ex_date: ee.Date
+
+    Returns:
+        string, the ee.Date converted into "year-month-day" format
+    """
     return "-".join([convert_int(ex_date.year), convert_int(ex_date.month), convert_int(ex_date.day)])
 
 
-def next_day(str_date, add=1):
-    str_day = str_date.split("-")[-1]
-    str_next_day = str(int(str_day) + add)
-    str_next_date = "-".join(str_date.split("-")[:-1] + [str_next_day])
-    # print(str_next_day)
-    return str_next_date
-
-
 def gjson_2_eegeom(path_geojson):
-    """Given the oath to the goejson returns an ee geometry polygon"""
+    """
+
+    Args:
+        path_geojson: path to a Geojson Polygon File (NOT MULTIPOLUGON!!)
+
+    Returns:
+        the ee.Geometry which is decribed in the geojson
+    """
     with open(path_geojson) as f:
         data = json.load(f)
     assert len(data["features"]) == 1, "More than one feature is stored {}".format(data["features"])
@@ -70,30 +104,41 @@ def gjson_2_eegeom(path_geojson):
 
 
 def define_geometry(list_coordinates):
-    """list_coordinates is a list of list. [[x1,y1],[x2,y2]..]
-    :returns an ee.Geometry"""
+    """
+
+    Args:
+        list_coordinates: list of coordinates ex : [[[x1,y1],...[xn,yn]]]
+
+    Returns:
+        the ee.Geometry.Polygon defined by the list of coordinates
+    """
+
     geometry = ee.Geometry.Polygon(
-        list_coordinates, None, False);
+        list_coordinates, None, False)
     return geometry
 
 
-def display_search(begin_date, ending_date, zone, collection):
-    # print("[INFO] searching images from collection {} \n beginning {} ending {} \n"
-    #       "in zone {}".format(DICT_COLLECTION[collection], begin_date, ending_date, zone)
-    #       )
-    pass
+def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param=None, name_s2=None):
+    """
 
+    Args:
+        begin_date: ee.Date
+        ending_date: ee.Date
+        zone: ee.Geometry, the image of the collection searched should cover a part of the zone
+        sent: int, could be 1 or 2, respectively indicating Sentinel 1 Collection or Sentinel 2
+        opt_param: dictionnary
+        name_s2: string or None
 
-def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}, name_s2=None):
-    """    :param opt_param:
-:param collection sent1 or sent2 collections
-    :param zone : an ee.Geometry
-    :param name_s2 : a string corrresponds to the name of the s2 image PRODUCT_ID in GEE
-    :return an Image collection"""
+    Returns:
+    an ee.ImageCollection
+    """
+
     # print("begin {} ending {}".format(begin_date,ending_date))
+    if opt_param is None:
+        opt_param = {}
     if type(begin_date) != type("u"):
         print("begin {} ending {}".format(begin_date.format().getInfo(), ending_date.format().getInfo()))
-    display_search(begin_date, ending_date, zone, sent)
+
     collection = ee.ImageCollection(DICT_COLLECTION[sent])
     collection = collection.filterDate(begin_date, ending_date).filterBounds(zone)
     # print("Collection sent {} filter len {}".format(sent, collection.toList(100).length().getInfo()))
@@ -108,10 +153,15 @@ def get_filter_collection(begin_date, ending_date, zone, sent=1, opt_param={}, n
 
 
 def opt_filter(collection, opt_param, sent):
-    """Function used to add new filters
-    :param collection:
-    :param opt_param:
-    :param sent:
+    """
+
+    Args:
+        collection: an ee.Image Collection
+        opt_param: a dictionnary, contains optional filters to apply on S1 image
+        sent: int, could be one or 2
+
+    Returns:
+        collection : an ee.ImageCollection, corresponds to the input ImageCollection on which we have applied different filters
     """
     # print("sent {}".format(sent))
     if collection.toList(100).length().getInfo() == 0:
@@ -152,9 +202,16 @@ def _argparser():
 
 
 def list_image_name(image_collection, sent):
-    """    :param sent:
-    :param image_collection : an ee image collection
-    :returns a list of the name of the image collection"""
+    """
+
+    Args:
+        image_collection: ee.ImageCollection
+        sent: int could be 1 or 2
+
+    Returns:list of string, returns a list of the Image_id of the Images contained in the input ImageCollection
+
+    """
+
     # get the len of the image collection
     print(type(image_collection))
     n = image_collection.toList(1000).length().getInfo()

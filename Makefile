@@ -22,7 +22,11 @@ path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
 s2_im_t1=S2B_MSIL1C_20200204T000239_N0208_R030_T55HGB_20200204T011552
 s2_im_t0=S2A_MSIL1C_20191022T000241_N0208_R030_T55HGB_20191022T012314
+<<<<<<< HEAD
 training_dir=/home/dum031/trainings/K0_GAN_DBN_SIG_LRELU/
+=======
+training_dir=/datastore/trainings/K0_GAN_DBN_SIG_LRELU/
+>>>>>>> f6f95b92d0c258e7f2de3482ce8e41706afdff78
 training_number=16
 pred_dataset=${target_directory}${output_split_dir_name}/test/
 weight=295
