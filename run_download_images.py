@@ -7,7 +7,7 @@ import sys
 
 from utils.download_images import download_all, create_download_dir
 from find_image import get_filter_collection, list_image_name, opt_filter, gjson_2_eegeom, eedate_2_string
-from utils.fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images
+from utils.fp_functions import sub_collection_tiles, extract_fp, check_clip_area, zone_in_images, get_biggest_s1_image
 from constant.gee_constant import S1_OPTPARAM
 from constant.storing_constant import DIR_T, OPT_DWND_IMAGE
 
@@ -111,21 +111,18 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     print("Test day +- {} from {}".format(0, date_t.format().getInfo()))
     i = 1
     total_len, dayli_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
-    all_found= zone_in_images(zone,dayli_collection) #boolean wether or not all the good images have been selected
+    all_found,final_image_collection= get_biggest_s1_image(zone,dayli_collection) #boolean wether or not all the good images have been selected
     print(type(zone), zone.getInfo())
     final_collection=dayli_collection
-    while all_found is False:  # iterate until a sentinel 1 image is found
+    while all_found is False: # iterate until a sentinel 1 image is found
         print("Test day +- {} from {}".format(i, date_t.format().getInfo()))
         i += 1
         total_len, dayli_collection = sent_image_search(date_t, zone, sent, optparam1, i, opt_search)
         final_collection=final_collection.merge(dayli_collection)
-        #TODO : make a function which merge the collection : if one geometry of the image is include into another one : remove the includede image
-        all_found=zone_in_images(zone,final_collection)
+        all_found,final_image_collection=get_biggest_s1_image(zone,final_collection)
     print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len, i))
-
-    final_list = list_image_name(final_collection, sent)
+    final_list = list_image_name(final_image_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
-
     list_subcol_sent1 = sub_collection_tiles(final_collection, zone, sent)  # Get subcollections list
     list_name_sent1=[]
     list_date_sent1=[]
@@ -218,7 +215,6 @@ def extract_name_date_first(collection, sent):
 
 def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
     """
-
     Args:
         bd: string, begin date
         ed: string, end date
@@ -228,47 +224,50 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
         optparam1: dictionnary or None, optional filter top apply on s1 image
         ccp: int, maximum cloud percentage in the image accepted, used only if name_s2 is not defined
         name_s2: string or None, name_id of the S2 image
-
     Returns:
         Two dictionnaries respectively for sentinel 1 and two. The keys of these dictionnaries are the image id and the
         values are the date of the image
 
     """
-
     dict_image_dwnld1 = {}
     dict_image_dwnld2 = {}
-    list_sent1_sent2_name = []
     # Extract the Image collection of sentinel 2 between the range dates
     print("With {} - {} looking for {}".format(bd,ed,name_s2))
     global_collection_sent2_t1 = get_filter_collection(bd, ed, zone, 2, opt_param={
         "ccp": ccp},name_s2=name_s2)
-    # Extract the List of subcollection with one subcollection = image between the range date
-    # at one special tile
-    print(type(global_collection_sent2_t1))
-    print(global_collection_sent2_t1.toList(100).length().getInfo())
-    list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, zone, 2)
-    list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
-    list_name_sent1 = []
-    assert len(list_subcol_sent2_t1) > 0, "No sentinel 2 list of subcollection has been created"
-    for sub_col in list_subcol_sent2_t1:  # Go over all the different subcollection
+    if name_s2 is None: #Only for automatic search, should be improved and tested
+        # Extract the List of subcollection with one subcollection = image between the range date
+        # at one special tile
+        print(type(global_collection_sent2_t1))
+        print(global_collection_sent2_t1.toList(100).length().getInfo())
+        list_subcol_sent2_t1 = sub_collection_tiles(global_collection_sent2_t1, zone, 2)
+        list_name_sent2 = []  # Will contains the name, date and fp of the required sentinel 2 Images
+        list_name_sent1 = []
+        assert len(list_subcol_sent2_t1) > 0, "No sentinel 2 list of subcollection has been created"
 
-        name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
-                                                                   ccp, zone)  # returns the image with less clouds
-        # on the specific zone which is the intersection of the two
-        #print("zone {}".format(type(zone)))
-        #print("zone  sent2 {}".format(type(zone)))
-        new_zone = check_clip_area(zone,
-                                   zone_sent2)  # corresponds to the intersection of the sent2 fp and the zone to download
-
-        # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
-        list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
-        # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
-        # image
+        for sub_col in list_subcol_sent2_t1:  # Go over all the different subcollection
+            name, date1_sent2_subcol, zone_sent2 = sent2_filter_clouds(sub_col, sent2criteria,
+                                                                       ccp, zone)  # returns the image with less clouds
+            # on the specific zone which is the intersection of the two
+            #print("zone {}".format(type(zone)))
+            #print("zone  sent2 {}".format(type(zone)))
+            new_zone = check_clip_area(zone,
+                                       zone_sent2)  # corresponds to the intersection of the sent2 fp and the zone to download
+            # print("Zone {}".format(zone_sent2.coordinates().getInfo()))
+            # list_name_sent2 += [name]  # save the name of the sent2 image at t1 to download
+            # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
+            # image
+            dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
+            list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
+            dict_image_dwnld1.update(
+                dict(zip(list_name_sent1, [eedate_2_string(date) for date in list_date_sent1])))
+           # list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
+    else:
+        name, date1_sent2_subcol, zone_sent2= extract_name_date_first(global_collection_sent2_t1,2)
         dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
-        list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol, new_zone, optparam1, "both")
+        list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol,zone_sent2, optparam1, "both")
         dict_image_dwnld1.update(
             dict(zip(list_name_sent1, [eedate_2_string(date) for date in list_date_sent1])))
-    list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
     return dict_image_dwnld1, dict_image_dwnld2
 
 
@@ -310,7 +309,7 @@ def main(bd, ed, bd2, ed2, path_zone, sent2criteria, optparam1, ccp, save, outpu
     print(dic_name_t1_sent1, dic_name_t1_sent2, )
     dic_name_t2_sent1, dic_name_t2_sent2 = download_sent2_sent1(bd2, ed2, zone_sent2_init, sent2criteria, optparam1,
                                                                 ccp,s2_t1)
-    print(dic_name_t2_sent1, dic_name_t2_sent2, )
+    print(dic_name_t2_sent1, dic_name_t2_sent2 )
 
     if save:
         download_all(dic_name_t2_sent1, sent=1,output_path= output_path+DIR_T[1],opt=OPT_DWND_IMAGE)
