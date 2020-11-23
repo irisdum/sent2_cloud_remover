@@ -119,11 +119,49 @@ def check_clip_area(zone, zone_sent2):
         return ee.Geometry(zone_sent2)
     pass
 
+def get_biggest_s1_image(zone,ImageCollection):
+    """
+
+    Args:
+        zone: a ee.Geometry
+        ImageCollection: an ee.ImageCollection
+
+    Returns:
+        - a boolean wether or not one image in the Imagecollection has a footprint that cover FACTEUR AREA percent of the
+        input zone
+        - an ee.ImageCollection of len 1, which contains the  image that covers the maximum amount of the zone
+    """
+
+    list_image = ee.List(ImageCollection.toList(100))
+    n = list_image.length().getInfo()
+    max_area_geom = extract_fp(ee.Image(list_image.get(0)))
+    final_image=ee.Image(list_image.get(0))
+    if n == 0:
+        return False
+    else:
+        for i in range(1,n):
+            image = ee.Image(list_image.get(i))
+            geo = extract_fp(image)
+            if geo.area(0.001).getInfo()>max_area_geom.area(0.001).getInfo():
+                max_area_geom=geo
+                final_image=image
+        if max_area_geom.area(0.001).getInfo() > FACTEUR_AREA * zone.area(0.001).getInfo():
+            print("The geometries of the Image Collection contains the geometry")
+            return True, ee.ImageCollection(final_image)
+        else:
+            return False, ee.ImageCollection(final_image)
 
 def zone_in_images(zone, ImageCollection):
-    """:param :zone ee.Geometry
-    :param list_image : list of ee.Image
-    :returns bool wether or not the Images in the image collection represent the area"""
+    """
+
+    Args:
+        zone: ee.Geometry
+        ImageCollection: an ee.ImageCollection
+
+    Returns:
+        bool wether or not the Images in the image collection represent the area
+    """
+
     list_inter = []  # list of intersection of the fp of all the images with the zone (ee.Geometry)
     list_image = ee.List(ImageCollection.toList(100))
     n = list_image.length().getInfo()
