@@ -123,7 +123,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     print("Number of image found of sent 1  found {} at {} days from sentinel 2 ".format(total_len, i))
     final_list = list_image_name(final_image_collection, sent)
     assert len(final_list) > 0, "Pb the list is empty {}".format(final_list)
-    list_subcol_sent1 = sub_collection_tiles(final_collection, zone, sent)  # Get subcollections list
+    list_subcol_sent1 = sub_collection_tiles(final_image_collection, zone, sent)  # Get subcollections list
     list_name_sent1=[]
     list_date_sent1=[]
     for sub_list in list_subcol_sent1:
