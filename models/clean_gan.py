@@ -27,6 +27,12 @@ import numpy as np
 
 class GAN():
     def __init__(self, model_yaml, train_yaml):
+        """
+
+        Args:
+            model_yaml: dictionnary with the model parameters
+            train_yaml: dictionnary the tran parameters
+        """
         self.sigma_val = 0
         self.model_yaml = model_yaml
         self.img_rows = 28
@@ -69,12 +75,12 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
-        self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization,
+        self.data_X, self.data_y,scale_dict_train = load_data(train_yaml["train_directory"], normalization=self.normalization,
                                              dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                              dict_rescale_type=self.dict_rescale_type)
-        self.val_X, self.val_Y = load_data(self.val_directory, normalization=self.normalization,
+        self.val_X, self.val_Y,scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type)
+                                           dict_rescale_type=self.dict_rescale_type) #TODO add option of reusing another scaler
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -108,7 +114,6 @@ class GAN():
         print("Input G")
         g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                         name="g_build_model_input_data")
-
         G = self.generator(g_input)
         print("G", G)
         # For the combined model we will only train the generator
@@ -123,7 +128,7 @@ class GAN():
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
-        print("[INFO] combiend model loss are : ".format(self.combined.metrics_names))
+        print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):
         img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),

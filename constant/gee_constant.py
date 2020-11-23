@@ -1,8 +1,8 @@
 #CONSTANT TO FILTER RESULTS TO FIND AND DOWNLOAD IMAGES
 from constant.storing_constant import XDIR, LABEL_DIR
 
-DICT_COLLECTION={1: "COPERNICUS/S1_GRD", 2: "COPERNICUS/S2"}
-S2_OPTPARAM={"instrument": "MSI", "processingLevel": "L1C"}
+DICT_COLLECTION={1: "COPERNICUS/S1_GRD", 2: "COPERNICUS/S2_SR"} # corresponds to the gee collection name
+S2_OPTPARAM={"instrument": "MSI", "processingLevel": "L2A"}
 S1_OPTPARAM={"productType": "GRD", "sensorMode": "IW", "instrument": "C-SAR"} # "polarisation": "VH" "orbitDirection":"descending"
 ORBIT_ID={1: "orbitNumber_start", 2: "MGRS_TILE"}
 
