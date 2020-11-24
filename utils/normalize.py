@@ -5,7 +5,8 @@ import os
 from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_METHOD, DICT_TRANSLATE_BAND, \
     CONVERTOR
 from sklearn.preprocessing import StandardScaler,RobustScaler
-from constant.processing_constant import DICT_RESCALE, DICT_GROUP_BAND_LABEL, DICT_GROUP_BAND_X, S1_BANDS, S2_BANDS
+from constant.processing_constant import DICT_RESCALE, DICT_GROUP_BAND_LABEL, DICT_GROUP_BAND_X, S1_BANDS, S2_BANDS, \
+    DICT_RESCALE_TYPE, DICT_SCALER
 from utils.image_find_tbx import extract_tile_id, find_csv
 import matplotlib.pyplot as plt
 import numpy as np
@@ -215,7 +216,7 @@ def conv1D_dim(tuple_dim):
 
 
 def rescale_array(batch_X, batch_label, dict_group_band_X=None, dict_group_band_label=None, dict_rescale_type=None,
-                  s1_log=True):
+                  s1_log=True,dict_scale=None):
     """
 
     Args:
@@ -239,6 +240,10 @@ def rescale_array(batch_X, batch_label, dict_group_band_X=None, dict_group_band_
         dict_group_band_label = DICT_GROUP_BAND_LABEL
     if dict_group_band_X is None:
         dict_group_band_X = DICT_GROUP_BAND_X
+    if dict_rescale_type is None:
+        dict_rescale_type=DICT_RESCALE_TYPE
+    if dict_scale is None:
+        dict_scale=DICT_SCALER
     rescaled_batch_X = np.zeros(batch_X.shape)
     rescaled_batch_label = np.zeros(batch_label.shape)
     # we deal with S1 normalization
@@ -249,37 +254,40 @@ def rescale_array(batch_X, batch_label, dict_group_band_X=None, dict_group_band_
             data_sar_band=np.log10(data_sar_band+10)
         init_shape=data_sar_band.shape
         data_flatten_sar_band=data_sar_band.reshape(conv1D_dim(data_sar_band.shape)) #Modify into 2D array as required for sklearn
-        output_data,sar_scale=sklearn_scale(dict_rescale_type[group_bands],data_flatten_sar_band)
+        output_data,sar_scale=sklearn_scale(dict_rescale_type[group_bands],data_flatten_sar_band,scaler=dict_scale[group_bands])
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]]=output_data.reshape(init_shape) #reshape it
         dict_scaler.update({group_bands:sar_scale})
     for group_bands in S2_BANDS:
-
         m=batch_X.shape[0]# the nber of element in batch_X
         data=np.concatenate((batch_X[:, :, :, dict_group_band_X[group_bands]],
                              batch_label[:, :, :, dict_group_band_label[group_bands]]))
         global_shape=data.shape
         data_flatten=data.reshape(conv1D_dim(data.shape))
-        flat_rescale_data,scale_s2=sklearn_scale(dict_rescale_type[group_bands],data_flatten)
+        flat_rescale_data,scale_s2=sklearn_scale(dict_rescale_type[group_bands],data_flatten,scaler=dict_scale[group_bands])
         rescale_global_data=flat_rescale_data.reshape(global_shape)
         rescaled_batch_X[:,:,:,dict_group_band_X[group_bands]]=rescale_global_data[:m-1,:,:,:]
         rescaled_batch_label[:,:,:,dict_group_band_label[group_bands]]=rescale_global_data[m:,:,:,:]
         dict_scaler.update({group_bands:scale_s2})
+
     return rescaled_batch_X,rescaled_batch_label,dict_scaler
 
 
-def sklearn_scale(scaling_method,data):
+def sklearn_scale(scaling_method,data,scaler=None):
     """
     Args:
         scaling_method: string, name of the method currently only StandardScaler works
         data: input data array to be rescaled
+        scaler : a sklearn Scaler
     Returns:
         data_rescale : the rescaled input numpy array (data)
         scaler :  the sklearn.processing method used
     """
     assert scaling_method in ["StandardScaler"],"The method name is not defined {}".format(scaling_method)
     if scaling_method=="StandardScaler":
-        scaler = StandardScaler()
-        data_rescale=scaler.fit_transform(data)
+        if scaler is None:
+            scaler = StandardScaler()
+            scaler.fit(data)
+        data_rescale=scaler.transform(data)
         return data_rescale,scaler
     else:
         return data,None
