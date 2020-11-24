@@ -265,6 +265,7 @@ def rescale_array(batch_X, batch_label, dict_group_band_X=None, dict_group_band_
         data_flatten=data.reshape(conv1D_dim(data.shape))
         flat_rescale_data,scale_s2=sklearn_scale(dict_rescale_type[group_bands],data_flatten,scaler=dict_scale[group_bands])
         rescale_global_data=flat_rescale_data.reshape(global_shape)
+        print("rescale_global_shape {} fit in {}".format(rescale_global_data.shape,rescaled_batch_X.shape))
         rescaled_batch_X[:,:,:,dict_group_band_X[group_bands]]=rescale_global_data[:m-1,:,:,:]
         rescaled_batch_label[:,:,:,dict_group_band_label[group_bands]]=rescale_global_data[m:,:,:,:]
         dict_scaler.update({group_bands:scale_s2})
