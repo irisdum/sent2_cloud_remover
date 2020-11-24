@@ -193,27 +193,15 @@ class GAN():
                 discri_input)
         else:
             x = discri_input
-        # layer 1
-        x = ZeroPadding2D(
-            padding=(1, 1), name="d_pad_0")(x)
-        x = Conv2D(64, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv1")(x)
-        #x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn1")(x) avoid BN to the input lay
-        # layer 2
-        x = ZeroPadding2D(padding=(1, 1), name="d_pad2")(x)
-        x = Conv2D(128, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv2")(x)
-        x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn2")(x)
-        # layer 3
-        x = ZeroPadding2D(padding=(1, 1), name="d_pad3")(x)
-        x = Conv2D(256, 4, padding="valid", activation=d_activation, strides=(2, 2), name="d_conv3")(x)
-        x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn3")(x)
-        # layer 4
-        x = ZeroPadding2D(padding=(1, 1), name="d_pad4")(x)
-        x = Conv2D(512, 4, padding="valid", activation=d_activation, strides=(1, 1), name="d_conv4")(x)
-        x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn4")(x)
-        # layer 5
-        x = ZeroPadding2D(padding=(1, 1), name="d_pad5")(x)
-        x = Conv2D(1, 4, padding="valid", strides=(1, 1), name="d_conv5")(x) #The activation is put afterwards
-        # x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn5")(x)
+        for i,layer_index in enumerate(model_yaml["dict_discri_archi"]):
+            layer_param=model_yaml["dict_discri_archi"][layer_index]
+            x = ZeroPadding2D(
+                padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
+            x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,
+                       strides=(layer_param["stride"], layer_param["stride"]), name="d_conv{}".format(layer_index))(x)
+            if i>0:
+                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn{}".format(layer_index))(x)
+
         if model_yaml["d_last_activ"] == "sigmoid":
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
         else:
