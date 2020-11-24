@@ -1,0 +1,33 @@
+name: training_env
+
+channels:
+  - conda-forge/label/cf201901 #for gdal
+  - conda-forge
+  - defaults
+  - anaconda
+  - conda-forge/label/broken
+
+dependencies:
+  - python=3.6
+  - conda-forge/label/cf201901::gdal>=2.3.3
+  - pip=20.*
+  - shapely>=1.6.1
+  - opencv>=3.1.0
+  - rtree
+  - anaconda::ipykernel
+  - anaconda::pandas=0.20
+  - anaconda::tensorflow-gpu>=2.0.0
+  - seaborn
+  - scikit-learn
+  - conda-forge::statsmodels
+  - scipy<=1.2.0
+  - cudnn
+  - notebook
+  - pip :
+      - geojson==2.5.0
+      - buzzard==0.6.0
+      - click
+      - ruamel.yaml
+      - tensorflow-estimator==2.1.*
+
+
