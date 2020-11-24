@@ -273,9 +273,9 @@ def rescale_array(batch_X, batch_label, dict_group_band_X=None, dict_group_band_
         flat_rescale_data, scale_s2 = sklearn_scale(dict_rescale_type[group_bands], data_flatten,
                                                     scaler=dict_scale[group_bands])
         rescale_global_data = flat_rescale_data.reshape(global_shape)
-        print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
-                                                                rescale_global_data[:m , :, :, :].shape,
-                                                                rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]].shape,rescaled_batch_label.shape))
+        # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
+        #                                                         rescale_global_data[:m , :, :, :].shape,
+        #                                                         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]].shape,rescaled_batch_label.shape))
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = rescale_global_data[:m , :, :, :]
         rescaled_batch_label[:, :, :, dict_group_band_label[group_bands]] = rescale_global_data[m:, :, :, :]
         dict_scaler.update({group_bands: scale_s2})
@@ -296,6 +296,7 @@ def sklearn_scale(scaling_method, data, scaler=None):
     assert scaling_method in ["StandardScaler"], "The method name is not defined {}".format(scaling_method)
     if scaling_method == "StandardScaler":
         if scaler is None:
+            print("No scaler was defined before")
             scaler = StandardScaler()
             scaler.fit(data)
         data_rescale = scaler.transform(data)
