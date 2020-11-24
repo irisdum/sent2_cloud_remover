@@ -32,7 +32,7 @@ BOUND_X=[100,1000]
 BOUND_Y=[100,1000]
 
 ## CONVERT Uint16 2 Float 32
-CONVERTOR=7000 #apply when displaying the tif tile but also when creating the train, test, val dataset
+CONVERTOR=10000 #apply when displaying the tif tile but also when creating the train, test, val dataset
 SCALE_S1=1
 
 ## SCAN TILES THRESHOLD OF NUMBER OF CLOUD PIXEL ALLOWED TO KEEP THE TILE

@@ -80,7 +80,7 @@ class GAN():
                                              dict_rescale_type=self.dict_rescale_type)
         self.val_X, self.val_Y,scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type) #TODO add option of reusing another scaler
+                                           dict_rescale_type=self.dict_rescale_type,dict_scale=scale_dict_train)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml

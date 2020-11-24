@@ -119,10 +119,12 @@ def create_input_dataset(dict_tiles, input_dir, output_dir, norm=False):
 
 
 def load_data(path_directory, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-              dict_band_label=None, dict_rescale_type=None):
+              dict_band_label=None, dict_rescale_type=None,dict_scale=None):
     """
 
     Args:
+        dict_scale: None or a dictionnary, the keys are string which correspond to group band names and the values
+         are sklearn scaler
         path_directory: string, path to the directory which contains the tiles, (train,test or val)which contains two directory dataX and label
         x_shape: tuple, dimension of the tiles for the tiles considered as the input in the NN (dataX)
         label_shape: tuple, dimension of the tiles considered as label in the NN
@@ -147,7 +149,8 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
     if normalization:
         dataX, data_label, dict_scale = rescale_array(dataX, data_label, dict_group_band_X=dict_band_X,
                                                       dict_group_band_label=dict_band_label,
-                                                      dict_rescale_type=dict_rescale_type, s1_log=True)
+                                                      dict_rescale_type=dict_rescale_type, s1_log=True,
+                                                      dict_scale=dict_scale)
         return dataX, data_label, dict_scale
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
