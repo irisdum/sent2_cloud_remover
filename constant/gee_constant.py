@@ -15,7 +15,7 @@ GEE_S2_BAND=["B2","B3","B4","B8"]
 
 
 ### DOWNLOADING CRITERIA
-FACTEUR_AREA=0.99 # correspond of the minimum area of the zone the sentinel 1 should cover
+FACTEUR_AREA=1 # correspond of the minimum area of the zone the sentinel 1 should cover
 
 VAR_NAME="_prepro"
 

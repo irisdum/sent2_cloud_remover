@@ -49,7 +49,7 @@ def _argparser():
     return parser.parse_args()
 
 
-def default_param(collection):
+def default_param(collection: int):
     if collection == 1:
         return S1_OPTPARAM
     elif collection == 2:
@@ -59,13 +59,13 @@ def default_param(collection):
     # TODO see the parameters for sentinel 2 !
 
 
-def collection_lenght(collection):
+def collection_lenght(collection: ee.ImageCollection):
     """:param collection: an ee.ImageCollection
     :returns an int"""
     return collection.toList(1000).length().getInfo()
 
 
-def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
+def sent_image_search(date_t: ee.Date, zone: ee.Geometry, sent: int, optparam1: dict, i: int, opt_search: str):
     """
 
     Args:
@@ -100,7 +100,7 @@ def sent_image_search(date_t, zone, sent, optparam1, i, opt_search):
         return collection_lenght(collection_sent1_t1_after), collection_sent1_t1_after
 
 
-def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
+def get_sentinel1_image(date_t: ee.Date, zone: ee.Geometry, optparam1: dict, opt_search="both", sent=1):
     """
 
     Args:
@@ -147,7 +147,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     return list_name_sent1, list_date_sent1
 
 
-def clip_on_geometry(geometry):
+def clip_on_geometry(geometry: ee.Geometry):
     """
 
     Args:
@@ -198,7 +198,7 @@ def sent2_filter_clouds(collection, sent2criteria, ccp, zone):
     return extract_name_date_first(collection_zone, 2)
 
 
-def extract_name_date_first(collection, sent):
+def extract_name_date_first(collection: ee.ImageCollection, sent: int) -> Tuple[str, ee.Date, ee.Geometry]:
     """
 
     Args:
@@ -220,7 +220,7 @@ def extract_name_date_first(collection, sent):
         # print("here")
     zone = extract_fp(collection.first(), sent)
 
-    return name, date_coll, zone  # TODO take care of the zone format read
+    return name, date_coll, zone
 
 
 def download_sent2_sent1(bd: str, ed: str, zone: ee.Geometry, sent2criteria: str, optparam1, ccp: int, name_s2: str) -> \
