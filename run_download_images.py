@@ -257,7 +257,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
             # we extract the footprint of sentinel 2 : we extract now all the sentinel 1 images which can reproduce this
             # image
             dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
-            list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2.intersection(zone), optparam1, "both")
+            list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol, zone_sent2.intersection(zone,0.001), optparam1, "both")
             dict_image_dwnld1.update(
                 dict(zip(list_name_sent1, [eedate_2_string(date) for date in list_date_sent1])))
            # list_sent1_sent2_name += list_name_sent2 + list_name_sent1  # collect all the names
@@ -265,7 +265,7 @@ def download_sent2_sent1(bd, ed, zone, sent2criteria, optparam1, ccp,name_s2):
         name, date1_sent2_subcol, zone_sent2= extract_name_date_first(global_collection_sent2_t1,2)
 
         dict_image_dwnld2.update({name: eedate_2_string(date1_sent2_subcol)})
-        list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol,zone_sent2.intersection(zone), optparam1, "both")
+        list_name_sent1, list_date_sent1 = get_sentinel1_image(date1_sent2_subcol,zone_sent2.intersection(zone,0.001), optparam1, "both")
         dict_image_dwnld1.update(
             dict(zip(list_name_sent1, [eedate_2_string(date) for date in list_date_sent1])))
     return dict_image_dwnld1, dict_image_dwnld2
