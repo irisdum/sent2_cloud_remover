@@ -126,7 +126,7 @@ def get_sentinel1_image(date_t, zone, optparam1, opt_search="both", sent=1):
     list_subcol_sent1 = sub_collection_tiles(final_image_collection, zone, sent)  # Get subcollections list
     list_name_sent1=[]
     list_date_sent1=[]
-    assert len(list_subcol_sent1)>1,"We should only find 1 Sentinel 1 image "
+    #assert len(list_subcol_sent1)==1,"We should only find 1 Sentinel 1 image "
     for sub_list in list_subcol_sent1:
         list_name_sent1 += list_image_name(sub_list, sent)
         list_date_sent1 += [sub_list.first().date() for image in list_image_name(sub_list, sent)]
