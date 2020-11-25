@@ -38,10 +38,11 @@ def reformat_dataframe(df):
     df["DOWNLOAD_PATH"] = df.apply(lambda row: get_zip_path(row), axis=1)
     return df
 
+
 def title_param1(image_id):
     """using the name of the sent1 image collect new param to filter for the query to the database"""
-    list_image_id=image_id.split("_")
-    return {"platform":list_image_id[0]}
+    list_image_id = image_id.split("_")
+    return {"platform": list_image_id[0]}
 
 
 def get_zip_path(row):
@@ -66,11 +67,11 @@ def transformfilter2query(filter_name, filter_value):
 
 
 def get_download_zip_url(path_image_name, dict_param, sent=1):
-    image_name=path_image_name.split("/")[-1]
-    #dict_param.update(S1_OPTPARAM) # update the parameters with d
-    if sent==1:
+    image_name = path_image_name.split("/")[-1]
+    # dict_param.update(S1_OPTPARAM) # update the parameters with d
+    if sent == 1:
         dict_param.update(S1_OPTPARAM)
-    if sent==2:
+    if sent == 2:
         dict_param.update(S2_OPTPARAM)
     proxy = None
     urlOpener = makeUrlOpener(proxy)
@@ -91,34 +92,57 @@ def get_download_zip_url(path_image_name, dict_param, sent=1):
         return get_image_download_path(df, image_name).iloc[0]
 
 
-def download_url(zip_file_url, output_path="",opt="zip"):
+def download_url(zip_file_url, output_path="", opt="zip"):
+    """
+
+    Args:
+        zip_file_url: string, url to the image
+        output_path: string, path where the image is going to be downloaded
+        opt: string, if "zip" the directory is not going to be extracted, keep its zip format
+
+    Returns:
+
+    """
     # print(r)
     r = requests.get(zip_file_url, stream=True)
     print(r)
     print(io.BytesIO(r.content))
     z = zipfile.ZipFile(io.BytesIO(r.content))
     print(z)
-    if opt=="zip":
-        os.system("wget {} -P {}".format(zip_file_url,output_path))
+    if opt == "zip":
+        os.system("wget {} -P {}".format(zip_file_url, output_path))
     else:
-        z.extractall(output_path+opt)
+        z.extractall(output_path + opt)
 
 
-def download_all(dic_download, sent, output_path,opt):
+def download_all(dic_download: dict, sent: int, output_path: str, opt: str) -> list:
+    """
+
+    Args:
+        dic_download:
+        sent: int, could be 1 or 2, corresponds for the sensor parameter
+        output_path: string, path to the directory where the zip image is going to be download
+        opt:
+
+    Returns:
+        a list of strings which is
+    """
     """:param dic_download : a dict with key the name of the image and the value the date of the image"""
     proxy = None
     urlOpener = makeUrlOpener(proxy)
+    l_url = []
     for image_name in dic_download:
         date = dic_download[image_name]
         print(image_name)
         dict_param = {"startDate": next_string_date(date, -1), "completionDate": next_string_date(date, 1)}
         zip_url = get_download_zip_url(image_name, dict_param, sent)
+        l_url += [zip_url]
         print("DOWNLOAD_PATH")
-        download_url(zip_url, output_path,opt)
+        download_url(zip_url, output_path, opt)
+    return l_url
 
 
 def main():
-
     proxy = None
     urlOpener = makeUrlOpener(proxy)
     image_id_test = "S1B_IW_GRDH_1SSH_20200322T220406_20200322T220435_020810_027767_839F"
@@ -137,6 +161,7 @@ def main():
 
 if __name__ == '__main__':
     import sys
+
     sys.path.append("../")
     main()
 
