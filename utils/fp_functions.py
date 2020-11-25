@@ -136,18 +136,18 @@ def get_biggest_s1_image(zone:ee.Geometry,ImageCollection:ee.ImageCollection):
     n = list_image.length().getInfo()
     max_area_geom = extract_fp(ee.Image(list_image.get(0)))
     final_image=ee.Image(list_image.get(0))
-    inter = max_area_geom.intersection(zone)
+    inter = max_area_geom.intersection(zone,0.001)
     if n == 0:
         return False
     else:
         for i in range(1,n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
-            inter=geo.intersection(zone)
+
             if inter.area(0.001).getInfo()>max_area_geom.area(0.001).getInfo():
                 max_area_geom=geo
                 final_image=image
-                inter = max_area_geom.intersection(zone)
+                inter = max_area_geom.intersection(zone,0.001)
         if inter.area(0.001).getInfo() >= FACTEUR_AREA * zone.area(0.001).getInfo(): #The intersection between the s2 fp and the s1inter footprint should be the same
             print("The geometries of the Image Collection contains the geometry")
             return True, ee.ImageCollection(final_image)
@@ -174,7 +174,7 @@ def zone_in_images(zone, ImageCollection):
         for i in range(n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
-            geo_inter = geo.intersection(zone)
+            geo_inter = geo.intersection(zone,0.001)
             list_inter = add_distinct_geom(list_inter, geo_inter)
         # compute the area
         area_union = get_list_area(list_inter)
