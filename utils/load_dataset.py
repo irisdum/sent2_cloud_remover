@@ -9,7 +9,7 @@ from osgeo import gdal
 import numpy as np
 
 from utils.normalize import rescale_on_batch, stat_from_csv, rescale_array
-
+#TODO adapt the code for multiple inputs
 
 def make_dataset_hierarchy(path_dataset):
     assert path_dataset[-1] == "/", "Wrong path should end with / not {}".format(path_dataset)
@@ -98,16 +98,14 @@ def prepare_tiles_from_id(list_id, input_dir, output_dir, norm=False):
         create_input(image_id, input_dir, output_dir, normalization=norm)
 
 
-def create_input_dataset(dict_tiles, input_dir, output_dir, norm=False):
+def create_input_dataset(dict_tiles:dict, input_dir:str, output_dir:str, norm=False):
     """
-
     Args:
         dict_tiles: dictionnary, describe the tile id used for train, val and test
          ex :  {"train/": ["01_02.tif",...],"val/":[list of id],"test/":[list of id] }
         input_dir: string, path to directory contains label/ and DataX/
         output_dir: string, path to the global dir that will contains will contains the npy tile created
         norm: boolean, recommended False
-
     Returns:
 
     """

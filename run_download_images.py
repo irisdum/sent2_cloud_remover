@@ -65,7 +65,8 @@ def collection_lenght(collection: ee.ImageCollection):
     return collection.toList(1000).length().getInfo()
 
 
-def sent_image_search(date_t: ee.Date, zone: ee.Geometry, sent: int, optparam1: dict, i: int, opt_search: str):
+def sent_image_search(date_t: ee.Date, zone: ee.Geometry, sent: int, optparam1: dict, i: int, opt_search: str)-> \
+        Tuple[int,ee.ImageCollection]:
     """
 
     Args:

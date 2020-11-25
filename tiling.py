@@ -2,6 +2,8 @@ import argparse
 import glob
 import os
 
+from typing import List
+
 from constant.gee_constant import VAR_NAME, EPSG, LISTE_BANDE
 from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
 from utils.converter import geojson_2_strcoordo_ul_lr
@@ -23,7 +25,7 @@ def _argparser():
     return parser.parse_args()
 
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
+def main(input_dir:str, output_dir:str, list_band2: List[str], list_band1: List[str], path_geojson:str):
     """
 
     Args:
@@ -37,22 +39,18 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
 
     """
     create_tiling_hierarchy(output_dir)
-    # Work
-    # Sentinel 1 at date 1 :
-    process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 0)
-    # Sentinel 1 at date 2 :
-    process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 1)
-    # Sentinel 2 at date 1 :
-    process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, 0)
-    # Sentinel 2 at date 2 :
-    process_date_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, path_geojson, 1)
+    for t in range(len(DIR_T)):
+        # Sentinel 1 at date t :
+        process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, t)
+        # Sentinel 2 at date t :
+        process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, t)
 
 
-def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geojson, t):
+def process_date_sent(list_band:List[str], sent:int , input_dir:str, output_dir:str, sub_dir:str , path_geojson:str, t:int)->str:
     """
 
     Args:
-        t:
+        t: the index for DIR_T
         list_band: list of string, indicates the band which are going to be used
         sent: int, could be 1 or 2, respectively for sentinel 1 data or sentinel 2 data
         input_dir: string path to the directory which contains the preprocesssed image, we consider it is  type **/prepro3/
@@ -61,7 +59,7 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         path_geojson: string, path to the geojson file which gives the coordinates of the Bbox.
 
     Returns:
-
+        path to the shapefile used to as a reference to tile the image
     """
     input_dir = input_dir + DIR_T[t]
     assert os.path.isdir(input_dir), "No directory name {}".format(input_dir)
