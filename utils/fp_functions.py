@@ -1,6 +1,8 @@
 # File where all the functions linked with sent 2 footprints are sentinel 1 footprints are defined
 
 import ee
+from typing import Tuple
+
 from constant.gee_constant import ORBIT_ID, FACTEUR_AREA
 
 
@@ -107,7 +109,7 @@ def extract_fp(image, sent=0):
     # print(type(fp))
 
 
-def check_clip_area(zone:ee.Geometry, zone_sent2:ee.Geometry): #TODO remove should not be used
+def check_clip_area(zone: ee.Geometry, zone_sent2: ee.Geometry):  # TODO remove should not be used
     ar_zone = zone.area(0.001).getInfo()
     ar_zone_sent2 = zone_sent2.area(0.001).getInfo()
     if ar_zone > ar_zone_sent2:
@@ -119,7 +121,8 @@ def check_clip_area(zone:ee.Geometry, zone_sent2:ee.Geometry): #TODO remove shou
         return ee.Geometry(zone_sent2)
     pass
 
-def get_biggest_s1_image(zone:ee.Geometry,ImageCollection:ee.ImageCollection):
+
+def get_biggest_s1_image(zone: ee.Geometry, ImageCollection: ee.ImageCollection) -> Tuple[bool, ee.ImageCollection]:
     """
 
     Args:
@@ -135,24 +138,26 @@ def get_biggest_s1_image(zone:ee.Geometry,ImageCollection:ee.ImageCollection):
     list_image = ee.List(ImageCollection.toList(100))
     n = list_image.length().getInfo()
     max_area_geom = extract_fp(ee.Image(list_image.get(0)))
-    final_image=ee.Image(list_image.get(0))
-    inter = max_area_geom.intersection(zone,0.001)
+    final_image = ee.Image(list_image.get(0))
+    inter = max_area_geom.intersection(zone, 0.001)
     if n == 0:
-        return False
+        return False, ImageCollection
     else:
-        for i in range(1,n):
+        for i in range(1, n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
 
-            if inter.area(0.001).getInfo()>max_area_geom.area(0.001).getInfo():
-                max_area_geom=geo
-                final_image=image
-                inter = max_area_geom.intersection(zone,0.001)
-        if inter.area(0.001).getInfo() >= FACTEUR_AREA * zone.area(0.001).getInfo(): #The intersection between the s2 fp and the s1inter footprint should be the same
+            if inter.area(0.001).getInfo() > max_area_geom.area(0.001).getInfo():
+                max_area_geom = geo
+                final_image = image
+                inter = max_area_geom.intersection(zone, 0.001)
+        if inter.area(0.001).getInfo() >= FACTEUR_AREA * zone.area(
+                0.001).getInfo():  # The intersection between the s2 fp and the s1inter footprint should be the same
             print("The geometries of the Image Collection contains the geometry")
             return True, ee.ImageCollection(final_image)
         else:
             return False, ee.ImageCollection(final_image)
+
 
 def zone_in_images(zone, ImageCollection):
     """
@@ -174,7 +179,7 @@ def zone_in_images(zone, ImageCollection):
         for i in range(n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
-            geo_inter = geo.intersection(zone,0.001)
+            geo_inter = geo.intersection(zone, 0.001)
             list_inter = add_distinct_geom(list_inter, geo_inter)
         # compute the area
         area_union = get_list_area(list_inter)
@@ -218,7 +223,8 @@ def get_list_area(list_geom):
         total_area += geom.area(0.001).getInfo()
     return total_area
 
-def merge_image_collection(collection1,collection2):
+
+def merge_image_collection(collection1, collection2):
     """Function which check if one the fp of one collection is include into another one, if yes keep the one with the biggest intersection area"""
     pass
 
