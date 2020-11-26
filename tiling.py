@@ -5,7 +5,7 @@ import os
 from typing import List
 
 from constant.gee_constant import VAR_NAME, EPSG, LISTE_BANDE
-from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
+from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, DICT_ORGA, DICT_ORGA_INT
 from utils.converter import geojson_2_strcoordo_ul_lr
 from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy
@@ -39,11 +39,15 @@ def main(input_dir:str, output_dir:str, list_band2: List[str], list_band1: List[
 
     """
     create_tiling_hierarchy(output_dir)
-    for t in range(len(DIR_T)):
+    dict_band={1:list_band1,2:list_band2}
+    for key in DICT_ORGA_INT:
+        for sent,t in DICT_ORGA_INT[key]: #tup is (sent,t)
+            process_date_sent(dict_band[sent],sent,input_dir,output_dir,key,path_geojson,t)
+    #for t in range(len(DIR_T)):
         # Sentinel 1 at date t :
-        process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, t)
+        #process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, t)
         # Sentinel 2 at date t :
-        process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, t)
+        #process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, t)
 
 
 def process_date_sent(list_band:List[str], sent:int , input_dir:str, output_dir:str, sub_dir:str , path_geojson:str, t:int)->str:
@@ -93,6 +97,8 @@ def process_date_sent(list_band:List[str], sent:int , input_dir:str, output_dir:
         l_output_path)
     # Crop the image
     output_dir= output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
+    assert "Sentinel{}_t{}/".format(sent, t) in DICT_ORGA[sub_dir], "You use a directory {} name which does not fit with the constant definition" \
+                                                                    "{}".format("Sentinel{}_t{}/".format(sent, t),DICT_ORGA[sub_dir])
     create_safe_directory(output_dir)
     crop_image_name = crop_image(l_output_path[0], path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
