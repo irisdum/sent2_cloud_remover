@@ -3,8 +3,8 @@ import os
 
 from typing import List
 
-from constant.gee_constant import DICT_SHAPE
-from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA
+from constant.gee_constant import LISTE_BANDE
+from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE, DICT_ORGA_INT
 from constant.model_constant import TRAINING_DIR
 from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
 from utils.converter import convert_array
@@ -45,7 +45,7 @@ def modify_array(raster_array):
     return convert_array(raster_array)
 
 
-def create_input(image_id, input_dir, output_dir, normalization=False):
+def create_input(image_id: str, input_dir:str, output_dir:str, normalization=False):
     """
 
     Args:
@@ -84,6 +84,24 @@ def create_input(image_id, input_dir, output_dir, normalization=False):
     np.save("{}{}.npy".format(output_dir + XDIR, image_id[:-4]), rescale_x)
     np.save("{}{}.npy".format(output_dir + LABEL_DIR, image_id[:-4]), rescale_label)
 
+def count_channel(dict_orga_int=None)->dict:
+    """
+
+    Args:
+        dict_orga_int : a dictionnary which has for each keys, a list of tuple (sent,t)
+    Returns:
+        A dictionnary which gives for each dic
+
+    """
+    channel_dic={}
+    if dict_orga_int is None:
+        dict_orga_int=DICT_ORGA_INT
+    for key in dict_orga_int:
+        count=0
+        for sent,t in dict_orga_int[key]:
+            count+=len(LISTE_BANDE[sent-1]) #add the nber of bands which corresponds to sentinel images downloaded
+        channel_dic.update({key:count})
+    return channel_dic
 
 def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False):
     """

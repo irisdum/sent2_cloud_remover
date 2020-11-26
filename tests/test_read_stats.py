@@ -4,8 +4,7 @@ sys.path.append("..")
 import argparse
 import numpy as np
 from utils.image_find_tbx import extract_tile_id, find_image_indir, find_csv
-from constant.gee_constant import DICT_SHAPE
-from constant.storing_constant import XDIR, LABEL_DIR
+from constant.storing_constant import XDIR, LABEL_DIR, DICT_SHAPE
 from utils.load_dataset import load_from_dir, load_data
 from utils.normalize import get_minmax_fromcsv
 
