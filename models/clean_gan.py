@@ -386,9 +386,9 @@ class GAN():
             len(l_image_id), batch.shape[0])
         if os.path.isdir(path_save):
             print("[INFO] the directory where to store the image already exists")
-            data_array, path_tile,_ = load_from_dir(path_save,self.model_yaml["dim_gt_image"] )#TODO act here
+            data_array, path_tile,_ = load_from_dir(path_save,self.model_yaml["dim_gt_image"] )
             return data_array
-        else: #TODO modify this to reuse the rescale sklean function use rescale array
+        else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
             if un_rescale: #remove the normalization made on the data
