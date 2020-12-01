@@ -18,7 +18,7 @@ from models.callbacks import write_log, write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
 from utils.load_dataset import load_data, save_images, load_from_dir, csv_2_dictstat
-from utils.normalize import rescale_on_batch
+from utils.normalize import rescale_on_batch, rescale_array
 from utils.open_yaml import open_yaml, saving_yaml
 from utils.metrics import batch_psnr, ssim_batch, compute_metric
 
@@ -49,11 +49,6 @@ class GAN():
             self.dict_rescale_type = train_yaml["dict_rescale_type"]
 
 
-        if "path_csv" not in train_yaml:
-            print("path°csv undefined do not use global band min and max to normalize the data")
-            self.path_csv = None
-        else:
-            self.path_csv=train_yaml["path_csv"]
 
         # self.latent_dim = 100
         # PATH
@@ -368,16 +363,14 @@ class GAN():
         val_pred = self.generator.predict(self.val_X)
         return compute_metric(self.val_Y, val_pred)
 
-    def predict_on_iter(self, batch, path_save, l_image_id=None,path_csv=None,un_rescale=True):
+    def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
         :param dataset:
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
         """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
-            if path_csv is None:
-                print("WARNING we use the models path to the csv (only good for dataset from which the training tiles are from")
-                path_csv=self.path_csv
+
             l_image_id = find_image_indir(batch+XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,
@@ -393,17 +386,16 @@ class GAN():
             len(l_image_id), batch.shape[0])
         if os.path.isdir(path_save):
             print("[INFO] the directory where to store the image already exists")
-            data_array, path_tile,_ = load_from_dir(path_save, DICT_SHAPE[LABEL_DIR], self.path_csv)
+            data_array, path_tile,_ = load_from_dir(path_save,self.model_yaml["dim_gt_image"] )#TODO act here
             return data_array
-        else: #TODO modify this to reuse the rescale sklean function
+        else: #TODO modify this to reuse the rescale sklean function use rescale array
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
             if un_rescale: #remove the normalization made on the data
-                assert self.path_csv is not None, "Do not unrescale if path_csv  {}".format(path_csv)
-                ldict_stat=csv_2_dictstat(l_image_id,self.path_csv)
-                _,batch_res=rescale_on_batch(batch, batch_res, dict_band_X=self.dict_band_X,
-                                             dict_band_label=self.dict_band_label,l_s2_stat=ldict_stat,
-                                             dict_method=None,dict_rescale_type=DICT_RESCALE_REVERSE)
+
+                _,batch_res,_=rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
+                                             dict_group_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type,
+                                          dict_scale=self.scale_dict_train,invert=True)
             assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
                                                                                                                       batch.shape)
             if path_save is not None:
