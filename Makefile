@@ -37,7 +37,7 @@ download_images_from_s2name_2d:
 	@python run_download_images.py --bd ${begin_date1} ${begin_date2} --ed ${end_date1}  ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_names ${s2_im_t0} ${s2_im_t1}
 
 download_images_from_s2name_3d:
-		@python run_download_images.py --bd ${begin_date1} ${begin_date2} --ed ${end_date1}  ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_names ${s2_im_t3} ${s2_im_t0} ${s2_im_t1}
+		@python run_download_images.py --bd ${begin_date3} ${begin_date1} ${begin_date2} --ed ${end_date3} ${end_date1}  ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_names ${s2_im_t3} ${s2_im_t0} ${s2_im_t1}
 
 conda_rasterio:
 	conda config --add channels conda-forge
