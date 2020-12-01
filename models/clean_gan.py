@@ -48,8 +48,6 @@ class GAN():
             self.dict_band_label = train_yaml["dict_band_label"]
             self.dict_rescale_type = train_yaml["dict_rescale_type"]
 
-
-
         # self.latent_dim = 100
         # PATH
         self.model_name = model_yaml["model_name"]
@@ -68,17 +66,20 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
-        self.data_X, self.data_y,self.scale_dict_train = load_data(train_yaml["train_directory"], normalization=self.normalization,
-                                                              x_shape=model_yaml["input_shape"],
-                                                              label_shape=model_yaml["dim_gt_image"],
-                                                              dict_band_X=self.dict_band_X,
-                                                              dict_band_label=self.dict_band_label,
-                                                            dict_rescale_type=self.dict_rescale_type)
-        self.val_X, self.val_Y,scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
-                                                          x_shape=model_yaml["input_shape"],
-                                                          label_shape=model_yaml["dim_gt_image"],
-                                           dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type,dict_scale=self.scale_dict_train)
+        self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
+                                                                    normalization=self.normalization,
+                                                                    x_shape=model_yaml["input_shape"],
+                                                                    label_shape=model_yaml["dim_gt_image"],
+                                                                    dict_band_X=self.dict_band_X,
+                                                                    dict_band_label=self.dict_band_label,
+                                                                    dict_rescale_type=self.dict_rescale_type)
+        self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
+                                                           x_shape=model_yaml["input_shape"],
+                                                           label_shape=model_yaml["dim_gt_image"],
+                                                           dict_band_X=self.dict_band_X,
+                                                           dict_band_label=self.dict_band_label,
+                                                           dict_rescale_type=self.dict_rescale_type,
+                                                           dict_scale=self.scale_dict_train)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -100,7 +101,8 @@ class GAN():
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
-        self.model_writer=tf.summary.create_file_writer(self.saving_logs_path)
+        self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
+
     def build_model(self):
 
         # We use the discriminator
@@ -160,7 +162,7 @@ class GAN():
                        padding=model_yaml["padding"], name="g_conv{}".format(i))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                    name="g_{}_bn".format(i))(x)
-            x=ReLU(name="g_{}_lay_relu".format(i))(x)
+            x = ReLU(name="g_{}_lay_relu".format(i))(x)
 
         for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
             x = build_resnet_block(x, id=j)
@@ -171,7 +173,7 @@ class GAN():
                        name="g_conv_after_resnetblock{}".format(i))(x)
             x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                    name="g_after_resnetblock{}_bn2".format(i))(x)
-            x=ReLU(name="g_after_resnetblock_relu_{}".format(i))(x)
+            x = ReLU(name="g_after_resnetblock_relu_{}".format(i))(x)
         # The last layer
         x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
                    padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
@@ -191,16 +193,17 @@ class GAN():
                 discri_input)
         else:
             x = discri_input
-        for i,layer_index in enumerate(model_yaml["dict_discri_archi"]):
-            layer_val=model_yaml["dict_discri_archi"][layer_index]
-            layer_key=model_yaml["layer_key"]
-            layer_param=dict(zip(layer_key,layer_val))
+        for i, layer_index in enumerate(model_yaml["dict_discri_archi"]):
+            layer_val = model_yaml["dict_discri_archi"][layer_index]
+            layer_key = model_yaml["layer_key"]
+            layer_param = dict(zip(layer_key, layer_val))
             x = ZeroPadding2D(
                 padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
             x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,
                        strides=(layer_param["stride"], layer_param["stride"]), name="d_conv{}".format(layer_index))(x)
-            if i>0:
-                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training, name="d_bn{}".format(layer_index))(x)
+            if i > 0:
+                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
+                                       name="d_bn{}".format(layer_index))(x)
 
         if model_yaml["d_last_activ"] == "sigmoid":
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
@@ -239,10 +242,10 @@ class GAN():
             start_epoch = int(self.previous_checkpoint) + 1
             self.load_from_checkpoint(self.previous_checkpoint)
         else:
-            #create_safe_directory(self.saving_logs_path)
+            # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch = 0
-        #self.define_callback()
+        # self.define_callback()
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -308,11 +311,11 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-                    write_log_tf2(self.model_writer,name_logs + l_name_metrics + name_val_metric,
-                                  val_logs + l_value_metrics + l_val_value_metrics,self.num_batches * epoch + idx)
-                   # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
-                    #          val_logs + l_value_metrics + l_val_value_metrics,
-                     #         self.num_batches * epoch + idx)
+                    write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric,
+                                  val_logs + l_value_metrics + l_val_value_metrics, self.num_batches * epoch + idx)
+                # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
+                #          val_logs + l_value_metrics + l_val_value_metrics,
+                #         self.num_batches * epoch + idx)
 
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
@@ -321,7 +324,7 @@ class GAN():
                 self.save_model(epoch)
 
     def save_model(self, step):
-        print("Saving model at {} step {}".format(self.checkpoint_dir,step))
+        print("Saving model at {} step {}".format(self.checkpoint_dir, step))
         checkpoint_dir = self.checkpoint_dir
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
@@ -371,7 +374,7 @@ class GAN():
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
             print("We load our data from {}".format(batch))
 
-            l_image_id = find_image_indir(batch+XDIR, "npy")
+            l_image_id = find_image_indir(batch + XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,
                                  x_shape=self.model_yaml["input_shape"],
@@ -386,22 +389,24 @@ class GAN():
             len(l_image_id), batch.shape[0])
         if os.path.isdir(path_save):
             print("[INFO] the directory where to store the image already exists")
-            data_array, path_tile,_ = load_from_dir(path_save,self.model_yaml["dim_gt_image"] )
+            data_array, path_tile, _ = load_from_dir(path_save, self.model_yaml["dim_gt_image"])
             return data_array
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
-            if un_rescale: #remove the normalization made on the data
+            if un_rescale:  # remove the normalization made on the data
 
-                _,batch_res,_=rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
-                                             dict_group_band_label=self.dict_band_label,dict_rescale_type=self.dict_rescale_type,
-                                          dict_scale=self.scale_dict_train,invert=True)
-            assert batch_res.shape[0]==batch.shape[0],"Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
-                                                                                                                      batch.shape)
+                _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
+                                                dict_group_band_label=self.dict_band_label,
+                                                dict_rescale_type=self.dict_rescale_type,
+                                                dict_scale=self.scale_dict_train, invert=True)
+            assert batch_res.shape[0] == batch.shape[
+                0], "Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
+                                                                                    batch.shape)
             if path_save is not None:
                 # we store the data at path_save
                 for i in range(batch_res.shape[0]):
-                    np.save("{}_image_{}".format(path_save, l_image_id[i].split("/")[-1]),batch_res[i,:,:,:])
+                    np.save("{}_image_{}".format(path_save, l_image_id[i].split("/")[-1]), batch_res[i, :, :, :])
         return batch_res
 
 

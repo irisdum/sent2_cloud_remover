@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 
 
-d
 def plot_one_band(raster_array, fig, ax, title="", cmap="bone"):
     """:param raster_array a numpy array
     Function that plot an np array with a colorbar"""
@@ -223,8 +222,9 @@ def conv1D_dim(tuple_dim):
     return (tuple_dim[0] * tuple_dim[1] * tuple_dim[2] * tuple_dim[3], 1)
 
 
-def rescale_array(batch_X:np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None, dict_rescale_type=None,
-                  s1_log=True, dict_scale=None,invert=False)-> Tuple[np.array, np.array, dict]:
+def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None,
+                  dict_rescale_type=None,
+                  s1_log=True, dict_scale=None, invert=False) -> Tuple[np.array, np.array, dict]:
     """
 
     Args:
@@ -276,19 +276,19 @@ def rescale_array(batch_X:np.array, batch_label, dict_group_band_X=None, dict_gr
         data_flatten = data.reshape(conv1D_dim(data.shape))
 
         flat_rescale_data, scale_s2 = sklearn_scale(dict_rescale_type[group_bands], data_flatten,
-                                                    scaler=dict_scale[group_bands],invert=invert)
+                                                    scaler=dict_scale[group_bands], invert=invert)
         rescale_global_data = flat_rescale_data.reshape(global_shape)
         # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
         #                                                         rescale_global_data[:m , :, :, :].shape,
         #                                                         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]].shape,rescaled_batch_label.shape))
-        rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = rescale_global_data[:m , :, :, :]
+        rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = rescale_global_data[:m, :, :, :]
         rescaled_batch_label[:, :, :, dict_group_band_label[group_bands]] = rescale_global_data[m:, :, :, :]
         dict_scaler.update({group_bands: scale_s2})
 
     return rescaled_batch_X, rescaled_batch_label, dict_scaler
 
 
-def sklearn_scale(scaling_method, data, scaler=None,invert=False):
+def sklearn_scale(scaling_method, data, scaler=None, invert=False):
     """
     Args:
         scaling_method: string, name of the method currently only StandardScaler works
@@ -306,7 +306,7 @@ def sklearn_scale(scaling_method, data, scaler=None,invert=False):
             scaler.fit(data)
         else:
             if invert:
-                return scaler.inverse_transform(data),scaler
+                return scaler.inverse_transform(data), scaler
         data_rescale = scaler.transform(data)
         return data_rescale, scaler
     else:
