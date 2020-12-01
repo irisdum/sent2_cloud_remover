@@ -194,7 +194,9 @@ class GAN():
         else:
             x = discri_input
         for i,layer_index in enumerate(model_yaml["dict_discri_archi"]):
-            layer_param=model_yaml["dict_discri_archi"][layer_index]
+            layer_val=model_yaml["dict_discri_archi"][layer_index]
+            layer_key=model_yaml["layer_key"]
+            layer_param=dict(zip(layer_key,layer_val))
             x = ZeroPadding2D(
                 padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
             x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,

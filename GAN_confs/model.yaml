@@ -25,7 +25,10 @@ do_rate: 0.5
 ######################################
 #describe the whole discriminator architecture
 
-dict_discri_archi: {1: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 64},2: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 128}, 3: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 256}, 4: {"padding": 1,"stride": 1,"kernel": 4,"nfilter": 512}, 5:{"padding": 1,"stride": 1,"kernel": 4,"nfilter": 1}}
+
+layer_key: ["padding","stride","kernel","nfilter"] #corresponds to the parameter name to be modified in the following dict
+dict_discri_archi: {1: [1, 2, 4, 64],2: [1,2,4,128], 3: [1,2,4,256], 4: [1,1,4,512], 5:[1,1,4,1]}. #For each list
+  #the values will be zipped with layer key
 ## last layer activation leaky relu alpha_param
 lrelu_alpha: 0.2 #useful only if lrelu
 d_activation: "lrelu" #could also be lrelu or relu, corresponds to the activation of the discriminator
