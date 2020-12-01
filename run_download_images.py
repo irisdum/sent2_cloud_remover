@@ -332,6 +332,7 @@ def main(l_bd: list, l_ed: list, path_zone: str, sent2criteria: str, optparam1: 
 if __name__ == '__main__':
     sys.path.append("./")
     args = _argparser()
+    print(args.bd,args.ed,args.s2_names)
     main(args.bd, args.ed, args.zone, args.sent2criteria, args.optparam1, int(args.ccp),
          args.save,
          args.output_path, args.s2_names)
