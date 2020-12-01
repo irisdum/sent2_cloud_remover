@@ -80,6 +80,8 @@ class GAN():
                                                               dict_band_label=self.dict_band_label,
                                                             dict_rescale_type=self.dict_rescale_type)
         self.val_X, self.val_Y,scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
+                                                          x_shape=model_yaml["input_shape"],
+                                                          label_shape=model_yaml["dim_gt_image"],
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                            dict_rescale_type=self.dict_rescale_type,dict_scale=scale_dict_train)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
@@ -378,7 +380,10 @@ class GAN():
                 path_csv=self.path_csv
             l_image_id = find_image_indir(batch+XDIR, "npy")
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type)
+                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,
+                                 x_shape=self.model_yaml["input_shape"],
+                                 label_shape=self.model_yaml["dim_gt_image"]
+                                 )
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
