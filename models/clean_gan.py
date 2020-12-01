@@ -47,9 +47,7 @@ class GAN():
             self.dict_band_X = train_yaml["dict_band_x"]
             self.dict_band_label = train_yaml["dict_band_label"]
             self.dict_rescale_type = train_yaml["dict_rescale_type"]
-            assert type(self.dict_band_label) == type(
-                {"u": 1}), "The argument {} of dict band label is not a dictionnary  but {}".format(
-                self.dict_band_label, type(self.dict_band_label))
+
 
         if "path_csv" not in train_yaml:
             print("path°csv undefined do not use global band min and max to normalize the data")
@@ -388,7 +386,7 @@ class GAN():
             print("[INFO] the directory where to store the image already exists")
             data_array, path_tile,_ = load_from_dir(path_save, DICT_SHAPE[LABEL_DIR], self.path_csv)
             return data_array
-        else:
+        else: #TODO modify this to reuse the rescale sklean function
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
             if un_rescale: #remove the normalization made on the data
