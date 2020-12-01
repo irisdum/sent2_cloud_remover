@@ -26,7 +26,7 @@ do_rate: 0.5
 ######################################
 #describe the whole discriminator architecture
 
-dict_discri_archi: {1:{"padding":1,"stride":2,"kernel":4,"nfilter":64},2:{"padding":1,"stride":2,"kernel":4,"nfilter":128},3: {"padding":1,"stride":2,"kernel":4,"nfilter":256},4:{"padding":1,"stride":1,"kernel":4,"nfilter":512},5:{"padding":1,"stride":1,"kernel":4,"nfilter":1}}
+dict_discri_archi: {1: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 64},2: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 128}, 3: {"padding": 1,"stride": 2,"kernel": 4,"nfilter": 256}, 4: {"padding": 1,"stride": 1,"kernel": 4,"nfilter": 512}, 5:{"padding": 1,"stride": 1,"kernel": 4,"nfilter": 1}}
 ## last layer activation leaky relu alpha_param
 lrelu_alpha: 0.2 #useful only if lrelu
 d_activation: "lrelu" #could also be lrelu or relu, corresponds to the activation of the discriminator
