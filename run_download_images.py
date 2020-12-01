@@ -20,12 +20,7 @@ def _argparser():
     parser.add_argument('--bd', nargs="+", help="list of the begin dates of all the S2 images")
     parser.add_argument('--ed', nargs="+",
                         help="list of the ending dates of all the S2 images")
-    parser.add_argument("--bd2", type=str,
-                        help="t2 corresponds to the second date for cloud free sent2 images"
-                             "acquisition")
-    parser.add_argument('--ed2', type=str,
-                        help="ending date t2 corresponds to the second date for cloud free sent2 images"
-                             "acquisition")
+
     parser.add_argument('--zone', type=str, help="path where the zone coordinates are stored ")
     parser.add_argument("--sent2criteria", type=str, default="lessclouds",
                         help="sent 2 criteria to select the image begin or"
