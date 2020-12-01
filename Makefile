@@ -1,5 +1,5 @@
-begin_date1=2019-10-20
-end_date1=2019-10-30
+begin_date1=2019-11-03
+end_date1=2019-11-10
 begin_date2=2020-02-01
 end_date2=2020-02-05
 CCP=50
@@ -7,7 +7,7 @@ geojson_file=confs/dataset2/dataset2_bbox_wsg84.geojson
 geojson_utm_file=confs/dataset2/dataset2_bbox_utm55s.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_zs_utm55s.xml
-source_directory=/srv/osirim/idumeur/data/dataset3/
+source_directory=/srv/osirim/idumeur/data/dataset6/
 target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/

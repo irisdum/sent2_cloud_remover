@@ -1,4 +1,4 @@
-name: training_env
+name: tf_env
 
 channels:
   - conda-forge/label/cf201901 #for gdal
