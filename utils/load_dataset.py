@@ -1,7 +1,10 @@
 # All the functions used to load the tiles
 import os
-from constant.gee_constant import DICT_SHAPE
-from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA
+
+from typing import List
+
+from constant.gee_constant import LISTE_BANDE
+from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE, DICT_ORGA_INT
 from constant.model_constant import TRAINING_DIR
 from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
 from utils.converter import convert_array
@@ -11,7 +14,9 @@ import numpy as np
 from utils.normalize import rescale_on_batch, stat_from_csv, rescale_array
 
 
-def make_dataset_hierarchy(path_dataset):
+# TODO adapt the code for multiple inputs
+
+def make_dataset_hierarchy(path_dataset: str):
     assert path_dataset[-1] == "/", "Wrong path should end with / not {}".format(path_dataset)
     create_safe_directory(path_dataset)
     for sub_dir in TRAINING_DIR:
@@ -20,7 +25,7 @@ def make_dataset_hierarchy(path_dataset):
         os.mkdir(path_dataset + sub_dir + LABEL_DIR)
 
 
-def tiff_2_array(path_tif):
+def tiff_2_array(path_tif: str):
     assert os
     raster = gdal.Open(path_tif)
     return raster.ReadAsArray()
@@ -40,7 +45,7 @@ def modify_array(raster_array):
     return convert_array(raster_array)
 
 
-def create_input(image_id, input_dir, output_dir, normalization=False):
+def create_input(image_id: str, input_dir:str, output_dir:str, normalization=False):
     """
 
     Args:
@@ -79,8 +84,26 @@ def create_input(image_id, input_dir, output_dir, normalization=False):
     np.save("{}{}.npy".format(output_dir + XDIR, image_id[:-4]), rescale_x)
     np.save("{}{}.npy".format(output_dir + LABEL_DIR, image_id[:-4]), rescale_label)
 
+def count_channel(dict_orga_int=None)->dict:
+    """
 
-def prepare_tiles_from_id(list_id, input_dir, output_dir, norm=False):
+    Args:
+        dict_orga_int : a dictionnary which has for each keys, a list of tuple (sent,t)
+    Returns:
+        A dictionnary which gives for each dic
+
+    """
+    channel_dic={}
+    if dict_orga_int is None:
+        dict_orga_int=DICT_ORGA_INT
+    for key in dict_orga_int:
+        count=0
+        for sent,t in dict_orga_int[key]:
+            count+=len(LISTE_BANDE[sent-1]) #add the nber of bands which corresponds to sentinel images downloaded
+        channel_dic.update({key:count})
+    return channel_dic
+
+def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False):
     """
     This function goes through a list of id. For each idea the create_input function is applied :
      we create dataX tile and label tile
@@ -98,16 +121,14 @@ def prepare_tiles_from_id(list_id, input_dir, output_dir, norm=False):
         create_input(image_id, input_dir, output_dir, normalization=norm)
 
 
-def create_input_dataset(dict_tiles, input_dir, output_dir, norm=False):
+def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm=False):
     """
-
     Args:
         dict_tiles: dictionnary, describe the tile id used for train, val and test
          ex :  {"train/": ["01_02.tif",...],"val/":[list of id],"test/":[list of id] }
         input_dir: string, path to directory contains label/ and DataX/
         output_dir: string, path to the global dir that will contains will contains the npy tile created
         norm: boolean, recommended False
-
     Returns:
 
     """
@@ -118,8 +139,8 @@ def create_input_dataset(dict_tiles, input_dir, output_dir, norm=False):
         prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir, norm=norm)
 
 
-def load_data(path_directory, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-              dict_band_label=None, dict_rescale_type=None,dict_scale=None):
+def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
+              dict_band_label=None, dict_rescale_type=None, dict_scale=None):
     """
 
     Args:
@@ -158,7 +179,7 @@ def load_data(path_directory, x_shape=None, label_shape=None, normalization=True
     return dataX, data_label, None
 
 
-def load_from_dir(path_dir, image_shape):
+def load_from_dir(path_dir: str, image_shape: tuple):
     """
 
     Args:
@@ -178,7 +199,7 @@ def load_from_dir(path_dir, image_shape):
     return data_array, path_tile, None
 
 
-def csv_2_dictstat(path_tile, path_dir_csv):
+def csv_2_dictstat(path_tile: str, path_dir_csv: str):
     ldict_stat = []
     for i, tile in enumerate(path_tile):
         ldict_stat += [stat_from_csv(path_tile=tile, dir_csv=path_dir_csv)]

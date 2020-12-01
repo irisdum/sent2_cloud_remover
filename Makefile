@@ -1,13 +1,15 @@
 begin_date1=2019-11-03
 end_date1=2019-11-10
 begin_date2=2020-02-01
-end_date2=2020-02-05
+end_date2=2020-02-06
+begin_date3=2019-09-25
+end_date3=2019-09-28
 CCP=50
 geojson_file=confs/dataset2/dataset2_bbox_wsg84.geojson
 geojson_utm_file=confs/dataset2/dataset2_bbox_utm55s.geojson
 wkt_file=confs/train_kangaroo_wkt.txt
 graph_xml_sent1=snap-confs/calibrate_sent1_zs_utm55s.xml
-source_directory=/srv/osirim/idumeur/data/dataset6/
+source_directory=/srv/osirim/idumeur/data/dataset7/
 target_directory=${source_directory}prepro1/
 build_dataset_dir=${target_directory}build_dataset/
 build_dataset_landclass=${source_directory}build_dataset_landclass/
@@ -22,6 +24,7 @@ path_model_yaml=GAN_confs/model.yaml
 path_grid_geosjon=${build_dataset_dir}dataX/Sentinel1_t0/tiling_sent1_t0_fp.geojson
 s2_im_t1=S2B_MSIL2A_20200204T000239_N0213_R030_T55HGB_20200204T015232
 s2_im_t0=S2B_MSIL2A_20191106T000239_N0213_R030_T55HGB_20191106T014722
+s2_im_t3=S2B_MSIL2A_20190927T000239_N0213_R030_T55HGB_20190927T015503
 training_dir=/datastore/trainings/K0_GAN_DBN_SIG_LRELU/
 training_number=16
 pred_dataset=${target_directory}${output_split_dir_name}/test/
@@ -30,8 +33,11 @@ pref_pred_image=tr${training_number}_w_${weight}_test_d6
 output_mosaic_dir=${target_directory}pred_tr${training_number}_i${weight}/
 snap_property_file=/srv/osirim/idumeur/snap/etc/snap.properties
 
-download_images_from_s2name:
-	@python run_download_images.py --bd1 ${begin_date1} --ed1 ${end_date1} --bd2 ${begin_date2} --ed2 ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_t0 ${s2_im_t0} --s2_t1 ${s2_im_t1}
+download_images_from_s2name_2d:
+	@python run_download_images.py --bd ${begin_date1} ${begin_date2} --ed ${end_date1}  ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_names ${s2_im_t0} ${s2_im_t1}
+
+download_images_from_s2name_3d:
+		@python run_download_images.py --bd ${begin_date1} ${begin_date2} --ed ${end_date1}  ${end_date2} --sent2criteria "lessclouds" --zone ${geojson_file} --ccp ${CCP} --save true --output_path ${source_directory}   --s2_names ${s2_im_t3} ${s2_im_t0} ${s2_im_t1}
 
 conda_rasterio:
 	conda config --add channels conda-forge

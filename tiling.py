@@ -2,8 +2,10 @@ import argparse
 import glob
 import os
 
+from typing import List
+
 from constant.gee_constant import VAR_NAME, EPSG, LISTE_BANDE
-from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T
+from constant.storing_constant import TEMPORARY_DIR, XDIR, LABEL_DIR, DIR_T, DICT_ORGA, DICT_ORGA_INT
 from utils.converter import geojson_2_strcoordo_ul_lr
 from utils.image_find_tbx import create_safe_directory
 from utils.storing_data import create_tiling_hierarchy
@@ -23,7 +25,7 @@ def _argparser():
     return parser.parse_args()
 
 
-def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
+def main(input_dir: str, output_dir: str, list_band2: List[str], list_band1: List[str], path_geojson: str):
     """
 
     Args:
@@ -37,22 +39,23 @@ def main(input_dir, output_dir, list_band2, list_band1, path_geojson):
 
     """
     create_tiling_hierarchy(output_dir)
-    # Work
-    # Sentinel 1 at date 1 :
-    process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 0)
-    # Sentinel 1 at date 2 :
-    process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, 1)
-    # Sentinel 2 at date 1 :
-    process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, 0)
-    # Sentinel 2 at date 2 :
-    process_date_sent(list_band2, 2, input_dir, output_dir, LABEL_DIR, path_geojson, 1)
+    dict_band = {1: list_band1, 2: list_band2}
+    for key in DICT_ORGA_INT:
+        for sent, t in DICT_ORGA_INT[key]:  # tup is (sent,t)
+            process_date_sent(dict_band[sent], sent, input_dir, output_dir, key, path_geojson, t)
+    # for t in range(len(DIR_T)):
+    # Sentinel 1 at date t :
+    # process_date_sent(list_band1, 1, input_dir, output_dir, XDIR, path_geojson, t)
+    # Sentinel 2 at date t :
+    # process_date_sent(list_band2, 2, input_dir, output_dir, XDIR, path_geojson, t)
 
 
-def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geojson, t):
+def process_date_sent(list_band: List[str], sent: int, input_dir: str, output_dir: str, sub_dir: str, path_geojson: str,
+                      t: int) -> str:
     """
 
     Args:
-        t:
+        t: the index for DIR_T
         list_band: list of string, indicates the band which are going to be used
         sent: int, could be 1 or 2, respectively for sentinel 1 data or sentinel 2 data
         input_dir: string path to the directory which contains the preprocesssed image, we consider it is  type **/prepro3/
@@ -61,7 +64,7 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         path_geojson: string, path to the geojson file which gives the coordinates of the Bbox.
 
     Returns:
-
+        path to the shapefile used to as a reference to tile the image
     """
     input_dir = input_dir + DIR_T[t]
     assert os.path.isdir(input_dir), "No directory name {}".format(input_dir)
@@ -83,8 +86,8 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         assert len(list_path_band) > 0, "No bands {} found in {}".format(list_band, dir)
         merged_band_image = combine_band(list_path_band, output_dir + sub_dir + TEMPORARY_DIR)
         l_output_path += [merged_band_image]
-        print ("[INFO] we combined for images bands {} in dir {} and output it as {}".format(list_path_band, dir,
-                                                                                             merged_band_image))
+        print("[INFO] we combined for images bands {} in dir {} and output it as {}".format(list_path_band, dir,
+                                                                                            merged_band_image))
     # Mosaic if multiple images found
     if len(l_output_path) > 1:
         l_output_path = [mosaic_image(l_output_path, output_dir + sub_dir + TEMPORARY_DIR)]
@@ -94,12 +97,15 @@ def process_date_sent(list_band, sent, input_dir, output_dir, sub_dir, path_geoj
         l_output_path) == 1, "Issue with the code should not end up with more than one image in the list {}".format(
         l_output_path)
     # Crop the image
-    output_dir= output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
+    output_dir = output_dir + sub_dir + "Sentinel{}_t{}/".format(sent, t)
+    assert "Sentinel{}_t{}/".format(sent, t) in DICT_ORGA[
+        sub_dir], "You use a directory {} name which does not fit with the constant definition" \
+                  "{}".format("Sentinel{}_t{}/".format(sent, t), DICT_ORGA[sub_dir])
     create_safe_directory(output_dir)
     crop_image_name = crop_image(l_output_path[0], path_geojson,
                                  output_dir + "merged_crop_sent{}_t{}.vrt".format(sent, t))
-    tiling_shp=tiling(crop_image_name,output_dir,sent,t,overlap=0)
-    print("[INFO] Image {} has been tiles, footprint of the tiles in {}".format(crop_image_name,tiling_shp))
+    tiling_shp = tiling(crop_image_name, output_dir, sent, t, overlap=0)
+    print("[INFO] Image {} has been tiles, footprint of the tiles in {}".format(crop_image_name, tiling_shp))
     return tiling_shp
 
 
@@ -130,7 +136,7 @@ def find_image_band(input_directory, list_band, format="img", sent=1):
         list_band: list of the band to collect
 
     Returns:
-        a list of the path each image band
+        a list of the path each image band, the order of the image cllected is the same order of list_band
     """
     l_final = []
     for b in list_band:
@@ -148,7 +154,7 @@ def find_image_band(input_directory, list_band, format="img", sent=1):
     return l_final
 
 
-def combine_band(list_path_band, output_dir):
+def combine_band(list_path_band: List[str], output_dir: str) -> str:
     """
 
     Args:
@@ -181,7 +187,7 @@ def create_name_band(band_path, output_dir, format="vrt"):
     return output_dir + band_path.split("/")[-2][:-4] + format
 
 
-def get_band_image_name(image_path, output_dir):
+def get_band_image_name(image_path: str, output_dir: str):
     """
 
     Args:
@@ -196,7 +202,6 @@ def get_band_image_name(image_path, output_dir):
     return output_dir + image_name.split(VAR_NAME)[0] + "merged.vrt"
 
 
-
 def crop_image(image_path, path_geojson, output_path):
     """
 
@@ -208,7 +213,7 @@ def crop_image(image_path, path_geojson, output_path):
     Returns: a string, path of the cropped image
 
     """
-    #assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
+    # assert os.path.isfile(path_geojson), "No path in {}".format(path_geojson)
     # assert os.path.isdir(output_dir),"No dir in {}".format(output_dir)
     str_bbox = geojson_2_strcoordo_ul_lr(path_geojson)
     print("BBox {}".format(str_bbox))
@@ -232,7 +237,6 @@ def list_2_str(list):
         ch += "{} ".format(p)
     print(ch)
     return ch
-
 
 
 def tiling(image_vrt, output_dir, sent=1, date_t=0, overlap=0):

@@ -3,8 +3,7 @@ import os
 import buzzard as buzz
 import argparse
 from utils.image_find_tbx import find_path, extract_tile_id, create_safe_directory
-from constant.gee_constant import DICT_SHAPE
-from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA
+from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE
 from utils.load_dataset import load_from_dir
 
 

@@ -109,11 +109,11 @@ def extract_fp(image, sent=0):
     # print(type(fp))
 
 
-def check_clip_area(zone: ee.Geometry, zone_sent2: ee.Geometry):  # TODO remove should not be used
+def check_clip_area(zone, zone_sent2):
     ar_zone = zone.area(0.001).getInfo()
     ar_zone_sent2 = zone_sent2.area(0.001).getInfo()
-    if ar_zone > ar_zone_sent2:
-        print("There is an issue the area of the zone to dwnld is bigger than the area of the intersection ")
+    if ar_zone < ar_zone_sent2:
+        print("There is an issue the area of the zone to dwnld is smaller than the area of the intersection ")
         print("zone : {} sent2: {}".format(ar_zone, ar_zone_sent2))
         return ee.Geometry(zone.intersection(zone_sent2, 0.001))
     else:
@@ -130,7 +130,7 @@ def get_biggest_s1_image(zone: ee.Geometry, ImageCollection: ee.ImageCollection)
         ImageCollection: an ee.ImageCollection
 
     Returns:
-        - a boolean wether or not one image in the Imagecollection has a footprint that cover FACTEUR AREA percent of the
+        - a boolean wether or not one image in the Imagecollection has a footprint that cover FACTEUR AREA proportion of the
         input zone
         - an ee.ImageCollection of len 1, which contains the  image that covers the maximum amount of the zone
     """
@@ -139,20 +139,16 @@ def get_biggest_s1_image(zone: ee.Geometry, ImageCollection: ee.ImageCollection)
     n = list_image.length().getInfo()
     max_area_geom = extract_fp(ee.Image(list_image.get(0)))
     final_image = ee.Image(list_image.get(0))
-    inter = max_area_geom.intersection(zone, 0.001)
     if n == 0:
-        return False, ImageCollection
+        return False,ImageCollection
     else:
         for i in range(1, n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
-
-            if inter.area(0.001).getInfo() > max_area_geom.area(0.001).getInfo():
+            if geo.area(0.001).getInfo() > max_area_geom.area(0.001).getInfo():
                 max_area_geom = geo
                 final_image = image
-                inter = max_area_geom.intersection(zone, 0.001)
-        if inter.area(0.001).getInfo() >= FACTEUR_AREA * zone.area(
-                0.001).getInfo():  # The intersection between the s2 fp and the s1inter footprint should be the same
+        if max_area_geom.area(0.001).getInfo() >= FACTEUR_AREA * zone.area(0.001).getInfo():
             print("The geometries of the Image Collection contains the geometry")
             return True, ee.ImageCollection(final_image)
         else:
@@ -179,7 +175,7 @@ def zone_in_images(zone, ImageCollection):
         for i in range(n):
             image = ee.Image(list_image.get(i))
             geo = extract_fp(image)
-            geo_inter = geo.intersection(zone, 0.001)
+            geo_inter = geo.intersection(zone)
             list_inter = add_distinct_geom(list_inter, geo_inter)
         # compute the area
         area_union = get_list_area(list_inter)

@@ -1,5 +1,4 @@
 #CONSTANT TO FILTER RESULTS TO FIND AND DOWNLOAD IMAGES
-from constant.storing_constant import XDIR, LABEL_DIR
 
 DICT_COLLECTION={1: "COPERNICUS/S1_GRD", 2: "COPERNICUS/S2_SR"} # corresponds to the gee collection name
 S2_OPTPARAM={"instrument": "MSI", "processingLevel": "L2A"}
@@ -15,7 +14,7 @@ GEE_S2_BAND=["B2","B3","B4","B8"]
 
 
 ### DOWNLOADING CRITERIA
-FACTEUR_AREA=0.99 # correspond of the minimum area of the zone the sentinel 1 should cover
+FACTEUR_AREA=1 # correspond of the minimum area of the zone the sentinel 1 should cover
 
 VAR_NAME="_prepro"
 
@@ -40,7 +39,6 @@ CLOUD_THR=20
 TOT_ZERO_PIXEL=0.7 #the minimum percentage of non 0 pixels that the tile should have to avoid being removed
 
 ## Dataset tiles shape
-DICT_SHAPE={XDIR:(256, 256, 8), LABEL_DIR:(256, 256, 4)}
 
 ##The data rescaling before going into the NN
 DICT_BAND_LABEL={"R":[0],"G":[1],"B":[2],"NIR":[3]}
