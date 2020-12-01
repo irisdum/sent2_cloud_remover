@@ -7,7 +7,7 @@ TEMPORARY_DIR= "temporary_dir/"
 TILING_DIR="tiling_dir/"
 XDIR="dataX/"
 LABEL_DIR="label/"
-DIR_T=["date1/", "date2/"]
+DIR_T=["date1/", "date2/","date3/"]
 OPT_DWND_IMAGE="zip" #the format of the file to dwnld avoid changing
 
 LIST_XDIR=["Sentinel1_t{}".format(i) for i in range(len(DIR_T))]+["Sentinel2_t{}".format(i) for i in range(len(DIR_T)-1)]
