@@ -73,7 +73,7 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
-        self.data_X, self.data_y,scale_dict_train = load_data(train_yaml["train_directory"], normalization=self.normalization,
+        self.data_X, self.data_y,self.scale_dict_train = load_data(train_yaml["train_directory"], normalization=self.normalization,
                                                               x_shape=model_yaml["input_shape"],
                                                               label_shape=model_yaml["dim_gt_image"],
                                                               dict_band_X=self.dict_band_X,
@@ -83,7 +83,7 @@ class GAN():
                                                           x_shape=model_yaml["input_shape"],
                                                           label_shape=model_yaml["dim_gt_image"],
                                            dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
-                                           dict_rescale_type=self.dict_rescale_type,dict_scale=scale_dict_train)
+                                           dict_rescale_type=self.dict_rescale_type,dict_scale=self.scale_dict_train)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -382,7 +382,8 @@ class GAN():
             batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
                                  dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,
                                  x_shape=self.model_yaml["input_shape"],
-                                 label_shape=self.model_yaml["dim_gt_image"]
+                                 label_shape=self.model_yaml["dim_gt_image"],
+                                 dict_scale=self.scale_dict_train
                                  )
         else:
             if l_image_id is None:
