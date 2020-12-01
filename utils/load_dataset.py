@@ -45,7 +45,7 @@ def modify_array(raster_array):
     return convert_array(raster_array)
 
 
-def create_input(image_id: str, input_dir:str, output_dir:str, normalization=False):
+def create_input(image_id: str, input_dir:str, output_dir:str, normalization=False,tile_size=256):
     """
 
     Args:
@@ -60,8 +60,9 @@ def create_input(image_id: str, input_dir:str, output_dir:str, normalization=Fal
     data_x = None
     label = None
     assert input_dir[-1] == "/", "Wrong path should end with / not {}".format(input_dir)
+    final_shape=count_channel(DICT_ORGA_INT,tile_size=tile_size)
     for name_dir in DICT_ORGA:  # there will be one tile created one for x one for y (label)
-        final_array = np.zeros(DICT_SHAPE[name_dir])
+        final_array = np.zeros(final_shape[name_dir])
         count_dim = 0
         for i, sent in enumerate(DICT_ORGA[name_dir]):  # goes through the list of subdirectories (Sent**date**)
             image_path = find_path(input_dir + name_dir + sent, image_id)
@@ -84,13 +85,14 @@ def create_input(image_id: str, input_dir:str, output_dir:str, normalization=Fal
     np.save("{}{}.npy".format(output_dir + XDIR, image_id[:-4]), rescale_x)
     np.save("{}{}.npy".format(output_dir + LABEL_DIR, image_id[:-4]), rescale_label)
 
-def count_channel(dict_orga_int=None)->dict:
+def count_channel(dict_orga_int=None,tile_size=256)->dict:
     """
 
     Args:
         dict_orga_int : a dictionnary which has for each keys, a list of tuple (sent,t)
     Returns:
-        A dictionnary which gives for each dic
+        A dictionnary which gives for each key of dict_orga_int the nber of bands used.i.e for each Sent the nber
+        of bands selected
 
     """
     channel_dic={}
@@ -100,10 +102,11 @@ def count_channel(dict_orga_int=None)->dict:
         count=0
         for sent,t in dict_orga_int[key]:
             count+=len(LISTE_BANDE[sent-1]) #add the nber of bands which corresponds to sentinel images downloaded
-        channel_dic.update({key:count})
+        shape_tuple=(tile_size,tile_size,count)
+        channel_dic.update({key:shape_tuple})
     return channel_dic
 
-def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False):
+def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False,tile_size=256):
     """
     This function goes through a list of id. For each idea the create_input function is applied :
      we create dataX tile and label tile
@@ -118,12 +121,13 @@ def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, n
     """
 
     for image_id in list_id:
-        create_input(image_id, input_dir, output_dir, normalization=norm)
+        create_input(image_id, input_dir, output_dir, normalization=norm,tile_size=tile_size)
 
 
-def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm=False):
+def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm=False,tile_size=256):
     """
     Args:
+        tile_size: int, the tile size the output tiles will be (tile_size,tile_size,nchannel) dimension
         dict_tiles: dictionnary, describe the tile id used for train, val and test
          ex :  {"train/": ["01_02.tif",...],"val/":[list of id],"test/":[list of id] }
         input_dir: string, path to directory contains label/ and DataX/
@@ -136,7 +140,7 @@ def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm
     make_dataset_hierarchy(output_dir)
     for sub_dir in dict_tiles:
         assert sub_dir in TRAINING_DIR, "Issue name directory is {} but should be in {}".format(sub_dir, TRAINING_DIR)
-        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir, norm=norm)
+        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir, norm=norm,tile_size=tile_size)
 
 
 def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
@@ -159,9 +163,9 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
 
     """
     if x_shape is None:
-        x_shape = DICT_SHAPE[XDIR]
+        x_shape = count_channel(DICT_ORGA_INT)[XDIR]
     if label_shape is None:
-        label_shape = DICT_SHAPE[LABEL_DIR]
+        label_shape = count_channel(DICT_ORGA_INT)[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
     dataX, path_tileX, _ = load_from_dir(path_directory + XDIR, x_shape)  # only need to load once the s
