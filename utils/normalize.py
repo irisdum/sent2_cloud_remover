@@ -251,7 +251,11 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE_TYPE
     if dict_scale is None:
-        dict_scale = DICT_SCALER
+        dict_scale={}
+        for bands in s1_bands:
+            dict_scale.update({bands:None})
+        for bands in s2_bands:
+            dict_scale.update({bands:None})
 
     rescaled_batch_X = np.zeros(batch_X.shape)
     rescaled_batch_label = np.zeros(batch_label.shape)
