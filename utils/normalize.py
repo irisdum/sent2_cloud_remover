@@ -224,7 +224,7 @@ def conv1D_dim(tuple_dim):
 
 def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None,
                   dict_rescale_type=None,
-                  s1_log=True, dict_scale=None, invert=False) -> Tuple[np.array, np.array, dict]:
+                  s1_log=True, dict_scale=None, invert=False,s2_bands=S2_BANDS,s1_bands=S1_BANDS) -> Tuple[np.array, np.array, dict]:
     """
 
     Args:
@@ -256,7 +256,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     rescaled_batch_X = np.zeros(batch_X.shape)
     rescaled_batch_label = np.zeros(batch_label.shape)
     # we deal with S1 normalization
-    for group_bands in S1_BANDS:
+    for group_bands in s1_bands:
         # all s1 band are in dict_band_X
         data_sar_band = batch_X[:, :, :, dict_group_band_X[group_bands]]
         if s1_log:
@@ -268,7 +268,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
                                                scaler=dict_scale[group_bands])
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = output_data.reshape(init_shape)  # reshape it
         dict_scaler.update({group_bands: sar_scale})
-    for group_bands in S2_BANDS:
+    for group_bands in s2_bands:
         m = batch_X.shape[0]  # the nber of element in batch_X
         data = np.concatenate((batch_X[:, :, :, dict_group_band_X[group_bands]],
                                batch_label[:, :, :, dict_group_band_label[group_bands]]))
