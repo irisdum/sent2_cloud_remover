@@ -7,6 +7,8 @@ normalization: true #id set to true normalization to the data is apllied, the no
 dict_band_x: {"RGBN":[4,5,6,7],"VV": [0,2],"VH":[1,3]} #the stats for normalization procedure is going to be compute on each of these group of bands
 dict_band_label: {"RGBN":[0,1,2,3]}
 dict_rescale_type: {"RGBN": "normalization","VV":"standardization","VH":"standardization"}
+s2_scale: 1/5
+
 path_csv: null  #"/datastore/dum031/data/dataset2/" #Path where the csv of the min max of s2 band on a yearb has been computed otherwise set to null
 #if path_csv null -> the min, max used to normalize s2 will be the mean of the min, max of the tile in the dataset
 

@@ -4,6 +4,7 @@ import os
 from typing import List
 
 from constant.gee_constant import LISTE_BANDE
+from constant.processing_constant import FACTEUR_STD_S2
 from constant.storing_constant import XDIR, LABEL_DIR, DICT_ORGA, DICT_SHAPE, DICT_ORGA_INT
 from constant.model_constant import TRAINING_DIR
 from utils.image_find_tbx import find_path, create_safe_directory, find_image_indir
@@ -144,7 +145,7 @@ def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm
 
 
 def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-              dict_band_label=None, dict_rescale_type=None, dict_scale=None):
+              dict_band_label=None, dict_rescale_type=None, dict_scale=None,fact_s2=FACTEUR_STD_S2):
     """
 
     Args:
@@ -175,7 +176,7 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
         dataX, data_label, dict_scale = rescale_array(dataX, data_label, dict_group_band_X=dict_band_X,
                                                       dict_group_band_label=dict_band_label,
                                                       dict_rescale_type=dict_rescale_type, s1_log=True,
-                                                      dict_scale=dict_scale)
+                                                      dict_scale=dict_scale,fact_scale=fact_s2)
         return dataX, data_label, dict_scale
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)

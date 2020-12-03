@@ -1,10 +1,13 @@
 model_name: GAN_v0
 
+# DIMENSION DATA
+input_shape: [256,256,8] #represent the dimension of one image (one tile) as the input of the generator
+dim_gt_image: [256,256,4] #represents the dimensions of the image to simulate (ground truth image)
 
 ######################################
 #### THE GENERATOR PARAM #############
 ######################################
-input_shape: [256,256,8]
+
 param_before_resnet: [[64,7],[128,3],[256,3]] # [dim,k] for the layers before the resnet blocks
 nb_resnet_blocs: 9 # Number of Resnet Block
 k_resnet: 3 #size of the kernel during the resent blocks
@@ -60,8 +63,7 @@ lrelu_alpha: 0.2 #useful only if lrelu
 d_activation: "lrelu" #could also be lrelu or relu, corresponds to the activation of the discriminator
 d_last_activ: sigmoid
 
-# Syntethized image_dim
-dim_gt_image: [256,256,4]
+
 
 add_discri_white_noise: false #boolean if True white noise is added to the input data
 add_relu_after_noise: true

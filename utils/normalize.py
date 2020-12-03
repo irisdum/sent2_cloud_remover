@@ -8,7 +8,7 @@ from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_METHOD, DIC
     CONVERTOR
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from constant.processing_constant import DICT_RESCALE, DICT_GROUP_BAND_LABEL, DICT_GROUP_BAND_X, S1_BANDS, S2_BANDS, \
-    DICT_RESCALE_TYPE, DICT_SCALER
+    DICT_RESCALE_TYPE, DICT_SCALER, FACTEUR_STD_S2
 from utils.image_find_tbx import extract_tile_id, find_csv
 import matplotlib.pyplot as plt
 import numpy as np
@@ -224,10 +224,13 @@ def conv1D_dim(tuple_dim):
 
 def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None,
                   dict_rescale_type=None,
-                  s1_log=True, dict_scale=None, invert=False,s2_bands=S2_BANDS,s1_bands=S1_BANDS) -> Tuple[np.array, np.array, dict]:
+                  s1_log=True, dict_scale=None, invert=False,s2_bands=S2_BANDS,s1_bands=S1_BANDS,
+                  fact_scale=FACTEUR_STD_S2) -> Tuple[np.array, np.array, dict]:
     """
 
     Args:
+        fact_scale: float, the S2 bands will be multiplied by this factor after rescaling. Will only be appled to the
+        bands defined in s2_bands
         batch_X: a numpy array
         batch_label: a numpy array , should have the same three first dimensions. Last dimension is the sprectral one
         dict_group_band_X: a dictionnary, gives indication on the index localisation of the band in the batch_X
@@ -264,12 +267,12 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         # all s1 band are in dict_band_X
         data_sar_band = batch_X[:, :, :, dict_group_band_X[group_bands]]
         if s1_log:
-            data_sar_band = np.log10(data_sar_band + 10)
+            data_sar_band = 10*np.log10(data_sar_band + 10)
         init_shape = data_sar_band.shape
         data_flatten_sar_band = data_sar_band.reshape(
             conv1D_dim(data_sar_band.shape))  # Modify into 2D array as required for sklearn
         output_data, sar_scale = sklearn_scale(dict_rescale_type[group_bands], data_flatten_sar_band,
-                                               scaler=dict_scale[group_bands])
+                                               scaler=dict_scale[group_bands],fact_scale=1)
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = output_data.reshape(init_shape)  # reshape it
         dict_scaler.update({group_bands: sar_scale})
     for group_bands in s2_bands:
@@ -280,7 +283,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         data_flatten = data.reshape(conv1D_dim(data.shape))
 
         flat_rescale_data, scale_s2 = sklearn_scale(dict_rescale_type[group_bands], data_flatten,
-                                                    scaler=dict_scale[group_bands], invert=invert)
+                                                    scaler=dict_scale[group_bands], invert=invert,fact_scale=fact_scale)
         rescale_global_data = flat_rescale_data.reshape(global_shape)
         # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
         #                                                         rescale_global_data[:m , :, :, :].shape,
@@ -292,7 +295,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     return rescaled_batch_X, rescaled_batch_label, dict_scaler
 
 
-def sklearn_scale(scaling_method, data, scaler=None, invert=False):
+def sklearn_scale(scaling_method, data, scaler=None, invert=False,fact_scale=1):
     """
     Args:
         scaling_method: string, name of the method currently only StandardScaler works
@@ -310,9 +313,9 @@ def sklearn_scale(scaling_method, data, scaler=None, invert=False):
             scaler.fit(data)
         else:
             if invert:
-                return scaler.inverse_transform(data), scaler
+                return scaler.inverse_transform(data*1/fact_scale), scaler
         data_rescale = scaler.transform(data)
-        return data_rescale, scaler
+        return data_rescale*fact_scale, scaler
     else:
         return data, None
 
