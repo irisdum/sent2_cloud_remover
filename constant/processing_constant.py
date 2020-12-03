@@ -10,3 +10,5 @@ DICT_RESCALE={"R":"","G":"center_norm11","B":"center_norm11","NIR":"center_norm1
               "VH":"centering"}
 DICT_RESCALE_TYPE={"VV": "StandardScaler", "VH":"StandardScaler","R,G,B,NIR":"StandardScaler"}
 DICT_SCALER={"VV": None, "VH":None,"R,G,B,NIR":None}
+
+FACTEUR_STD_S2=1/5 #facteur used to mutliply the final standardized distribution
