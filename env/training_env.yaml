@@ -19,7 +19,6 @@ dependencies:
   - anaconda::tensorflow-gpu>=2.0.0
   - seaborn
   - scikit-learn
-  - conda-forge::statsmodels
   - scipy<=1.2.0
   - cudnn
   - notebook
