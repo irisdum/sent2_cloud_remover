@@ -12,3 +12,4 @@ DICT_RESCALE_TYPE={"VV": "StandardScaler", "VH":"StandardScaler","R,G,B,NIR":"St
 DICT_SCALER={"VV": None, "VH":None,"R,G,B,NIR":None}
 
 FACTEUR_STD_S2=1/5 #facteur used to mutliply the final standardized distribution
+FACTEUR_STD_S1=1/2
