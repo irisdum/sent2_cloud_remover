@@ -281,7 +281,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         data_flatten_sar_band = data_sar_band.reshape(
             conv1D_dim(data_sar_band.shape))  # Modify into 2D array as required for sklearn
         output_data, sar_scale = sklearn_scale(dict_rescale_type[group_bands], data_flatten_sar_band,
-                                               scaler=dict_scale[group_bands], fact_scale=fact_scale1)
+                                               scaler=dict_scale[group_bands], fact_scale=fact_scale1,invert=invert)
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = output_data.reshape(init_shape)  # reshape it
         dict_scaler.update({group_bands: sar_scale})
     for group_bands in s2_bands:
