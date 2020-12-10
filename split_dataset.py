@@ -1,6 +1,6 @@
 import numpy as np
 from scanning_dataset import list_all_conformed_tiles,split_train_test_val
-from utils.load_dataset import create_input_dataset
+from utils.create_dataset import create_input_dataset
 import argparse
 
 def _argparser():
