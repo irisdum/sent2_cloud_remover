@@ -513,6 +513,6 @@ def replace_batch_nan_knn(batch,lband_index):
     print("Important the index of the bands in lband_index should be index that follow each other")
     knn_batch=np.copy(batch)
     for b in lband_index:
-        list_arr_band=Parallel(n_jobs=-1)(delayed(knn_model)(data) for data in batch[:,:,:,b])
+        list_arr_band=Parallel(n_jobs=2)(delayed(knn_model)(data) for data in batch[:,:,:,b])
         knn_batch[:,:,:,b]=np.array(list_arr_band)
     return knn_batch

@@ -29,5 +29,5 @@ dependencies:
       - ruamel.yaml
       - tensorflow-estimator==2.1.*
       - jupyter-tensorboard
-
+      - joblib
 
