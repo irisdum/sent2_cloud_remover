@@ -1,15 +1,12 @@
 name: tf_env
 
 channels:
-  - conda-forge/label/cf201901 #for gdal
   - conda-forge
   - defaults
   - anaconda
-  - conda-forge/label/broken
 
 dependencies:
   - python=3.6
-  - gdal>=2.3.3
   - pip=20.*
   - shapely>=1.6.1
   - opencv>=3.1.0
