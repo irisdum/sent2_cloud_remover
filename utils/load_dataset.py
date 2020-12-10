@@ -11,6 +11,7 @@ from utils.image_find_tbx import find_path, create_safe_directory, find_image_in
 from utils.converter import convert_array
 from osgeo import gdal
 import numpy as np
+from joblib import Parallel, delayed
 
 from utils.normalize import rescale_on_batch, stat_from_csv, rescale_array
 
@@ -46,7 +47,7 @@ def modify_array(raster_array):
     return convert_array(raster_array)
 
 
-def create_input(image_id: str, input_dir:str, output_dir:str, normalization=False,tile_size=256):
+def create_input(image_id: str, input_dir: str, output_dir: str, normalization=False, tile_size=256):
     """
 
     Args:
@@ -61,7 +62,7 @@ def create_input(image_id: str, input_dir:str, output_dir:str, normalization=Fal
     data_x = None
     label = None
     assert input_dir[-1] == "/", "Wrong path should end with / not {}".format(input_dir)
-    final_shape=count_channel(DICT_ORGA_INT,tile_size=tile_size)
+    final_shape = count_channel(DICT_ORGA_INT, tile_size=tile_size)
     for name_dir in DICT_ORGA:  # there will be one tile created one for x one for y (label)
         final_array = np.zeros(final_shape[name_dir])
         count_dim = 0
@@ -86,7 +87,8 @@ def create_input(image_id: str, input_dir:str, output_dir:str, normalization=Fal
     np.save("{}{}.npy".format(output_dir + XDIR, image_id[:-4]), rescale_x)
     np.save("{}{}.npy".format(output_dir + LABEL_DIR, image_id[:-4]), rescale_label)
 
-def count_channel(dict_orga_int=None,tile_size=256)->dict:
+
+def count_channel(dict_orga_int=None, tile_size=256) -> dict:
     """
 
     Args:
@@ -96,18 +98,19 @@ def count_channel(dict_orga_int=None,tile_size=256)->dict:
         of bands selected
 
     """
-    channel_dic={}
+    channel_dic = {}
     if dict_orga_int is None:
-        dict_orga_int=DICT_ORGA_INT
+        dict_orga_int = DICT_ORGA_INT
     for key in dict_orga_int:
-        count=0
-        for sent,t in dict_orga_int[key]:
-            count+=len(LISTE_BANDE[sent-1]) #add the nber of bands which corresponds to sentinel images downloaded
-        shape_tuple=(tile_size,tile_size,count)
-        channel_dic.update({key:shape_tuple})
+        count = 0
+        for sent, t in dict_orga_int[key]:
+            count += len(LISTE_BANDE[sent - 1])  # add the nber of bands which corresponds to sentinel images downloaded
+        shape_tuple = (tile_size, tile_size, count)
+        channel_dic.update({key: shape_tuple})
     return channel_dic
 
-def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False,tile_size=256):
+
+def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, norm=False, tile_size=256):
     """
     This function goes through a list of id. For each idea the create_input function is applied :
      we create dataX tile and label tile
@@ -122,10 +125,10 @@ def prepare_tiles_from_id(list_id: List[str], input_dir: str, output_dir: str, n
     """
 
     for image_id in list_id:
-        create_input(image_id, input_dir, output_dir, normalization=norm,tile_size=tile_size)
+        create_input(image_id, input_dir, output_dir, normalization=norm, tile_size=tile_size)
 
 
-def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm=False,tile_size=256):
+def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm=False, tile_size=256):
     """
     Args:
         tile_size: int, the tile size the output tiles will be (tile_size,tile_size,nchannel) dimension
@@ -141,11 +144,11 @@ def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm
     make_dataset_hierarchy(output_dir)
     for sub_dir in dict_tiles:
         assert sub_dir in TRAINING_DIR, "Issue name directory is {} but should be in {}".format(sub_dir, TRAINING_DIR)
-        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir, norm=norm,tile_size=tile_size)
+        prepare_tiles_from_id(dict_tiles[sub_dir], input_dir, output_dir + sub_dir, norm=norm, tile_size=tile_size)
 
 
 def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-              dict_band_label=None, dict_rescale_type=None, dict_scale=None,fact_s2=FACTEUR_STD_S2):
+              dict_band_label=None, dict_rescale_type=None, dict_scale=None, fact_s2=FACTEUR_STD_S2):
     """
 
     Args:
@@ -176,7 +179,7 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
         dataX, data_label, dict_scale = rescale_array(dataX, data_label, dict_group_band_X=dict_band_X,
                                                       dict_group_band_label=dict_band_label,
                                                       dict_rescale_type=dict_rescale_type, s1_log=True,
-                                                      dict_scale=dict_scale,fact_scale=fact_s2)
+                                                      dict_scale=dict_scale, fact_scale=fact_s2)
         return dataX, data_label, dict_scale
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
                                                                                                       x_shape)
@@ -197,11 +200,20 @@ def load_from_dir(path_dir: str, image_shape: tuple):
     assert os.path.isdir(path_dir), "Dir {} does not exist".format(path_dir)
     path_tile = find_image_indir(path_dir, "npy")  # list of all
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
-    data_array = np.zeros(batch_x_shape)
-    for i, tile in enumerate(path_tile):
-        assert os.path.isfile(tile), "Wrong path to tile {}".format(tile)
-        data_array[i, :, :, :] = np.load(tile)
+    # data_array = np.zeros(batch_x_shape)
+    data_array = np.array(Parallel(n_jobs=2)(delayed(load_one_tile)(tile) for tile in path_tile))
+    # for i, tile in enumerate(path_tile):
+    #  assert os.path.isfile(tile), "Wrong path to tile {}".format(tile)
+    #  data_array[i, :, :, :] = np.load(tile)
+    assert data_array.shape == batch_x_shape, "Wrong dimension of the data loaded is {} expected ".format(
+        data_array.shape,
+        batch_x_shape)
     return data_array, path_tile, None
+
+
+def load_one_tile(path_tile):
+    assert os.path.isfile(path_tile), "Wrong path to tile {}".format(path_tile)
+    return np.load(path_tile)
 
 
 def csv_2_dictstat(path_tile: str, path_dir_csv: str):

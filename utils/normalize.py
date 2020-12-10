@@ -275,7 +275,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
             print("Remove the negative values in order to have no error in the log : negative value will be replaced using"
                   "knn algorithm")
             data_sar_band = replace_batch_nan_knn(data_nan_sar, [0, 1, 2, 3])
-            data_sar_band = 10 * np.log10(data_sar_band + 10)
+            data_sar_band = 10 * np.log10(data_sar_band)
         init_shape = data_sar_band.shape
         data_flatten_sar_band = data_sar_band.reshape(
             conv1D_dim(data_sar_band.shape))  # Modify into 2D array as required for sklearn
