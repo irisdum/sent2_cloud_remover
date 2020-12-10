@@ -9,7 +9,7 @@ channels:
 
 dependencies:
   - python=3.7
-  - conda-forge/label/cf201901::gdal>=2.3.3
+  - gdal>=2.3.3
   - pip=20.*
   - shapely>=1.6.1
   - opencv>=3.1.0
