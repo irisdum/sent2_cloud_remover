@@ -30,7 +30,7 @@ The aim is to donwload the data which are going to be used for the training of t
 For each Sentinel 2 image downloaded we want to have the corresponding Sentinel 1 images (the closest in time).
 ## LOOKING AT THE AREA OF INTEREST
  TODO : include the Google earth engine scripts
- 
+
 
 
 ## Downloading the data
@@ -98,6 +98,7 @@ The combination found might not be the best one, the code is still really slow.
 
 ## Tiling
 `make test_tiling`
+
 ## Build dataset 
 ### Requirements
 The preprocessed image are stored in two different directories depending on their date range. 
@@ -115,8 +116,31 @@ Using gdalbuildvrt a VRT file is created creating first a mosaic for each image 
 the required bands together : 
 
 ## Training a Model
+If you are only interested into the training 
+
+First you can use the specific training condo environment : env/training_env.yaml : 
+
+```bash
+conda env create -f env/training_env.yaml
+conda activate training_env
+python -m ipykernel install --user --name=training_env
+```
+
+Start jupyter notebook. If in a remote machine : add  `--ip=0.0.0.0 --no-browser`
+
+Now you can open the jupyter Notebook : notebooks/Trainings.ipynb
+
+Modify the constant, defined at the beginning at the notebook and run the training. 
+
+The training is also configured to be supervised using Tensorboard. 
+
+Open a new terminal window within training_env and 
+
+
+
 The cycle GAN model used is defined in models/clean_gan.py
 In order to train a model two yaml should be modified, examples available in GAN_confs :  
+
 - model.yaml
 - train.yaml
 Then running gan_train.sh path_to_model_yaml path_to_train_yaml will start the training job
