@@ -9,9 +9,9 @@
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
 export PATH=$PATH:/srv/osirim/idumeur/snap/bin
-gptPath="gpt -e -c 10G -q 32 -x"
-#export JAVA_OPTS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"
-#export _JAVA_OPTIONS="-Xmx8192m -XX:CompressedClassSpaceSize=256m"
+gptPath="gpt -e -c 130G -q 600"
+#export JAVA_OPTS="-Xmx30G -XX:CompressedClassSpaceSize=256m"
+#export _JAVA_OPTIONS="-Xmx30G -XX:CompressedClassSpaceSize=256m"
 
 ############################################
 # Command line handling
@@ -59,7 +59,7 @@ for F in $(ls -1d "${sourceDirectory}"/S2*.zip); do
   while IFS= read -r poly; do
     targetFilePrefix="process1_${i}"
     targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-    ${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B2,B3,B4,B8" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
+    ${gptPath} ${graphXmlPath}  -p "${parameterFilePath}"  -Pfile="${targetDirectory}/$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B2,B3,B4,B8" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
     #${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b3_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B3" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
     #${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b4_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B4" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}
     #${gptPath} ${graphXmlPath} -e -p "${parameterFilePath}"  -Pfile="${targetDirectory}/b8_$(removeExtension "$(basename ${F})")_prepro_${i}" -PBands="B8" -Pgeometry="${poly}" -t  ${targetFile} -PinputFile=${sourceFile}

@@ -1,4 +1,4 @@
-name: proj_env2
+name: proj_env
 
 channels:
   - conda-forge/label/cf201901 #for gdal
@@ -9,7 +9,7 @@ channels:
 
 dependencies:
   - python=3.6
-  - conda-forge/label/cf201901::gdal>=2.3.3
+  - conda-forge::gdal>2.3.3
   - pip=20.*
   - shapely
   - python-fmask
@@ -25,7 +25,7 @@ dependencies:
   - scipy<=1.2.0
   - cudnn
   - earthengine-api>=0.1.231
-  - six>=1.13.0
+#  - six>=1.13.0
   - notebook
   - tornado>=6.1
   - pip :
