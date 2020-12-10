@@ -11,7 +11,7 @@ DICT_RESCALE={"R":"","G":"center_norm11","B":"center_norm11","NIR":"center_norm1
 DICT_RESCALE_TYPE={"VV": "StandardScaler", "VH":"StandardScaler","R,G,B,NIR":"StandardScaler"}
 DICT_SCALER={"VV": None, "VH":None,"R,G,B,NIR":None}
 
-FACTEUR_STD_S2=1/5 #facteur used to mutliply the final standardized distribution
-FACTEUR_STD_S1=1/2
+FACT_STD_S2= 1 / 5 #facteur used to mutliply the final standardized distribution
+FACT_STD_S1= 1 / 2
 
 DATA_RANGE=(-1,1) #used if clip_s2 in load_data and/or rescale_array

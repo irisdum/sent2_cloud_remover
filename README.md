@@ -172,7 +172,11 @@ Before training the model, it is recommended to rescale your data between -1 and
 
 Currently we have been downloading Sentinel 2 Level 2A products, and Sentinel 1 GRD product coming from *GeoscienceAustralia/NCI Copernicus Hub server*. Moreover Sentinel 1 images have been preprocessed using snap gpt tool (check the *snap-confs/calibrate_sent1_zs_utm55s.xml* file) and the preprocessing section for more details. 
 
-However after the preprocessing some values of Sentinel 1 can be negative, and as we want to work with db intensities, we fix this issue using a knn algorithm. All the pixels having negative values of the SAR images are replaced using their neighbour intensities. Then we apply 10*log10 transformation before applying StandardScaler (scikit-learn method).
+However after the preprocessing some values of Sentinel 1 can be negative, and as we want to work with db intensities, we fix this issue using a knn algorithm. All the pixels having negative values of the SAR images are replaced using their neighbour intensities. Then we apply 10*log10 transformation before applying StandardScaler (scikit-learn method). To have data between -1 and 1, the distribution is divided by the constant `FACT_STD_S1`   (in *constant/processing.constant.py*) .
+
+For Sentinel 2 we have 
+
+
 
 ## Vegetation index 
 In order to assess the burned area different vegetation index have been implemented.
