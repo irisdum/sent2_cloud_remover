@@ -269,12 +269,13 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     for group_bands in s1_bands:
         # all s1 band are in dict_band_X
         data_sar_band = batch_X[:, :, :, dict_group_band_X[group_bands]]
+        nbands=len(dict_group_band_X[group_bands])
         if s1_log:
             data_nan_sar = np.copy(data_sar_band)
             data_nan_sar[data_nan_sar < 0] = float("nan")
             print("Remove the negative values in order to have no error in the log : negative value will be replaced using"
                   "knn algorithm")
-            data_sar_band = replace_batch_nan_knn(data_nan_sar,dict_group_band_X[group_bands])
+            data_sar_band = replace_batch_nan_knn(data_nan_sar,[i for i in range(nbands)])
             data_sar_band = 10 * np.log10(data_sar_band)
         init_shape = data_sar_band.shape
         data_flatten_sar_band = data_sar_band.reshape(
