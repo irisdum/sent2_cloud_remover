@@ -296,6 +296,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
                                                     fact_scale=fact_scale2)
         if clip_s2: #we clip between -1 and 1
             flat_rescale_data=np.clip(flat_rescale_data,DATA_RANGE[0],DATA_RANGE[1])
+
         rescale_global_data = flat_rescale_data.reshape(global_shape)
         # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
         #                                                         rescale_global_data[:m , :, :, :].shape,

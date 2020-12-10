@@ -142,6 +142,7 @@ class GAN():
         img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_input_data")
 
+
         def build_resnet_block(input, id=0):
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
@@ -157,6 +158,7 @@ class GAN():
             x = Add(name="g_block_{}_add".format(id))([x, input])
             x = ReLU(name="g_block_{}_relu2".format(id))(x)
             return x
+
 
         if model_yaml["last_activation"] == "tanh":
             print("use tanh keras")
