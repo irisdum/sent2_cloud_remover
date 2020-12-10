@@ -71,23 +71,23 @@ class GAN():
         self.fact_s1 = train_yaml["s1_scale"]
 
         self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
-                                                                    normalization=self.normalization,
                                                                     x_shape=model_yaml["input_shape"],
                                                                     label_shape=model_yaml["dim_gt_image"],
+                                                                    normalization=self.normalization,
                                                                     dict_band_X=self.dict_band_X,
                                                                     dict_band_label=self.dict_band_label,
                                                                     dict_rescale_type=self.dict_rescale_type,
-                                                                    s1_bands=self.s1bands,s2_bands=self.s2bands,
-                                                                    fact_s2=self.fact_s2,fact_s1=self.fact_s1)
-        self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, normalization=self.normalization,
-                                                           x_shape=model_yaml["input_shape"],
+                                                                    fact_s2=self.fact_s2, fact_s1=self.fact_s1,
+                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands)
+        self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
                                                            label_shape=model_yaml["dim_gt_image"],
+                                                           normalization=self.normalization,
                                                            dict_band_X=self.dict_band_X,
                                                            dict_band_label=self.dict_band_label,
                                                            dict_rescale_type=self.dict_rescale_type,
-                                                           dict_scale=self.scale_dict_train,
-                                                           s1_bands=self.s1bands, s2_bands=self.s2bands,
-                                                           fact_s2=self.fact_s2,fact_s1=self.fact_s1)
+                                                           dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
+                                                           fact_s1=self.fact_s1, s2_bands=self.s2bands,
+                                                           s1_bands=self.s1bands)
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
@@ -383,14 +383,12 @@ class GAN():
             print("We load our data from {}".format(batch))
 
             l_image_id = find_image_indir(batch + XDIR, "npy")
-            batch, _ = load_data(batch, normalization=self.normalization, dict_band_X=self.dict_band_X,
-                                 dict_band_label=self.dict_band_label, dict_rescale_type=self.dict_rescale_type,
-                                 x_shape=self.model_yaml["input_shape"],
-                                 label_shape=self.model_yaml["dim_gt_image"],
-                                 dict_scale=self.scale_dict_train,
-                                 fact_s2=self.fact_s2,fact_s1=self.fact_s1,
-                                 s1_bands=self.s1bands, s2_bands=self.s2bands
-                                 )
+            batch, _ = load_data(batch, x_shape=self.model_yaml["input_shape"],
+                                 label_shape=self.model_yaml["dim_gt_image"], normalization=self.normalization,
+                                 dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
+                                 dict_rescale_type=self.dict_rescale_type, dict_scale=self.scale_dict_train,
+                                 fact_s2=self.fact_s2, fact_s1=self.fact_s1, s2_bands=self.s2bands,
+                                 s1_bands=self.s1bands)
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
@@ -409,7 +407,7 @@ class GAN():
                 _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
                                                 dict_group_band_label=self.dict_band_label,
                                                 dict_rescale_type=self.dict_rescale_type,
-                                                dict_scale=self.scale_dict_train, invert=True,fact_scale2=self.fact_s2,
+                                                dict_scale=self.scale_dict_train, invert=True, fact_scale2=self.fact_s2,
                                                 fact_scale1=self.fact_s1)
             assert batch_res.shape[0] == batch.shape[
                 0], "Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
