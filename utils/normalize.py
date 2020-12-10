@@ -4,6 +4,8 @@ import os
 
 from typing import Tuple
 
+from sklearn.impute import KNNImputer
+
 from constant.gee_constant import DICT_BAND_X, DICT_BAND_LABEL, DICT_METHOD, DICT_TRANSLATE_BAND, \
     CONVERTOR
 from sklearn.preprocessing import StandardScaler, RobustScaler
@@ -13,6 +15,7 @@ from utils.image_find_tbx import extract_tile_id, find_csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 
 
 def plot_one_band(raster_array, fig, ax, title="", cmap="bone"):
@@ -224,7 +227,7 @@ def conv1D_dim(tuple_dim):
 
 def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None,
                   dict_rescale_type=None,
-                  s1_log=True, dict_scale=None, invert=False,s2_bands=S2_BANDS,s1_bands=S1_BANDS,
+                  s1_log=True, dict_scale=None, invert=False, s2_bands=S2_BANDS, s1_bands=S1_BANDS,
                   fact_scale=FACTEUR_STD_S2) -> Tuple[np.array, np.array, dict]:
     """
 
@@ -254,11 +257,11 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     if dict_rescale_type is None:
         dict_rescale_type = DICT_RESCALE_TYPE
     if dict_scale is None:
-        dict_scale={}
+        dict_scale = {}
         for bands in s1_bands:
-            dict_scale.update({bands:None})
+            dict_scale.update({bands: None})
         for bands in s2_bands:
-            dict_scale.update({bands:None})
+            dict_scale.update({bands: None})
 
     rescaled_batch_X = np.zeros(batch_X.shape)
     rescaled_batch_label = np.zeros(batch_label.shape)
@@ -267,12 +270,17 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         # all s1 band are in dict_band_X
         data_sar_band = batch_X[:, :, :, dict_group_band_X[group_bands]]
         if s1_log:
-            data_sar_band = 10*np.log10(data_sar_band + 10)
+            data_nan_sar = np.copy(data_sar_band)
+            data_nan_sar[data_nan_sar < 0] = float("nan")
+            print("Remove the negative values in order to have no error in the log : negative value will be replaced using"
+                  "knn algorithm")
+            data_sar_band = replace_batch_nan_knn(data_nan_sar, [0, 1, 2, 3])
+            data_sar_band = 10 * np.log10(data_sar_band)
         init_shape = data_sar_band.shape
         data_flatten_sar_band = data_sar_band.reshape(
             conv1D_dim(data_sar_band.shape))  # Modify into 2D array as required for sklearn
         output_data, sar_scale = sklearn_scale(dict_rescale_type[group_bands], data_flatten_sar_band,
-                                               scaler=dict_scale[group_bands],fact_scale=1)
+                                               scaler=dict_scale[group_bands], fact_scale=1)
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = output_data.reshape(init_shape)  # reshape it
         dict_scaler.update({group_bands: sar_scale})
     for group_bands in s2_bands:
@@ -283,7 +291,8 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         data_flatten = data.reshape(conv1D_dim(data.shape))
 
         flat_rescale_data, scale_s2 = sklearn_scale(dict_rescale_type[group_bands], data_flatten,
-                                                    scaler=dict_scale[group_bands], invert=invert,fact_scale=fact_scale)
+                                                    scaler=dict_scale[group_bands], invert=invert,
+                                                    fact_scale=fact_scale)
         rescale_global_data = flat_rescale_data.reshape(global_shape)
         # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
         #                                                         rescale_global_data[:m , :, :, :].shape,
@@ -295,7 +304,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     return rescaled_batch_X, rescaled_batch_label, dict_scaler
 
 
-def sklearn_scale(scaling_method, data, scaler=None, invert=False,fact_scale=1):
+def sklearn_scale(scaling_method, data, scaler=None, invert=False, fact_scale=1):
     """
     Args:
         scaling_method: string, name of the method currently only StandardScaler works
@@ -313,9 +322,9 @@ def sklearn_scale(scaling_method, data, scaler=None, invert=False,fact_scale=1):
             scaler.fit(data)
         else:
             if invert:
-                return scaler.inverse_transform(data*1/fact_scale), scaler
+                return scaler.inverse_transform(data * 1 / fact_scale), scaler
         data_rescale = scaler.transform(data)
-        return data_rescale*fact_scale, scaler
+        return data_rescale * fact_scale, scaler
     else:
         return data, None
 
@@ -434,7 +443,10 @@ def stat_from_csv(path_tile, dir_csv, dict_translate_band=None):
     """:param path_tile path to the npy tile array svaed
     :param dir_csv path to the directory which contains the nomralized csv file
     :param dict_band a dictionnary which contains the dict_band information
-     :returns a dictionnary {B2:(min,max) ...}"""
+     :returns a dictionnary {B2:(min,max) ...}
+
+    Args:
+        dict_translate_band: """
     if dir_csv is None:
         return None
     assert os.path.isdir(dir_csv), "No directory at {}".format(dir_csv)
@@ -487,3 +499,16 @@ def get_ndvi_minmax_fromcsv(tile_id, path_csv, vi):  # TODO make one isnge funct
     assert subf_df.shape[0] == 1, "Wrong number of image found {}".format(subf_df)
     dict_res = subf_df.iloc[0].to_dict()
     return dict_res[name_col[0]], dict_res[name_col[1]]
+
+
+def knn_model(data):
+    knn=KNNImputer(n_neighbors=5)
+    return knn.fit_transform(data)
+
+def replace_batch_nan_knn(batch,lband_index):
+    print("Important the index of the bands in lband_index should be index that follow each other")
+    knn_batch=np.copy(batch)
+    for b in lband_index:
+        list_arr_band=Parallel(n_jobs=2)(delayed(knn_model)(data) for data in batch[:,:,:,b])
+        knn_batch[:,:,:,b]=np.array(list_arr_band)
+    return knn_batch
