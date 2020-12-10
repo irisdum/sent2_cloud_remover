@@ -37,6 +37,7 @@ For each Sentinel 2 image downloaded we want to have the corresponding Sentinel 
 The download of the image uses the library auscophub found https://github.com/CopernicusAustralasia/auscophub/releases`. 
 It enables to send request to the GeoscienceAustralia/NCI Copernicus Hub server and download the images. 
 The file `utils/download_image.py` gathers the functions useful to download the image. 
+
 ### The automatic version
 (not recommended, not optimized and not truly recommended)
 Input : 
@@ -126,36 +127,56 @@ conda activate training_env
 python -m ipykernel install --user --name=training_env
 ```
 
+### Start a training
+
+#### With Jupyter
+
 Start jupyter notebook. If in a remote machine : add  `--ip=0.0.0.0 --no-browser`
 
 Now you can open the jupyter Notebook : notebooks/Trainings.ipynb
 
 Modify the constant, defined at the beginning at the notebook and run the training. 
 
-The training is also configured to be supervised using Tensorboard. 
-
-Open a new terminal window within training_env and 
-
-
+#### As a batch job
 
 The cycle GAN model used is defined in models/clean_gan.py
 In order to train a model two yaml should be modified, examples available in GAN_confs :  
 
 - model.yaml
 - train.yaml
-Then running gan_train.sh path_to_model_yaml path_to_train_yaml will start the training job
+  Then running gan_train.sh path_to_model_yaml path_to_train_yaml will start the training job
+
+### Supervise the training
+
+#### Tensorboard : metric supervision
+
+The training is also configured to be supervised using Tensorboard. 
+
+Open a new terminal window within training_env and run tensorboard.
+
+Local command `tensorboard --logdir <path>`
+
+If in remote machine : `tensorboard --logdir <path> --host 0.0.0.0`
+
+#### Validation image visualization : notebook
+
+Eventually you can also look at how the images look like during the training. 
+
+Open the notebook *SPECIFY NOTEBOOK*
 
 Notebooks will soon be released showing examples of the results
 
 ### Normalization of the data
 
-Before training the model, it is recommended to rescale your data between 0 and 1. Different way of rescaling have been studied.
-By default :  a normalization of S2 bands is done. For each band min and max are computed on the batch. Then the mean of the max and min
-computed for each tile of the batch is used to normalize (band by band) the S2 band. For S1 band a standardization is applied
-In order to compare the compute meaningful vegetation index on the simulated s2 images, it could be interesting the get the 
-minimum and maximum value for each S2 band on each tile. Then the min and max value will be used to normalized the data as for the previous method.
-In order to get the S2 min and max over a year, python script is made using Google earth engine API. The output of this script
-is a csv.
+Before training the model, it is recommended to rescale your data between -1 and 1.
+
+Currently we have been downloading Sentinel 2 Level 2A products, and Sentinel 1 GRD product coming from *GeoscienceAustralia/NCI Copernicus Hub server*. Moreover Sentinel 1 images have been preprocessed using snap gpt tool (check the *snap-confs/calibrate_sent1_zs_utm55s.xml* file) and the preprocessing section for more details. 
+
+However after the preprocessing some values of Sentinel 1 can be negative, and as we want to work with db intensities, we fix this issue using a knn algorithm. All the pixels having negative values of the SAR images are replaced using their neighbour intensities. Then we apply 10*log10 transformation before applying StandardScaler (scikit-learn method). To have data between -1 and 1, the distribution is divided by the constant `FACT_STD_S1`   (in *constant/processing.constant.py*) .
+
+For Sentinel 2 we have 
+
+
 
 ## Vegetation index 
 In order to assess the burned area different vegetation index have been implemented.

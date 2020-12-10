@@ -8,17 +8,17 @@ channels:
   - conda-forge/label/broken
 
 dependencies:
-  - python=3.7
-  - conda-forge/label/cf201901::gdal>=2.3.3
+  - python=3.6
+  - gdal>=2.3.3
   - pip=20.*
   - shapely>=1.6.1
   - opencv>=3.1.0
-  - anaconda::ipykernel
-  - anaconda::pandas=0.20
+  - ipykernel
+  - pandas>=0.20
   - anaconda::tensorflow-gpu>=2.0.0
   - seaborn
   - scikit-learn>=0.23
-  - scipy<=1.2.0
+  - scipy
   - cudnn
   - notebook
   - pip :
