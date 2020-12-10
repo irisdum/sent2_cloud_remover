@@ -148,7 +148,8 @@ def create_input_dataset(dict_tiles: dict, input_dir: str, output_dir: str, norm
 
 
 def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
-              dict_band_label=None, dict_rescale_type=None, dict_scale=None, fact_s2=FACTEUR_STD_S2,s2_bands=S2_BANDS,
+              dict_band_label=None, dict_rescale_type=None, dict_scale=None, fact_s2=FACTEUR_STD_S2,fact_s1=FACTEUR_STD_S2,
+              s2_bands=S2_BANDS,
               s1_bands=S1_BANDS):
     """
 
@@ -180,7 +181,7 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
         dataX, data_label, dict_scale = rescale_array(dataX, data_label, dict_group_band_X=dict_band_X,
                                                       dict_group_band_label=dict_band_label,
                                                       dict_rescale_type=dict_rescale_type, s1_log=True,
-                                                      dict_scale=dict_scale, fact_scale=fact_s2,
+                                                      dict_scale=dict_scale, fact_scale2=fact_s2,fact_scale1=fact_s1,
                                                       s2_bands=s2_bands, s1_bands=s1_bands)
         return dataX, data_label, dict_scale
     assert data_label.shape[0] == dataX.shape[0], "Not the same nber of label {} and dataX {}".format(label_shape,
