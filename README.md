@@ -102,19 +102,18 @@ The combination found might not be the best one, the code is still really slow.
 
 ## Build dataset 
 ### Requirements
-The preprocessed image are stored in two different directories depending on their date range. 
+The preprocessed image are stored in different directories depending on their dates. 
 
 Once the images are preprocessed, it is now time to sort the data in order to split the training data and the label in two
 different directories : 
+
 - dataX: contains Sentinel 1 and 2 at the first date range and Sentinel 1 at the second date range  
-    - Sentinel1_t0 : directory with Sentinel 1 images 
+    - Sentinel1_t0 : directory with Sentinel 1 images  at date 0
     - Sentinel1_t1
     - Sentinel2_t0 
 - label: contains Sentinel 2 at the second date range
 
-For dataX : 
-Using gdalbuildvrt a VRT file is created creating first a mosaic for each image bands. Then another VRT file is made merging
-the required bands together : 
+make split_dataset
 
 ## Training a Model
 If you are only interested into the training 
@@ -174,14 +173,9 @@ Currently we have been downloading Sentinel 2 Level 2A products, and Sentinel 1 
 
 However after the preprocessing some values of Sentinel 1 can be negative, and as we want to work with db intensities, we fix this issue using a knn algorithm. All the pixels having negative values of the SAR images are replaced using their neighbour intensities. Then we apply 10*log10 transformation before applying StandardScaler (scikit-learn method). To have data between -1 and 1, the distribution is divided by the constant `FACT_STD_S1`   (in *constant/processing.constant.py*) .
 
-For Sentinel 2 we have 
+For Sentinel 2 we have use StandardScaler and FACT_STD_S2
 
 
-
-## Vegetation index 
-In order to assess the burned area different vegetation index have been implemented.
-
-## Land classification
 
 # Analyszing the GAN output
 
