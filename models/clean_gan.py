@@ -220,10 +220,10 @@ class GAN():
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="d_bn{}".format(layer_index))(x)
 
-        x = Flatten(name="flatten")(x)
-        for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
-            dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
-            x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
+        #x = Flatten(name="flatten")(x)
+        #for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
+        #    dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
+        #    x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
 
         if model_yaml["d_last_activ"] == "sigmoid":
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
@@ -254,8 +254,8 @@ class GAN():
 
     def train(self):
         # Adversarial ground truths
-        valid = np.ones((self.batch_size, model_from_yaml["discri_dense_archi"][-1]))
-        fake = np.zeros((self.batch_size, model_from_yaml["discri_dense_archi"][-1])) #before the first two dim was 30,30,1
+        valid = np.ones((self.batch_size, 30, 30, 1)) #because of the shape of the discri
+        fake = np.zeros((self.batch_size, 30, 30, 1))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1

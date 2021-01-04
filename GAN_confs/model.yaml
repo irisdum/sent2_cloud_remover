@@ -28,7 +28,7 @@ do_rate: 0.5
 #### THE DISCRIMINATOR PARAM #############
 ######################################
 #describe the whole discriminator architecture
-discri_opt_padding: CONSTANT #"CONSTANT" for ZeroPadding, REFLECT or SYMMETRIC
+discri_opt_padding: SYMMETRIC #"CONSTANT" for ZeroPadding, REFLECT or SYMMETRIC
 
 layer_key: ["padding","stride","kernel","nfilter"] #corresponds to the parameter name to be modified in the following dict
 dict_discri_archi:
@@ -59,8 +59,6 @@ dict_discri_archi:
     - 1
 discri_dense_archi:
   1:
-    - 16
-  2:
     - 1
   #the values will be zipped with layer key
 ## last layer activation leaky relu alpha_param
@@ -73,4 +71,4 @@ d_last_activ: sigmoid
 add_discri_white_noise: false #boolean if True white noise is added to the input data
 add_relu_after_noise: true
 
-add_discri_noise: true #if set to true add_discri_white_noise should be set to false !!!!
+add_discri_noise: false #if set to true add_discri_white_noise should be set to false !!!!
