@@ -47,7 +47,7 @@ class GAN():
             self.dict_band_X = train_yaml["dict_band_x"]
             self.dict_band_label = train_yaml["dict_band_label"]
             self.dict_rescale_type = train_yaml["dict_rescale_type"]
-        self.s1bands=train_yaml["s1bands"]
+        self.s1bands = train_yaml["s1bands"]
         self.s2bands = train_yaml["s2bands"]
         # self.latent_dim = 100
         # PATH
@@ -67,7 +67,7 @@ class GAN():
         self.fact_g_lr = train_yaml["fact_g_lr"]
         self.beta1 = train_yaml["beta1"]
         self.val_directory = train_yaml["val_directory"]
-        self.fact_s2=train_yaml["s2_scale"]
+        self.fact_s2 = train_yaml["s2_scale"]
         self.fact_s1 = train_yaml["s1_scale"]
 
         self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
@@ -142,7 +142,6 @@ class GAN():
         img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
                           name="g_input_data")
 
-
         def build_resnet_block(input, id=0):
             """Define the ResNet block"""
             x = Conv2D(model_yaml["dim_resnet"], model_yaml["k_resnet"], padding=model_yaml["padding"],
@@ -158,7 +157,6 @@ class GAN():
             x = Add(name="g_block_{}_add".format(id))([x, input])
             x = ReLU(name="g_block_{}_relu2".format(id))(x)
             return x
-
 
         if model_yaml["last_activation"] == "tanh":
             print("use tanh keras")
@@ -207,13 +205,25 @@ class GAN():
             layer_val = model_yaml["dict_discri_archi"][layer_index]
             layer_key = model_yaml["layer_key"]
             layer_param = dict(zip(layer_key, layer_val))
-            x = ZeroPadding2D(
-                padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
+            pad = layer_param["padding"]
+            vpadding = [[pad, pad], [pad, pad], [0, 0]]  # the last dimension is 12
+            x = tf.pad(x, vpadding, model_yaml["discri_opt_padding"],
+                       name="{}_padding_{}".format(model_yaml["discri_opt_padding"],
+                                                   layer_index))  # the type of padding is defined the yaml,
+            # more infomration  in https://www.tensorflow.org/api_docs/python/tf/pad
+            #
+            # x = ZeroPadding2D(
+            #   padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
             x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,
                        strides=(layer_param["stride"], layer_param["stride"]), name="d_conv{}".format(layer_index))(x)
             if i > 0:
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="d_bn{}".format(layer_index))(x)
+
+        #x = Flatten(name="flatten")(x)
+        #for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
+        #    dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
+        #    x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
 
         if model_yaml["d_last_activ"] == "sigmoid":
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
@@ -244,11 +254,10 @@ class GAN():
 
     def train(self):
         # Adversarial ground truths
-        valid = np.ones((self.batch_size, 30, 30, 1))
+        valid = np.ones((self.batch_size, 30, 30, 1)) #because of the shape of the discri
         fake = np.zeros((self.batch_size, 30, 30, 1))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
-            # TODO LOAD WEIGHTS FOR DISCRI COMBINED AND GENE
             start_epoch = int(self.previous_checkpoint) + 1
             self.load_from_checkpoint(self.previous_checkpoint)
         else:
