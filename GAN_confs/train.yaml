@@ -10,7 +10,7 @@ dict_rescale_type: {"VV": "StandardScaler", "VH":"StandardScaler","R,G,B":"Stand
 s2_scale: 1/7
 s1_scale: 1/5
 s1bands: ["VV","VH"]
-s2bands: ["R","G","B","NIR"]
+s2bands: ["R,G,B","NIR"]
 path_csv: null  #"/datastore/dum031/data/dataset2/" #Path where the csv of the min max of s2 band on a yearb has been computed otherwise set to null
 #if path_csv null -> the min, max used to normalize s2 will be the mean of the min, max of the tile in the dataset
 lim_train_tile: 1
