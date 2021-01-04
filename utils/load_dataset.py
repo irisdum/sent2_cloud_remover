@@ -50,10 +50,11 @@ def count_channel(dict_orga_int=None, tile_size=256) -> dict:
 
 def load_data(path_directory: str, x_shape=None, label_shape=None, normalization=True, dict_band_X=None,
               dict_band_label=None, dict_rescale_type=None, dict_scale=None, fact_s2=FACT_STD_S2,
-              fact_s1=FACT_STD_S1, s2_bands=S2_BANDS, s1_bands=S1_BANDS, clip_s2=True):
+              fact_s1=FACT_STD_S1, s2_bands=S2_BANDS, s1_bands=S1_BANDS, clip_s2=True,lim=None):
     """
 
     Args:
+        lim: None or int. if int the max nber of tile which is goint to loaded
         clip_s2:
         dict_scale: None or a dictionnary, the keys are string which correspond to group band names and the values
          are sklearn scaler
@@ -75,8 +76,8 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
         label_shape = count_channel(DICT_ORGA_INT)[LABEL_DIR]
     assert x_shape[0] == label_shape[0], "Label and data does not have the same dimension label {} data {}".format(
         label_shape, x_shape)
-    dataX, path_tileX, _ = load_from_dir(path_directory + XDIR, x_shape)  # only need to load once the s
-    data_label, path_tile_label, _ = load_from_dir(path_directory + LABEL_DIR, label_shape)
+    dataX, path_tileX, _ = load_from_dir(path_directory + XDIR, x_shape,lim=lim)  # only need to load once the s
+    data_label, path_tile_label, _ = load_from_dir(path_directory + LABEL_DIR, label_shape,lim=lim)
     # print("L_dict_STAT {}".format(ldict_stat))
     if normalization:
         dataX, data_label, dict_scale = rescale_array(dataX, data_label, dict_group_band_X=dict_band_X,
@@ -91,10 +92,11 @@ def load_data(path_directory: str, x_shape=None, label_shape=None, normalization
     return dataX, data_label, None
 
 
-def load_from_dir(path_dir: str, image_shape: tuple):
+def load_from_dir(path_dir: str, image_shape: tuple, lim=None):
     """
 
     Args:
+        lim: int or None. if int the max nber of tile which is going to be taken into account
         path_dir: string, path to the directory
         image_shape: tuple, shape of the image
 
@@ -102,7 +104,7 @@ def load_from_dir(path_dir: str, image_shape: tuple):
         a numpy array, the list of the tif tile used, the image shape
     """
     assert os.path.isdir(path_dir), "Dir {} does not exist".format(path_dir)
-    path_tile = find_image_indir(path_dir, "npy")  # list of all
+    path_tile = find_image_indir(path_dir, "npy")[:lim]  # list of all
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     # data_array = np.zeros(batch_x_shape)
     data_array = np.array(Parallel(n_jobs=-1)(delayed(load_one_tile)(tile) for tile in path_tile))

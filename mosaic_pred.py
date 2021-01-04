@@ -52,7 +52,7 @@ def _argparser():
 
 def main(build_dataset_dir, predicted_dir, output_dir, im_prefix,path_csv):
     create_safe_directory(output_dir)
-    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR],path_dir_csv=path_csv)
+    batch_pred, l_path_npy, _ = load_from_dir(predicted_dir, DICT_SHAPE[LABEL_DIR])
     l_outpath = []
     for i,image_path in enumerate(l_path_npy):
         tile_id = extract_tile_id(image_path).split(".")[0] + ".tif"

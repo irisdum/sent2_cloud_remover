@@ -13,6 +13,8 @@ s1bands: ["VV","VH"]
 s2bands: ["R","G","B","NIR"]
 path_csv: null  #"/datastore/dum031/data/dataset2/" #Path where the csv of the min max of s2 band on a yearb has been computed otherwise set to null
 #if path_csv null -> the min, max used to normalize s2 will be the mean of the min, max of the tile in the dataset
+lim_train_tile: 1
+lim_val_tile: 1
 
 ## Parameter for the Adam optimizer
 lr: 0.0001 #learning rate
