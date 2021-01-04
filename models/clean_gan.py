@@ -206,7 +206,7 @@ class GAN():
             layer_key = model_yaml["layer_key"]
             layer_param = dict(zip(layer_key, layer_val))
             pad = layer_param["padding"]
-            vpadding = [[pad, pad,], [pad, pad], [0, 0]]  # the last dimension is 12
+            vpadding = tf.constant([[pad, pad], [pad, pad], [0, 0]])# the last dimension is 12
             x = tf.pad(x, vpadding, model_yaml["discri_opt_padding"],
                        name="{}_padding_{}".format(model_yaml["discri_opt_padding"],
                                                    layer_index))  # the type of padding is defined the yaml,
