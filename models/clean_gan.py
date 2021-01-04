@@ -69,7 +69,6 @@ class GAN():
         self.val_directory = train_yaml["val_directory"]
         self.fact_s2 = train_yaml["s2_scale"]
         self.fact_s1 = train_yaml["s1_scale"]
-
         self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
                                                                     x_shape=model_yaml["input_shape"],
                                                                     label_shape=model_yaml["dim_gt_image"],
@@ -78,7 +77,7 @@ class GAN():
                                                                     dict_band_label=self.dict_band_label,
                                                                     dict_rescale_type=self.dict_rescale_type,
                                                                     fact_s2=self.fact_s2, fact_s1=self.fact_s1,
-                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands)
+                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands,lim=train_yaml["lim_train_tile"])
         self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
                                                            label_shape=model_yaml["dim_gt_image"],
                                                            normalization=self.normalization,
@@ -87,7 +86,7 @@ class GAN():
                                                            dict_rescale_type=self.dict_rescale_type,
                                                            dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
                                                            fact_s1=self.fact_s1, s2_bands=self.s2bands,
-                                                           s1_bands=self.s1bands)
+                                                           s1_bands=self.s1bands,lim=train_yaml["lim_val_tile"])
         print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
