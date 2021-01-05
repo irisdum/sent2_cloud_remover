@@ -110,39 +110,35 @@ class GAN():
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
-
+        self.strategy=tf.distribute.MirroredStrategy()
     def build_model(self):
+        strategy = tf.distribute.MirroredStrategy()
+        print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+        with strategy.scope():
 
-        # We use the discriminator
-        self.discriminator = self.build_discriminator(self.model_yaml)
-        self.discriminator.compile(loss='binary_crossentropy',
-                                   optimizer=self.d_optimizer,
-                                   metrics=['accuracy'])
-        self.generator = self.build_generator(self.model_yaml, is_training=True)
-        print("Input G")
-        g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
-                        name="g_build_model_input_data")
-        G = self.generator(g_input)
-        print("G", G)
-        # For the combined model we will only train the generator
-        self.discriminator.trainable = False
-        D_input = tf.concat([G, g_input], axis=-1)
-        print("INPUT DISCRI ", D_input)
-        # The discriminator takes generated images as input and determines validity
-        D_output_fake = self.discriminator(D_input)
-        # print(D_output)
-        # The combined model  (stacked generator and discriminator)
-        #TO TRAIN WITH MULTIPLE GPU
-        if self.gpu>1:
-            tf.compat.v1.disable_eager_execution()
-            print("[INFO] training with {} GPUs...".format(self.gpu))
-            with tf.device("/cpu:0"):
-                self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
-            self.combined=multi_gpu_model(self.combined,gpus=self.gpu)
-        else:
+            # We use the discriminator
+            self.discriminator = self.build_discriminator(self.model_yaml)
+            self.discriminator.compile(loss='binary_crossentropy',
+                                       optimizer=self.d_optimizer,
+                                       metrics=['accuracy'])
+            self.generator = self.build_generator(self.model_yaml, is_training=True)
+            print("Input G")
+            g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                            name="g_build_model_input_data")
+            G = self.generator(g_input)
+            print("G", G)
+            # For the combined model we will only train the generator
+            self.discriminator.trainable = False
+            D_input = tf.concat([G, g_input], axis=-1)
+            print("INPUT DISCRI ", D_input)
+            # The discriminator takes generated images as input and determines validity
+            D_output_fake = self.discriminator(D_input)
+            # print(D_output)
+            # The combined model  (stacked generator and discriminator)
+            #TO TRAIN WITH MULTIPLE GPU
+
             self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
-
-        self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
+            self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
