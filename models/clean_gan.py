@@ -3,7 +3,7 @@ import os
 import random
 import time
 import tensorflow as tf
-
+from tensorflow.compat.v2.keras.utils import multi_gpu_model
 from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Add
 from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D, ReLU, GaussianNoise
 
@@ -87,7 +87,8 @@ class GAN():
                                                            dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
                                                            fact_s1=self.fact_s1, s2_bands=self.s2bands,
                                                            s1_bands=self.s1bands,lim=train_yaml["lim_val_tile"])
-        print("Loading the data done dataX {} dataY ".format(self.data_X.shape, self.data_y.shape))
+        print("Loading the data done dataX {} dataY {}".format(self.data_X.shape, self.data_y.shape))
+        self.gpu=train_yaml["n_gpu"]
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
@@ -131,8 +132,16 @@ class GAN():
         D_output_fake = self.discriminator(D_input)
         # print(D_output)
         # The combined model  (stacked generator and discriminator)
-        # Trains the generator to fool the discriminator
-        self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
+        #TO TRAIN WITH MULTIPLE GPU
+        if self.gpu>1:
+            tf.compat.v1.disable_eager_execution()
+            print("[INFO] training with {} GPUs...".format(self.gpu))
+            with tf.device("/cpu:0"):
+                self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
+            self.combined=multi_gpu_model(self.combined,gpus=self.gpu)
+        else:
+            self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
+
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
@@ -274,7 +283,7 @@ class GAN():
         d_loss = [100, 100]
         l_val_name_metrics, l_val_value_metrics = [], []
         for epoch in range(start_epoch, self.epoch):
-            print("starting epoch {}".format(epoch))
+            #print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
                 ###   THE INPUTS ##
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
