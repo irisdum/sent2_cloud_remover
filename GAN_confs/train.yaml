@@ -30,6 +30,8 @@ batch_size: 1
 training_number: 1
 training_dir: "/srv/osirim/idumeur/trainings/" #the model images and checkpoint will be stored at training_dir/trainining_number
 # The model will be saved every saving step epoch
+n_gpu: 1 #the nber of GPU used for the training
+
 
 im_saving_step: 30 #every n epochs image from the training set are saved
 weights_saving_step: 50 # every n epochs the model is saved
