@@ -111,7 +111,7 @@ class GAN():
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
-        self.strategy = tf.distribute.MirroredStrategy()
+        #self.strategy = tf.distribute.MirroredStrategy()
 
     def build_model(self):
         # strategy = tf.distribute.MirroredStrategy()
