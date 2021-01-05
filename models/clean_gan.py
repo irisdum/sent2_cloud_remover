@@ -320,15 +320,15 @@ class GAN():
 
                 if epoch % self.im_saving_step == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
-                    _, unrescale_gen_imgs, _ = rescale_array(batch_input, gen_imgs, dict_group_band_X=self.dict_band_X,
-                                                    dict_group_band_label=self.dict_band_label,
-                                                    dict_rescale_type=self.dict_rescale_type,
-                                                    dict_scale=self.scale_dict_train, invert=True,
-                                                    s2_bands=self.s2bands,s1_bands=self.s1bands,
-                                                    fact_scale2=self.fact_s2,
-                                                    fact_scale1=self.fact_s1,clip_s2=False)
+                    #_, unrescale_gen_imgs, _ = rescale_array(batch_input, gen_imgs, dict_group_band_X=self.dict_band_X,
+                                                 #   dict_group_band_label=self.dict_band_label,
+                                                #    dict_rescale_type=self.dict_rescale_type,
+                                              #      dict_scale=self.scale_dict_train, invert=True,
+                                                #    s2_bands=self.s2bands,s1_bands=self.s1bands,
+                                                #    fact_scale2=self.fact_s2,
+                                                 #   fact_scale1=self.fact_s1,clip_s2=False)
 
-                    save_images(unrescale_gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
+                    save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
                 if idx % self.val_metric_step == 0:
                     l_val_name_metrics, l_val_value_metrics = self.val_metric()
@@ -425,13 +425,13 @@ class GAN():
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
-            if un_rescale:  # remove the normalization made on the data
+            #if un_rescale:  # remove the normalization made on the data
 
-                _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
-                                                dict_group_band_label=self.dict_band_label,
-                                                dict_rescale_type=self.dict_rescale_type,
-                                                dict_scale=self.scale_dict_train, invert=True, fact_scale2=self.fact_s2,
-                                                fact_scale1=self.fact_s1)
+                # _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
+                #                                 dict_group_band_label=self.dict_band_label,
+                #                                 dict_rescale_type=self.dict_rescale_type,
+                #                                 dict_scale=self.scale_dict_train, invert=True, fact_scale2=self.fact_s2,
+                #                                 fact_scale1=self.fact_s1,clip_s2=False)
             assert batch_res.shape[0] == batch.shape[
                 0], "Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
                                                                                     batch.shape)
