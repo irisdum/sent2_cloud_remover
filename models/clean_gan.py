@@ -77,7 +77,8 @@ class GAN():
                                                                     dict_band_label=self.dict_band_label,
                                                                     dict_rescale_type=self.dict_rescale_type,
                                                                     fact_s2=self.fact_s2, fact_s1=self.fact_s1,
-                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands,lim=train_yaml["lim_train_tile"])
+                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands,
+                                                                    lim=train_yaml["lim_train_tile"])
         self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
                                                            label_shape=model_yaml["dim_gt_image"],
                                                            normalization=self.normalization,
@@ -86,9 +87,9 @@ class GAN():
                                                            dict_rescale_type=self.dict_rescale_type,
                                                            dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
                                                            fact_s1=self.fact_s1, s2_bands=self.s2bands,
-                                                           s1_bands=self.s1bands,lim=train_yaml["lim_val_tile"])
+                                                           s1_bands=self.s1bands, lim=train_yaml["lim_val_tile"])
         print("Loading the data done dataX {} dataY {}".format(self.data_X.shape, self.data_y.shape))
-        self.gpu=train_yaml["n_gpu"]
+        self.gpu = train_yaml["n_gpu"]
         self.num_batches = self.data_X.shape[0] // self.batch_size
         self.model_yaml = model_yaml
         self.im_saving_step = train_yaml["im_saving_step"]
@@ -110,35 +111,36 @@ class GAN():
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
-        self.strategy=tf.distribute.MirroredStrategy()
+        self.strategy = tf.distribute.MirroredStrategy()
+
     def build_model(self):
-        strategy = tf.distribute.MirroredStrategy()
-        print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
-        with strategy.scope():
+        # strategy = tf.distribute.MirroredStrategy()
+        # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+        # with strategy.scope():
 
-            # We use the discriminator
-            self.discriminator = self.build_discriminator(self.model_yaml)
-            self.discriminator.compile(loss='binary_crossentropy',
-                                       optimizer=self.d_optimizer,
-                                       metrics=['accuracy'])
-            self.generator = self.build_generator(self.model_yaml, is_training=True)
-            print("Input G")
-            g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
-                            name="g_build_model_input_data")
-            G = self.generator(g_input)
-            print("G", G)
-            # For the combined model we will only train the generator
-            self.discriminator.trainable = False
-            D_input = tf.concat([G, g_input], axis=-1)
-            print("INPUT DISCRI ", D_input)
-            # The discriminator takes generated images as input and determines validity
-            D_output_fake = self.discriminator(D_input)
-            # print(D_output)
-            # The combined model  (stacked generator and discriminator)
-            #TO TRAIN WITH MULTIPLE GPU
+        # We use the discriminator
+        self.discriminator = self.build_discriminator(self.model_yaml)
+        self.discriminator.compile(loss='binary_crossentropy',
+                                   optimizer=self.d_optimizer,
+                                   metrics=['accuracy'])
+        self.generator = self.build_generator(self.model_yaml, is_training=True)
+        print("Input G")
+        g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                        name="g_build_model_input_data")
+        G = self.generator(g_input)
+        print("G", G)
+        # For the combined model we will only train the generator
+        self.discriminator.trainable = False
+        D_input = tf.concat([G, g_input], axis=-1)
+        print("INPUT DISCRI ", D_input)
+        # The discriminator takes generated images as input and determines validity
+        D_output_fake = self.discriminator(D_input)
+        # print(D_output)
+        # The combined model  (stacked generator and discriminator)
+        # TO TRAIN WITH MULTIPLE GPU
 
-            self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
-            self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
+        self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
+        self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
@@ -210,7 +212,7 @@ class GAN():
             layer_key = model_yaml["layer_key"]
             layer_param = dict(zip(layer_key, layer_val))
             pad = layer_param["padding"]
-            vpadding = tf.constant([[0,0],[pad, pad], [pad, pad], [0, 0]])# the last dimension is 12
+            vpadding = tf.constant([[0, 0], [pad, pad], [pad, pad], [0, 0]])  # the last dimension is 12
             x = tf.pad(x, vpadding, model_yaml["discri_opt_padding"],
                        name="{}_padding_{}".format(model_yaml["discri_opt_padding"],
                                                    layer_index))  # the type of padding is defined the yaml,
@@ -224,8 +226,8 @@ class GAN():
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="d_bn{}".format(layer_index))(x)
 
-        #x = Flatten(name="flatten")(x)
-        #for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
+        # x = Flatten(name="flatten")(x)
+        # for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
         #    dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
         #    x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
 
@@ -258,7 +260,7 @@ class GAN():
 
     def train(self):
         # Adversarial ground truths
-        valid = np.ones((self.batch_size, 30, 30, 1)) #because of the shape of the discri
+        valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
         fake = np.zeros((self.batch_size, 30, 30, 1))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
@@ -279,7 +281,7 @@ class GAN():
         d_loss = [100, 100]
         l_val_name_metrics, l_val_value_metrics = [], []
         for epoch in range(start_epoch, self.epoch):
-            #print("starting epoch {}".format(epoch))
+            # print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
                 ###   THE INPUTS ##
                 batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
@@ -320,13 +322,13 @@ class GAN():
 
                 if epoch % self.im_saving_step == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
-                    #_, unrescale_gen_imgs, _ = rescale_array(batch_input, gen_imgs, dict_group_band_X=self.dict_band_X,
-                                                 #   dict_group_band_label=self.dict_band_label,
-                                                #    dict_rescale_type=self.dict_rescale_type,
-                                              #      dict_scale=self.scale_dict_train, invert=True,
-                                                #    s2_bands=self.s2bands,s1_bands=self.s1bands,
-                                                #    fact_scale2=self.fact_s2,
-                                                 #   fact_scale1=self.fact_s1,clip_s2=False)
+                    # _, unrescale_gen_imgs, _ = rescale_array(batch_input, gen_imgs, dict_group_band_X=self.dict_band_X,
+                    #   dict_group_band_label=self.dict_band_label,
+                    #    dict_rescale_type=self.dict_rescale_type,
+                    #      dict_scale=self.scale_dict_train, invert=True,
+                    #    s2_bands=self.s2bands,s1_bands=self.s1bands,
+                    #    fact_scale2=self.fact_s2,
+                    #   fact_scale1=self.fact_s1,clip_s2=False)
 
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
@@ -411,7 +413,7 @@ class GAN():
                                  dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                  dict_rescale_type=self.dict_rescale_type, dict_scale=self.scale_dict_train,
                                  fact_s2=self.fact_s2, fact_s1=self.fact_s1, s2_bands=self.s2bands,
-                                 s1_bands=self.s1bands,clip_s2=False)
+                                 s1_bands=self.s1bands, clip_s2=False)
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
@@ -425,13 +427,13 @@ class GAN():
         else:
             create_safe_directory(path_save)
             batch_res = self.generator.predict(batch)
-            #if un_rescale:  # remove the normalization made on the data
+            # if un_rescale:  # remove the normalization made on the data
 
-                # _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
-                #                                 dict_group_band_label=self.dict_band_label,
-                #                                 dict_rescale_type=self.dict_rescale_type,
-                #                                 dict_scale=self.scale_dict_train, invert=True, fact_scale2=self.fact_s2,
-                #                                 fact_scale1=self.fact_s1,clip_s2=False)
+            # _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
+            #                                 dict_group_band_label=self.dict_band_label,
+            #                                 dict_rescale_type=self.dict_rescale_type,
+            #                                 dict_scale=self.scale_dict_train, invert=True, fact_scale2=self.fact_s2,
+            #                                 fact_scale1=self.fact_s1,clip_s2=False)
             assert batch_res.shape[0] == batch.shape[
                 0], "Wrong prediction should have shape {} but has shape {}".format(batch_res.shape,
                                                                                     batch.shape)
