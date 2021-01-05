@@ -330,7 +330,7 @@ class GAN():
                                                     dict_scale=self.scale_dict_train, invert=True,
                                                     s2_bands=self.s2bands,s1_bands=self.s1bands,
                                                     fact_scale2=self.fact_s2,
-                                                    fact_scale1=self.fact_s1)
+                                                    fact_scale1=self.fact_s1,clip_s2=False)
 
                     save_images(unrescale_gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
@@ -415,7 +415,7 @@ class GAN():
                                  dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                  dict_rescale_type=self.dict_rescale_type, dict_scale=self.scale_dict_train,
                                  fact_s2=self.fact_s2, fact_s1=self.fact_s1, s2_bands=self.s2bands,
-                                 s1_bands=self.s1bands)
+                                 s1_bands=self.s1bands,clip_s2=False)
         else:
             if l_image_id is None:
                 print("We defined our own index for image name")
