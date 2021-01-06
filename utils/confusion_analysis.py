@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils.display_image import histo_val
+from utils.old_dispay_vi import histo_val
 
 
 def proba_wc_vege(batch_classif, batch_confusion, plot=True, N_tot=24, all_val=True, list_class=None):
