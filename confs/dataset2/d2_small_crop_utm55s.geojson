@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "small_crop_utm55s",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32755" } },
-"features": [
-
-]
-}

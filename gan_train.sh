@@ -12,9 +12,4 @@ model_path="$1"
 # second parameter is a path to a parameter file
 train_path="$2"
 
-
-module load miniconda3/4.3.13
-unset PYTHONHOME
-unset PYTHONPATH
-source activate /datastore/dum031/envs/env_tf_gpu
 python train.py --model_path ${model_path} --train_path ${train_path}
