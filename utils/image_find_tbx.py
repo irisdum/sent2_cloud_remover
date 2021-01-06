@@ -24,7 +24,7 @@ def extract_relative_path(path_tif):
 
 def extract_tile_id(path_tif):
     ch=path_tif.split("/")[-1]
-    return  ch.split("_")[4]+"_"+ch.split("_")[5].split(".")[0]
+    return  ch.split("_")[4]+"_"+ch.split("_")[5]
 
 
 
