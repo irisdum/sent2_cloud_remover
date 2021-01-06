@@ -137,8 +137,9 @@ def list_all_conformed_tiles(path_final_dataset, sent_dir="dataX/Sentinel1_t1/",
     list_all_tiles = glob.glob(path_final_dataset + sent_dir + "**/*.tif", recursive=True)
     print("Initial dataset size {}".format(len(list_all_tiles)))
     l_all_id = [extract_tile_id(path) for path in list_all_tiles]
-    print(l_all_id[:10])
+    print(l_all_id)
     for id_tile in l_unconformed_id:
+        print(id_tile)
         # print(id_tile in l_unconformed_id)
         # print("remove {} ".format(id_tile))
         l_all_id.remove(id_tile)
