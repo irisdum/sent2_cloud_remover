@@ -23,7 +23,8 @@ def extract_relative_path(path_tif):
 
 
 def extract_tile_id(path_tif):
-    return path_tif.split("/")[-1][-9:]
+    return  path_tif.split("_")[4]+"_"+path_tif.split("_")[5].split(".")[0]
+
 
 
 def get_all_tiles_path(path_sent_dir):
