@@ -104,7 +104,9 @@ def load_from_dir(path_dir: str, image_shape: tuple, lim=None):
         a numpy array, the list of the tif tile used, the image shape
     """
     assert os.path.isdir(path_dir), "Dir {} does not exist".format(path_dir)
-    path_tile = find_image_indir(path_dir, "npy")[:lim]  # list of all
+    path_tile = find_image_indir(path_dir, "npy")
+    if lim is not None:
+        path_tile = path_tile[:lim]  # list of all
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     # data_array = np.zeros(batch_x_shape)
     data_array = np.array(Parallel(n_jobs=-1)(delayed(load_one_tile)(tile) for tile in path_tile))
