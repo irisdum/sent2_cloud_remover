@@ -287,9 +287,9 @@ class GAN():
 
     def train(self):
         # Adversarial ground truths
-        with self.strategy.scope():
-            valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
-            fake = np.zeros((self.batch_size, 30, 30, 1))
+
+        valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
+        fake = np.zeros((self.batch_size, 30, 30, 1))
         print("valid shape {}".format(valid.shape))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
