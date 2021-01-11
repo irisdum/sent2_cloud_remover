@@ -305,19 +305,19 @@ class GAN():
 
                 #print(batch_input)
                 ##  TRAIN THE DISCRIMINATOR
+                with self.strategy.scope():
+                    d_noise_real = random.uniform(self.real_label_smoothing[0],
+                                                  self.real_label_smoothing[1])  # Add noise on the loss
+                    d_noise_fake = random.uniform(self.fake_label_smoothing[0],
+                                                  self.fake_label_smoothing[1])  # Add noise on the loss
 
-                d_noise_real = random.uniform(self.real_label_smoothing[0],
-                                              self.real_label_smoothing[1])  # Add noise on the loss
-                d_noise_fake = random.uniform(self.fake_label_smoothing[0],
-                                              self.fake_label_smoothing[1])  # Add noise on the loss
-
-                # Create a noisy gt images
-                batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)
-                # Generate a batch of new images
-                # print("Make a prediction")
-                gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
-                D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
-                D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
+                    # Create a noisy gt images
+                    batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)
+                    # Generate a batch of new images
+                    # print("Make a prediction")
+                    gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
+                    D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
+                    D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
                 print("shape d train")
                 print(valid.shape,D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
