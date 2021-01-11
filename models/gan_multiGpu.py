@@ -2,6 +2,7 @@
 import os
 import random
 import runai.ga
+import runai.ga.keras
 import tensorflow as tf
 from tensorflow.compat.v2.keras.utils import multi_gpu_model
 from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Add
