@@ -113,8 +113,8 @@ class GAN():
 
         self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
         with self.strategy.scope():
-            self.d_optimizer = Adam(self.learning_rate, self.beta1)
-            self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+            self.d_optimizer = Adam(self.learning_rate, self.beta1,name='Adam')
+            self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1,name='Adam')
             self.d_optimizer = runai.ga.keras.optimizers.Optimizer(self.d_optimizer
               , steps=train_yaml["gradient_acc_step"])
             self.g_optimizer = runai.ga.keras.optimizers.Optimizer(self.g_optimizer
