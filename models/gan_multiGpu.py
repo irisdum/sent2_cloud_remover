@@ -285,9 +285,8 @@ class GAN():
 
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
-        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
-        train_dist_dataset = self.strategy.experimental_distribute_dataset(train_dataset)
-        test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
+        #test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
+
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -301,7 +300,7 @@ class GAN():
         for epoch in range(start_epoch, self.epoch):
 
             # print("starting epoch {}".format(epoch))
-            for idx,(batch_input,batch_gt) in enumerate(train_dist_dataset):
+            for idx,(batch_input,batch_gt) in enumerate(train_dataset):
 
                 print(batch_input)
                 ##  TRAIN THE DISCRIMINATOR
