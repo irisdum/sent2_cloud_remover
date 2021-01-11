@@ -110,6 +110,10 @@ class GAN():
         with self.strategy.scope():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+        self.buffer_size=self.data_X.shape[0]
+
+
+        self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
         self.build_model()
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
@@ -279,8 +283,11 @@ class GAN():
         ## LOADING THE DATA ON MULTIPLE GPU
         strategy = tf.distribute.MirroredStrategy()
 
-
-
+        train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
+            self.global_batch_size)
+        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
+        train_dist_dataset = self.strategy.experimental_distribute_dataset(train_dataset)
+        test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -294,13 +301,8 @@ class GAN():
         for epoch in range(start_epoch, self.epoch):
 
             # print("starting epoch {}".format(epoch))
-            for idx in range(start_batch_id, self.num_batches):
-                ###   THE INPUTS ##
-                batch_input = self.data_X[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
-                    np.float32)  # the input
-                # print("batch_input ite {} shape {} ".format(idx,batch_input.shape))
-                batch_gt = self.data_y[idx * self.batch_size:(idx + 1) * self.batch_size].astype(
-                    np.float32)  # the Ground Truth images
+            for idx,(batch_input,batch_gt) in enumerate(train_dist_dataset):
+
 
                 ##  TRAIN THE DISCRIMINATOR
 
@@ -331,7 +333,6 @@ class GAN():
 
                 if epoch % self.im_saving_step == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
-
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
                 if idx % self.val_metric_step == 0:
@@ -364,9 +365,9 @@ class GAN():
         GLOBAL_BATCH_SIZE = BATCH_SIZE_PER_REPLICA * self.strategy.num_replicas_in_sync
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(BUFFER_SIZE).batch(
             GLOBAL_BATCH_SIZE)
-        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(GLOBAL_BATCH_SIZE)
+
         train_dist_dataset = self.strategy.experimental_distribute_dataset(train_dataset)
-        test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
+
 
         loss_object = tf.keras.losses.BinaryCrossentropy(
             from_logits=True,
@@ -433,6 +434,8 @@ class GAN():
         return loaded_model
 
     def val_metric(self):
+        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
+        test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
         val_pred = self.generator.predict(self.val_X)
         return compute_metric(self.val_Y, val_pred)
 
