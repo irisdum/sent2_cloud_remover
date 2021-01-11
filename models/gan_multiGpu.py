@@ -343,7 +343,7 @@ class GAN():
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
                                          d_loss_real[1], d_loss_fake[1], d_loss[1]]
                     # The metrics
-                    l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
+                    l_name_metrics, l_value_metrics = compute_metric(batch_gt.eval(), gen_imgs.eval())
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
@@ -437,7 +437,7 @@ class GAN():
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
         test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
         val_pred = self.generator.predict(self.val_X)
-        return compute_metric(self.val_Y, val_pred)
+        return compute_metric(self.val_Y.eval(), val_pred.eval())
 
     def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
