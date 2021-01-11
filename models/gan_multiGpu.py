@@ -451,8 +451,8 @@ class GAN():
 
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
-        test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
-        for i,(x,y) in enumerate(test_dist_dataset):
+        #test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
+        for i,(x,y) in enumerate(test_dataset):
             print("eval on {}".format(i))
 
             val_pred = self.generator.predict(x)
