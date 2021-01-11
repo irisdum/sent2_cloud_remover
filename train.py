@@ -2,12 +2,17 @@
 from models import clean_gan
 from ruamel import yaml
 import os
+from models import gan_multiGpu
 
 import argparse
 
 
-def main(path_train, path_model):
-    gan = clean_gan.GAN(open_yaml(path_model), open_yaml(path_train))
+def main(path_train, path_model,mgpu):
+    if mgpu:
+        print("we take care of mgpu")
+        gan = gan_multiGpu.GAN(open_yaml(path_model), open_yaml(path_train))
+    else:
+        gan = clean_gan.GAN(open_yaml(path_model), open_yaml(path_train))
     model_dir = gan.model_dir
     training_dir = gan.this_training_dir
     saving_yaml(path_model, model_dir)
@@ -48,7 +53,7 @@ def _argparser():
     parser.add_argument('--model_path', type=str, default="./GAN_confs/model.yaml",
                         help="path to yaml model ")
     parser.add_argument("--train_path", type=str, default="./GAN_confs/train.yaml")
-
+    parser.add_argument("--mgpu", type=bool, default=False)
     return parser.parse_args()
 
 
@@ -56,4 +61,4 @@ if __name__ == '__main__':
     parser = _argparser()
     # path_train="./GAN_confs/train.yaml"
     # path_model="./GAN_confs/model.yaml"
-    main(parser.train_path, parser.model_path)
+    main(parser.train_path, parser.model_path,parser.mgpu)
