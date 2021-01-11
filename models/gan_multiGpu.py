@@ -107,14 +107,14 @@ class GAN():
 
         self.max_im = 10
         self.strategy= tf.distribute.MirroredStrategy()
+        print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
+        self.buffer_size = self.data_X.shape[0]
+
+        self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
         with self.strategy.scope():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-        self.buffer_size=self.data_X.shape[0]
-
-
-        self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
-        self.build_model()
+            self.build_model()
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
@@ -124,32 +124,31 @@ class GAN():
     def build_model(self):
         # strategy = tf.distribute.MirroredStrategy()
         # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
-        # with strategy.scope():
-        with self.strategy.scope():
-            # We use the discriminator
-            self.discriminator = self.build_discriminator(self.model_yaml)
-            self.discriminator.compile(loss='binary_crossentropy',
-                                       optimizer=self.d_optimizer,
-                                       metrics=['accuracy'])
-            self.generator = self.build_generator(self.model_yaml, is_training=True)
-            print("Input G")
-            g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
-                            name="g_build_model_input_data")
-            G = self.generator(g_input)
-            print("G", G)
-            # For the combined model we will only train the generator
-            self.discriminator.trainable = False
-            D_input = tf.concat([G, g_input], axis=-1)
-            print("INPUT DISCRI ", D_input)
-            # The discriminator takes generated images as input and determines validity
-            D_output_fake = self.discriminator(D_input)
-            # print(D_output)
-            # The combined model  (stacked generator and discriminator)
-            # TO TRAIN WITH MULTIPLE GPU
 
-            self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
-            self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
-                              optimizer=self.g_optimizer)
+        # We use the discriminator
+        self.discriminator = self.build_discriminator(self.model_yaml)
+        self.discriminator.compile(loss='binary_crossentropy',
+                                   optimizer=self.d_optimizer,
+                                   metrics=['accuracy'])
+        self.generator = self.build_generator(self.model_yaml, is_training=True)
+        print("Input G")
+        g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                        name="g_build_model_input_data")
+        G = self.generator(g_input)
+        print("G", G)
+        # For the combined model we will only train the generator
+        self.discriminator.trainable = False
+        D_input = tf.concat([G, g_input], axis=-1)
+        print("INPUT DISCRI ", D_input)
+        # The discriminator takes generated images as input and determines validity
+        D_output_fake = self.discriminator(D_input)
+        # print(D_output)
+        # The combined model  (stacked generator and discriminator)
+        # TO TRAIN WITH MULTIPLE GPU
+
+        self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
+        self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
+                          optimizer=self.g_optimizer)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):
@@ -169,83 +168,83 @@ class GAN():
             x = Add(name="g_block_{}_add".format(id))([x, input])
             x = ReLU(name="g_block_{}_relu2".format(id))(x)
             return x
-        with self.strategy.scope():
-            img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
-                              name="g_input_data")
 
-            if model_yaml["last_activation"] == "tanh":
-                print("use tanh keras")
-                last_activ = lambda x: tf.keras.activations.tanh(x)
-            else:
-                last_activ = model_yaml["last_activation"]
-            x = img_input
+        img_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
+                          name="g_input_data")
 
-            for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
-                x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                           padding=model_yaml["padding"], name="g_conv{}".format(i))(x)
-                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
-                                       name="g_{}_bn".format(i))(x)
-                x = ReLU(name="g_{}_lay_relu".format(i))(x)
+        if model_yaml["last_activation"] == "tanh":
+            print("use tanh keras")
+            last_activ = lambda x: tf.keras.activations.tanh(x)
+        else:
+            last_activ = model_yaml["last_activation"]
+        x = img_input
 
-            for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
-                x = build_resnet_block(x, id=j)
+        for i, param_lay in enumerate(model_yaml["param_before_resnet"]):  # build the blocks before the Resnet Blocks
+            x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
+                       padding=model_yaml["padding"], name="g_conv{}".format(i))(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
+                                   name="g_{}_bn".format(i))(x)
+            x = ReLU(name="g_{}_lay_relu".format(i))(x)
 
-            for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
-                x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
-                           padding=model_yaml["padding"],
-                           name="g_conv_after_resnetblock{}".format(i))(x)
-                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
-                                       name="g_after_resnetblock{}_bn2".format(i))(x)
-                x = ReLU(name="g_after_resnetblock_relu_{}".format(i))(x)
-            # The last layer
-            x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
-                       padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
-            model_gene = Model(img_input, x, name="Generator")
+        for j in range(model_yaml["nb_resnet_blocs"]):  # add the Resnet blocks
+            x = build_resnet_block(x, id=j)
+
+        for i, param_lay in enumerate(model_yaml["param_after_resnet"]):
+            x = Conv2D(param_lay[0], param_lay[1], strides=tuple(model_yaml["stride"]),
+                       padding=model_yaml["padding"],
+                       name="g_conv_after_resnetblock{}".format(i))(x)
+            x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
+                                   name="g_after_resnetblock{}_bn2".format(i))(x)
+            x = ReLU(name="g_after_resnetblock_relu_{}".format(i))(x)
+        # The last layer
+        x = Conv2D(model_yaml["last_layer"][0], model_yaml["last_layer"][1], strides=tuple(model_yaml["stride"]),
+                   padding=model_yaml["padding"], name="g_final_conv", activation=last_activ)(x)
+        model_gene = Model(img_input, x, name="Generator")
         model_gene.summary()
         return model_gene
 
     def build_discriminator(self, model_yaml, is_training=True):
-        with self.strategy.scope():
-            discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
-            if model_yaml["d_activation"] == "lrelu":
-                d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
-            else:
-                d_activation = model_yaml["d_activation"]
 
-            if model_yaml["add_discri_noise"]:
-                x = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"], name="d_GaussianNoise")(
-                    discri_input)
-            else:
-                x = discri_input
-            for i, layer_index in enumerate(model_yaml["dict_discri_archi"]):
-                layer_val = model_yaml["dict_discri_archi"][layer_index]
-                layer_key = model_yaml["layer_key"]
-                layer_param = dict(zip(layer_key, layer_val))
-                pad = layer_param["padding"]
-                vpadding = tf.constant([[0, 0], [pad, pad], [pad, pad], [0, 0]])  # the last dimension is 12
-                x = tf.pad(x, vpadding, model_yaml["discri_opt_padding"],
-                           name="{}_padding_{}".format(model_yaml["discri_opt_padding"],
-                                                       layer_index))  # the type of padding is defined the yaml,
-                # more infomration  in https://www.tensorflow.org/api_docs/python/tf/pad
-                #
-                # x = ZeroPadding2D(
-                #   padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
-                x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,
-                           strides=(layer_param["stride"], layer_param["stride"]), name="d_conv{}".format(layer_index))(x)
-                if i > 0:
-                    x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
-                                           name="d_bn{}".format(layer_index))(x)
+        discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
+        if model_yaml["d_activation"] == "lrelu":
+            d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
+        else:
+            d_activation = model_yaml["d_activation"]
 
-            # x = Flatten(name="flatten")(x)
-            # for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
-            #    dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
-            #    x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
+        if model_yaml["add_discri_noise"]:
+            x = GaussianNoise(self.sigma_val, input_shape=self.model_yaml["dim_gt_image"], name="d_GaussianNoise")(
+                discri_input)
+        else:
+            x = discri_input
+        for i, layer_index in enumerate(model_yaml["dict_discri_archi"]):
+            layer_val = model_yaml["dict_discri_archi"][layer_index]
+            layer_key = model_yaml["layer_key"]
+            layer_param = dict(zip(layer_key, layer_val))
+            pad = layer_param["padding"]
+            vpadding = tf.constant([[0, 0], [pad, pad], [pad, pad], [0, 0]])  # the last dimension is 12
+            x = tf.pad(x, vpadding, model_yaml["discri_opt_padding"],
+                       name="{}_padding_{}".format(model_yaml["discri_opt_padding"],
+                                                   layer_index))  # the type of padding is defined the yaml,
+            # more infomration  in https://www.tensorflow.org/api_docs/python/tf/pad
+            #
+            # x = ZeroPadding2D(
+            #   padding=(layer_param["padding"], layer_param["padding"]), name="d_pad_{}".format(layer_index))(x)
+            x = Conv2D(layer_param["nfilter"], layer_param["kernel"], padding="valid", activation=d_activation,
+                       strides=(layer_param["stride"], layer_param["stride"]), name="d_conv{}".format(layer_index))(x)
+            if i > 0:
+                x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
+                                       name="d_bn{}".format(layer_index))(x)
 
-            if model_yaml["d_last_activ"] == "sigmoid":
-                x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
-            else:
-                x_final = x
-            model_discri = Model(discri_input, x_final, name="discriminator")
+        # x = Flatten(name="flatten")(x)
+        # for i, dlayer_idx in enumerate(model_yaml["discri_dense_archi"]):
+        #    dense_layer = model_yaml["discri_dense_archi"][dlayer_idx]
+        #    x = Dense(dense_layer, activation=d_activation, name="dense_{}".format(dlayer_idx))(x)
+
+        if model_yaml["d_last_activ"] == "sigmoid":
+            x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
+        else:
+            x_final = x
+        model_discri = Model(discri_input, x_final, name="discriminator")
         model_discri.summary()
         return model_discri
 
@@ -268,6 +267,24 @@ class GAN():
                                                   write_graph=True, write_grads=True)
         self.g_tensorboard_callback.set_model(self.combined)
 
+
+    def train_gpu(self):
+        valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
+        fake = np.zeros((self.batch_size, 30, 30, 1))
+
+        print("valid shape {}".format(valid.shape))
+        if self.previous_checkpoint is not None:
+            print("LOADING the model from step {}".format(self.previous_checkpoint))
+            start_epoch = int(self.previous_checkpoint) + 1
+            self.load_from_checkpoint(self.previous_checkpoint)
+        else:
+            # create_safe_directory(self.saving_logs_path)
+            create_safe_directory(self.saving_image_path)
+        train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
+            self.global_batch_size)
+        train_dist_dataset = self.strategy.experimental_distribute_dataset(train_dataset)
+
+
     def train(self):
         # Adversarial ground truths
         with self.strategy.scope():
@@ -287,7 +304,6 @@ class GAN():
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
         #test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
-
         # loop for epoch
         start_time = time.time()
         sigma_val = self.sigma_init
@@ -305,19 +321,19 @@ class GAN():
 
                 #print(batch_input)
                 ##  TRAIN THE DISCRIMINATOR
-                with self.strategy.scope():
-                    d_noise_real = random.uniform(self.real_label_smoothing[0],
-                                                  self.real_label_smoothing[1])  # Add noise on the loss
-                    d_noise_fake = random.uniform(self.fake_label_smoothing[0],
-                                                  self.fake_label_smoothing[1])  # Add noise on the loss
 
-                    # Create a noisy gt images
-                    batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)
-                    # Generate a batch of new images
-                    # print("Make a prediction")
-                    gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
-                    D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
-                    D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
+                d_noise_real = random.uniform(self.real_label_smoothing[0],
+                                              self.real_label_smoothing[1])  # Add noise on the loss
+                d_noise_fake = random.uniform(self.fake_label_smoothing[0],
+                                              self.fake_label_smoothing[1])  # Add noise on the loss
+
+                # Create a noisy gt images
+                batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)
+                # Generate a batch of new images
+                # print("Make a prediction")
+                gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
+                D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
+                D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
                 print("shape d train")
                 print(valid.shape,D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
@@ -351,9 +367,7 @@ class GAN():
                         name_logs, val_logs)
                     write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric+["time_in_sec"],
                                   val_logs + l_value_metrics + l_val_value_metrics+[start_time-time.time()], self.num_batches * epoch + idx,)
-                # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
-                #          val_logs + l_value_metrics + l_val_value_metrics,
-                #         self.num_batches * epoch + idx)
+
 
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
