@@ -343,7 +343,7 @@ class GAN():
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
                                          d_loss_real[1], d_loss_fake[1], d_loss[1]]
                     # The metrics
-                    l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
+                    l_name_metrics, l_value_metrics = compute_metric(batch_gt.eval(), gen_imgs.eval())
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
