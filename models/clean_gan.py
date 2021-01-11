@@ -23,6 +23,7 @@ from utils.open_yaml import open_yaml, saving_yaml
 from utils.metrics import batch_psnr, ssim_batch, compute_metric
 
 import numpy as np
+import time
 
 
 class GAN():
@@ -280,6 +281,7 @@ class GAN():
         d_loss_fake = [100, 100]
         d_loss = [100, 100]
         l_val_name_metrics, l_val_value_metrics = [], []
+        start_time=time.time()
         for epoch in range(start_epoch, self.epoch):
             # print("starting epoch {}".format(epoch))
             for idx in range(start_batch_id, self.num_batches):
@@ -344,8 +346,8 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-                    write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric,
-                                  val_logs + l_value_metrics + l_val_value_metrics, self.num_batches * epoch + idx)
+                    write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric+["time_in_sec"],
+                                  val_logs + l_value_metrics + l_val_value_metrics+[start_time-time.time()], self.num_batches * epoch + idx,)
                 # write_log(self.g_tensorboard_callback, name_logs + l_name_metrics + name_val_metric,
                 #          val_logs + l_value_metrics + l_val_value_metrics,
                 #         self.num_batches * epoch + idx)
