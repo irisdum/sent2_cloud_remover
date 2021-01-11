@@ -434,10 +434,13 @@ class GAN():
         return loaded_model
 
     def val_metric(self):
-        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
+        test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
         test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
-        val_pred = self.generator.predict(self.val_X)
-        return compute_metric(self.val_Y.eval(), val_pred.eval())
+        for i,(x,y) in enumerate(test_dist_dataset):
+            print("eval on {}".format(i))
+            val_pred = self.generator.predict(x)
+            label=y
+        return compute_metric(label, val_pred.eval())
 
     def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
