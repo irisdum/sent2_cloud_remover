@@ -303,7 +303,7 @@ class GAN():
             # print("starting epoch {}".format(epoch))
             for idx,(batch_input,batch_gt) in enumerate(train_dist_dataset):
 
-
+                print(batch_input)
                 ##  TRAIN THE DISCRIMINATOR
 
                 d_noise_real = random.uniform(self.real_label_smoothing[0],
