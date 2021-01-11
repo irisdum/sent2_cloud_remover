@@ -343,7 +343,8 @@ class GAN():
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
                                          d_loss_real[1], d_loss_fake[1], d_loss[1]]
                     # The metrics
-                    l_name_metrics, l_value_metrics = compute_metric(batch_gt.eval(), gen_imgs.eval())
+                    print(type(batch_gt),type(gen_imgs))
+                    l_name_metrics, l_value_metrics = compute_metric(batch_gt, gen_imgs)
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
@@ -440,7 +441,7 @@ class GAN():
             print("eval on {}".format(i))
             val_pred = self.generator.predict(x)
             label=y
-        return compute_metric(label, val_pred.eval())
+        return compute_metric(label, val_pred)
 
     def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
