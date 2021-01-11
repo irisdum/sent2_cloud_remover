@@ -1,7 +1,7 @@
 # Keras Implementation of GAN
 import os
 import random
-import time
+import runai.ga
 import tensorflow as tf
 from tensorflow.compat.v2.keras.utils import multi_gpu_model
 from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Add
@@ -114,6 +114,10 @@ class GAN():
         with self.strategy.scope():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+            self.d_optimizer = runai.ga.keras.optimizers.Optimizer(self.d_optimizer
+              , steps=train_yaml["gradient_acc_step"])
+            self.g_optimizer = runai.ga.keras.optimizers.Optimizer(self.g_optimizer
+                                                                   , steps=train_yaml["gradient_acc_step"])
             self.build_model()
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
@@ -290,7 +294,7 @@ class GAN():
 
         valid = np.ones((self.global_batch_size, 30, 30, 1))  # because of the shape of the discri
         fake = np.zeros((self.global_batch_size, 30, 30, 1))
-        print("valid shape {}".format(valid.shape))
+        #print("valid shape {}".format(valid.shape))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1
@@ -350,9 +354,9 @@ class GAN():
 
                 if epoch % self.im_saving_step == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
-                    save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
+                    save_images(gen_imgs, self.saving_image_path, ite= idx)
                 # LOGS to print in Tensorboard
-                if idx % self.val_metric_step == 0:
+                if epoch % self.val_metric_step == 0:
                     l_val_name_metrics, l_val_value_metrics = self.val_metric()
                     name_val_metric = ["val_{}".format(name) for name in l_val_name_metrics]
                     name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
@@ -360,13 +364,13 @@ class GAN():
                     val_logs = g_loss + [g_loss[0] + 100 * g_loss[1], d_loss_real[0], d_loss_fake[0], d_loss[0],
                                          d_loss_real[1], d_loss_fake[1], d_loss[1]]
                     # The metrics
-                    print(type(batch_gt),type(gen_imgs))
+                    #print(type(batch_gt),type(gen_imgs))
                     l_name_metrics, l_value_metrics = compute_metric(batch_gt.numpy(), gen_imgs)
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
                     write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric+["time_in_sec"],
-                                  val_logs + l_value_metrics + l_val_value_metrics+[start_time-time.time()], self.num_batches * epoch + idx,)
+                                  val_logs + l_value_metrics + l_val_value_metrics+[start_time-time.time()], epoch)
 
 
             if epoch % self.sigma_step == 0:  # update simga
@@ -374,41 +378,7 @@ class GAN():
             # save the models
             if epoch % self.w_saving_step == 0:
                 self.save_model(epoch)
-    def train_multi_gpu(self):
 
-        BUFFER_SIZE = self.data_X.shape[0]
-        BATCH_SIZE_PER_REPLICA = self.batch_size
-        GLOBAL_BATCH_SIZE = BATCH_SIZE_PER_REPLICA * self.strategy.num_replicas_in_sync
-        train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(BUFFER_SIZE).batch(
-            GLOBAL_BATCH_SIZE)
-
-        train_dist_dataset = self.strategy.experimental_distribute_dataset(train_dataset)
-
-
-        loss_object = tf.keras.losses.BinaryCrossentropy(
-            from_logits=True,
-            reduction=tf.keras.losses.Reduction.NONE)
-        #
-        # def compute_loss(labels, predictions):
-        #     per_example_loss = loss_object(labels, predictions)
-        #     return tf.nn.compute_average_loss(per_example_loss, global_batch_size=GLOBAL_BATCH_SIZE)
-        #
-        # def train_step(inputs):
-        #     features, labels = inputs
-        #
-        #     with tf.GradientTape() as tape:
-        #         predictions = model(features, training=True)
-        #         loss = compute_loss(labels, predictions)
-        #
-        #     gradients = tape.gradient(loss, model.trainable_variables)
-        #     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-        #     return loss
-        #
-        # @tf.function
-        # def distributed_train_step(dist_inputs):
-        #     per_replica_losses = mirrored_strategy.run(train_step, args=(dist_inputs,))
-        #     return mirrored_strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses,
-        #                                     axis=None)
 
     def save_model(self, step):
         print("Saving model at {} step {}".format(self.checkpoint_dir, step))
@@ -453,10 +423,10 @@ class GAN():
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
         #test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
         for i,(x,y) in enumerate(test_dataset):
-            print("eval on {}".format(i))
+            #print("eval on {}".format(i))
 
             val_pred = self.generator.predict(x)
-            print("type  {} {}".format(type(y),type(val_pred)))
+            #print("type  {} {}".format(type(y),type(val_pred)))
             label=y
         return compute_metric(label.numpy(), val_pred)
 
@@ -466,7 +436,7 @@ class GAN():
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
         """
         if type(batch) == type("u"):  # the param is an string we load the bathc from this directory
-            print("We load our data from {}".format(batch))
+            #print("We load our data from {}".format(batch))
 
             l_image_id = find_image_indir(batch + XDIR, "npy")
             batch, _ = load_data(batch, x_shape=self.model_yaml["input_shape"],
