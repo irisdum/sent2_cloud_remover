@@ -270,8 +270,9 @@ class GAN():
 
     def train(self):
         # Adversarial ground truths
-        valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
-        fake = np.zeros((self.batch_size, 30, 30, 1))
+        with self.strategy.scope():
+            valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
+            fake = np.zeros((self.batch_size, 30, 30, 1))
         print("valid shape {}".format(valid.shape))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
@@ -281,8 +282,7 @@ class GAN():
             # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch = 0
-        ## LOADING THE DATA ON MULTIPLE GPU
-        strategy = tf.distribute.MirroredStrategy()
+
 
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
