@@ -272,6 +272,7 @@ class GAN():
         # Adversarial ground truths
         valid = np.ones((self.batch_size, 30, 30, 1))  # because of the shape of the discri
         fake = np.zeros((self.batch_size, 30, 30, 1))
+        print("valid shape {}".format(valid.shape))
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1
@@ -302,7 +303,7 @@ class GAN():
             # print("starting epoch {}".format(epoch))
             for idx,(batch_input,batch_gt) in enumerate(train_dataset):
 
-                print(batch_input)
+                #print(batch_input)
                 ##  TRAIN THE DISCRIMINATOR
 
                 d_noise_real = random.uniform(self.real_label_smoothing[0],
@@ -317,7 +318,8 @@ class GAN():
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
-
+                print("shape d train")
+                print(valid.shape,D_input_fake.shape)
                 d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
 
                 d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
