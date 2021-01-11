@@ -439,7 +439,9 @@ class GAN():
         test_dist_dataset = self.strategy.experimental_distribute_dataset(test_dataset)
         for i,(x,y) in enumerate(test_dist_dataset):
             print("eval on {}".format(i))
+
             val_pred = self.generator.predict(x)
+            print("type  {} {}".format(type(y),type(val_pred)))
             label=y
         return compute_metric(label, val_pred)
 
