@@ -115,10 +115,10 @@ class GAN():
         with self.strategy.scope():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-            self.d_optimizer = runai.ga.keras.optimizers.Optimizer(self.d_optimizer
-              , steps=train_yaml["gradient_acc_step"],name='Adam')
-            self.g_optimizer = runai.ga.keras.optimizers.Optimizer(self.g_optimizer
-                                                                   , steps=train_yaml["gradient_acc_step"],name='Adam')
+            #self.d_optimizer = runai.ga.keras.optimizers.Optimizer(self.d_optimizer
+             # , steps=train_yaml["gradient_acc_step"],name='Adam')
+            #self.g_optimizer = runai.ga.keras.optimizers.Optimizer(self.g_optimizer
+             #                                                      , steps=train_yaml["gradient_acc_step"],name='Adam')
             self.build_model()
         # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
         # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
