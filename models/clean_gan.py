@@ -333,7 +333,7 @@ class GAN():
 
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
-                if epoch % self.val_metric_epoch == 0:
+                if idx % self.val_metric_epoch == 0:
                     l_val_name_metrics, l_val_value_metrics = self.val_metric()
                     name_val_metric = ["val_{}".format(name) for name in l_val_name_metrics]
                     name_logs = self.combined.metrics_names + ["g_loss_tot", "d_loss_real", "d_loss_fake", "d_loss_tot",
@@ -346,7 +346,7 @@ class GAN():
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
                     write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric+["time_in_sec"],
-                                  val_logs + l_value_metrics + l_val_value_metrics+[time.time()-start_time], self.num_batches * epoch + idx,)
+                                  val_logs + l_value_metrics + l_val_value_metrics+[time.time()-start_time], self.num_batches * epoch + idx)
 
 
             if epoch % self.sigma_step == 0:  # update simga
