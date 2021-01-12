@@ -280,7 +280,7 @@ class GAN():
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
         sigma_val = self.sigma_init
-
+        
         start_time=time.time()
         for epoch in range(start_epoch, self.epoch):
             # print("starting epoch {}".format(epoch))
