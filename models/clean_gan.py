@@ -106,6 +106,7 @@ class GAN():
         self.sigma_decay = train_yaml["sigma_decay"]
         self.max_im = 10
         self.buffer_size = self.data_X.shape[0]
+        self.steps_per_execution=train_yaml["steps_per_execution"]
         if self.mgpu: # If training on multi_gpu
             self.strategy = tf.distribute.MirroredStrategy()
             print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
@@ -130,7 +131,7 @@ class GAN():
         self.discriminator = self.build_discriminator(self.model_yaml)
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=self.d_optimizer,
-                                   metrics=['accuracy'])
+                                   metrics=['accuracy'],steps_per_execution=self.steps_per_execution)
         self.generator = self.build_generator(self.model_yaml, is_training=True)
         print("Input G")
         g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
@@ -149,7 +150,7 @@ class GAN():
 
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
-                              optimizer=self.g_optimizer)
+                              optimizer=self.g_optimizer,steps_per_execution=self.steps_per_execution)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):

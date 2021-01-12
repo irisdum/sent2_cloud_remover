@@ -24,11 +24,11 @@ lambda: 100 #100 is recoomended #lambda is the factor applied to the L1 loss abs
 load_model: null #if not null is the iteration where we load our model, the training will start over at ite+1
 epoch: 300 #epoch of train of the generator
 batch_size: 2
-gradient_acc_step: 2 #Not used
-training_number: 22 #To modify, the checkpoints, logs will be saved in dir <path_training_dir>/training_<training_number>
+steps_per_execution: 32 #inside train_on_batch_function set to 1 if you do want to use it
+training_number: 25 #To modify, the checkpoints, logs will be saved in dir <path_training_dir>/training_<training_number>
 training_dir: "/srv/osirim/idumeur/trainings/" #the model images and checkpoint will be stored at training_dir/trainining_number
 # The model will be saved every saving step epoch
-multi_gpu: true #the nber of GPU used for the training. Keep in mind that with multiple GPU, the weights are updated each
+multi_gpu: false #the nber of GPU used for the training. Keep in mind that with multiple GPU, the weights are updated each
   # batch_size*n_device_avalaible tiles
 
 
