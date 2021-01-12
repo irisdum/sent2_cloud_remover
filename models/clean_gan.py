@@ -106,6 +106,7 @@ class GAN():
         self.sigma_decay = train_yaml["sigma_decay"]
         self.max_im = 10
         self.buffer_size = self.data_X.shape[0]
+        self.steps_per_execution=train_yaml["steps_per_execution"]
         if self.mgpu: # If training on multi_gpu
             self.strategy = tf.distribute.MirroredStrategy()
             print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
@@ -299,12 +300,12 @@ class GAN():
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
 
-                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
+                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid,steps_per_execution=self.steps_per_execution)
 
-                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
+                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake,steps_per_execution=self.steps_per_execution)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
-                g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
+                g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt],steps_per_execution=self.steps_per_execution)
 
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
