@@ -96,7 +96,7 @@ tiling_overlap:
 
 split_dataset:
 	@python split_dataset.py --input_dataset ${build_dataset_dir} --output_dir_name ${output_split_dir_name} --ptest ${split_test} --pval ${split_val} --ptrain ${split_train} --keep_clouds ${clouds}
-
+	zip -r ${target_directory}output_dir_name ${output_split_dir_name}.zip ${target_directory}output_dir_name ${output_split_dir_name}
 train_model:
 	python train.py --model_path ${path_model_yaml} --train_path ${path_model_yaml}
 
