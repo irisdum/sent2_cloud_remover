@@ -13,7 +13,7 @@ from utils.load_dataset import load_data
 def main(path_train, path_model,mgpu,h5):
     train_yaml=open_yaml(path_train)
     model_yaml=open_yaml(path_model)
-    input_dir="/".join(train_yaml["train_directory"].split("/")[:-1])
+    input_dir="/".join(train_yaml["train_directory"].split("/")[:-2]+"/")
     if h5:
         dict_path_data_h5py=convert_all_data(input_dir,train_yaml,model_yaml=model_yaml)
     else:
