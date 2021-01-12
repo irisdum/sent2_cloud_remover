@@ -115,13 +115,8 @@ class GAN():
         with self.strategy.scope():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-            #self.d_optimizer = runai.ga.keras.optimizers.Optimizer(self.d_optimizer
-             # , steps=train_yaml["gradient_acc_step"],name='Adam')
-            #self.g_optimizer = runai.ga.keras.optimizers.Optimizer(self.g_optimizer
-             #                                                      , steps=train_yaml["gradient_acc_step"],name='Adam')
+
             self.build_model()
-        # self.data_X, self.data_y = load_data(train_yaml["train_directory"], normalization=self.normalization)
-        # self.val_X, self.val_Y = load_data(train_yaml["val_directory"], normalization=self.normalization)
 
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
         #self.strategy = tf.distribute.MirroredStrategy()
@@ -308,11 +303,8 @@ class GAN():
 
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
-        #test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.global_batch_size)
         # loop for epoch
-        start_time = time.time()
         sigma_val = self.sigma_init
-        start_batch_id = 0
         # dict_metric={"epoch":[],"d_loss_real":[],"d_loss_fake":[],"d_loss":[],"g_loss":[]}
         d_loss_real = [100, 100]  # init losses
         d_loss_fake = [100, 100]
