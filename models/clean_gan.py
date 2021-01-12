@@ -396,8 +396,8 @@ class GAN():
 
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
-        x,label=test_dataset.get()
-        val_pred = self.generator.predict(x)
+        for x,label in test_dataset:
+            val_pred = self.generator.predict(x)
         return compute_metric(label.numpy(), val_pred)
 
     def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
