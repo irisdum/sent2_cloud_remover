@@ -131,7 +131,7 @@ class GAN():
         self.discriminator = self.build_discriminator(self.model_yaml)
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=self.d_optimizer,
-                                   metrics=['accuracy'])
+                                   metrics=['accuracy'],steps_per_execution=self.steps_per_execution)
         self.generator = self.build_generator(self.model_yaml, is_training=True)
         print("Input G")
         g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
@@ -150,7 +150,7 @@ class GAN():
 
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
-                              optimizer=self.g_optimizer)
+                              optimizer=self.g_optimizer,steps_per_execution=self.steps_per_execution)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):
@@ -300,12 +300,12 @@ class GAN():
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
                 D_input_fake = tf.concat([gen_imgs, batch_input], axis=-1)
 
-                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid,steps_per_execution=self.steps_per_execution)
+                d_loss_real = self.discriminator.train_on_batch(D_input_real, d_noise_real * valid)
 
-                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake,steps_per_execution=self.steps_per_execution)
+                d_loss_fake = self.discriminator.train_on_batch(D_input_fake, d_noise_fake * fake)
                 d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
-                g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt],steps_per_execution=self.steps_per_execution)
+                g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
 
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch, self.num_batches * epoch + idx,
