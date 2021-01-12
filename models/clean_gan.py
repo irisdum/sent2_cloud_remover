@@ -25,12 +25,14 @@ from utils.metrics import batch_psnr, ssim_batch, compute_metric
 import numpy as np
 import time
 
+import h5py
 
 class GAN():
-    def __init__(self, model_yaml, train_yaml):
+    def __init__(self, model_yaml, train_yaml, data_h5py=None):
         """
 
         Args:
+            data_h5py:
             model_yaml: dictionnary with the model parameters
             train_yaml: dictionnary the tran parameters
         """
@@ -70,7 +72,20 @@ class GAN():
         self.val_directory = train_yaml["val_directory"]
         self.fact_s2 = train_yaml["s2_scale"]
         self.fact_s1 = train_yaml["s1_scale"]
-        self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
+
+        if data_h5py is not None:
+            train_data=h5py.File(data_h5py["train/"], 'r')
+            val_data=h5py.File(data_h5py["val/"], 'r')
+            self.data_X=train_data.get("data_X")
+            self.data_y=train_data.get("data_y")
+            self.val_X = val_data.get("data_X")
+            self.val_Y = val_data.get("data_y")
+            train_data.close()
+            val_data.close()
+            ##reshape
+            print(self.data_X.shape,self.val_X.shape)
+        else:
+            self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
                                                                     x_shape=model_yaml["input_shape"],
                                                                     label_shape=model_yaml["dim_gt_image"],
                                                                     normalization=self.normalization,
@@ -80,7 +95,7 @@ class GAN():
                                                                     fact_s2=self.fact_s2, fact_s1=self.fact_s1,
                                                                     s2_bands=self.s2bands, s1_bands=self.s1bands,
                                                                     lim=train_yaml["lim_train_tile"])
-        self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
+            self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
                                                            label_shape=model_yaml["dim_gt_image"],
                                                            normalization=self.normalization,
                                                            dict_band_X=self.dict_band_X,
@@ -280,7 +295,7 @@ class GAN():
         train_dataset = tf.data.Dataset.from_tensor_slices((self.data_X, self.data_y)).shuffle(self.batch_size).batch(
             self.global_batch_size)
         sigma_val = self.sigma_init
-        
+
         start_time=time.time()
         for epoch in range(start_epoch, self.epoch):
             # print("starting epoch {}".format(epoch))
