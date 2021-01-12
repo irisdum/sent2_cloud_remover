@@ -104,7 +104,6 @@ class GAN():
         self.sigma_init = train_yaml["sigma_init"]
         self.sigma_step = train_yaml['sigma_step']
         self.sigma_decay = train_yaml["sigma_decay"]
-        self.ite_train_g = train_yaml["train_g_multiple_time"]
         self.max_im = 10
         self.buffer_size = self.data_X.shape[0]
         if self.mgpu: # If training on multi_gpu

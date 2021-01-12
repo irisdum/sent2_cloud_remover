@@ -35,8 +35,7 @@ multi_gpu: true #the nber of GPU used for the training. Keep in mind that with m
 im_saving_step: 1 #every n epochs image from the training set are saved
 weights_saving_step: 1 # every n epochs the model is saved
 metric_step: 1 #every n iterations when the validation metrics are computed. An iteration is the number of batches that goes into the Network
-#TRAIN THE GENERATOR MULTIPLE TIME
-train_g_multiple_time: [] #[3,4,5,6,7,20,21,22,23]
+
 
 ## DISCRIMINATOR PREVENT OVERFITTING
 real_label_smoothing: [1.0,1.0] #if you do not want to apply label smoothing [1,1]
