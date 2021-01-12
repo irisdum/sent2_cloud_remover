@@ -146,7 +146,7 @@ class GAN():
         self.discriminator = self.build_discriminator(self.model_yaml)
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=self.d_optimizer,
-                                   metrics=['accuracy'],experimental_steps_per_execution=self.steps_per_execution)
+                                   metrics=['accuracy'])
         self.generator = self.build_generator(self.model_yaml, is_training=True)
         print("Input G")
         g_input = Input(shape=(self.data_X.shape[1], self.data_X.shape[2], self.data_X.shape[3]),
@@ -165,7 +165,7 @@ class GAN():
 
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
-                              optimizer=self.g_optimizer,experimental_steps_per_execution=self.steps_per_execution)
+                              optimizer=self.g_optimizer)
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):
