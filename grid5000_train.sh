@@ -1,4 +1,4 @@
-
+#!/bin/bash
 source /home/idumeur/miniconda3/etc/profile.d/conda.sh
 conda activate training_env
 
