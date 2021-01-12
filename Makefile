@@ -98,7 +98,10 @@ split_dataset:
 	@python split_dataset.py --input_dataset ${build_dataset_dir} --output_dir_name ${output_split_dir_name} --ptest ${split_test} --pval ${split_val} --ptrain ${split_train} --keep_clouds ${clouds}
 
 train_model:
-	python train.py --model_path ${path_train_yaml} --train_path ${path_model_yaml}
+	python train.py --model_path ${path_model_yaml} --train_path ${path_model_yaml}
+
+train_on_cluster:
+	oarsub -q production "nodes=1/gpu=2,walltime=25:00:00" gri5000_train.sh ${path_model_yaml} ${path_model_yaml} ${target_directory}${output_split_dir_name}
 
 install_snap:
 	@wget http://step.esa.int/downloads/7.0/installers/esa-snap_all_unix_7_0.sh
