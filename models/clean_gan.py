@@ -275,7 +275,7 @@ class GAN():
         # Define Tensorboard callbacks
         self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
                                                   batch_size=self.batch_size,
-                                                  write_graph=True, write_grads=True)
+                                                  write_graph=True, write_grads=True,profile_batch=2)
         self.g_tensorboard_callback.set_model(self.combined)
 
     def train(self):

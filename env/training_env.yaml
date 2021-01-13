@@ -29,4 +29,5 @@ dependencies:
       - tensorflow-estimator==2.1.*
       - jupyter-tensorboard
       - joblib
+      - tensorboard_plugin_profile
 
