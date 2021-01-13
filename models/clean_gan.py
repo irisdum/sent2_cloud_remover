@@ -330,7 +330,6 @@ class GAN():
                 if epoch % self.im_saving_epoch == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
 
-
                     save_images(gen_imgs, self.saving_image_path, ite=self.num_batches * epoch + idx)
                 # LOGS to print in Tensorboard
                 if idx % self.val_metric_epoch == 0:
