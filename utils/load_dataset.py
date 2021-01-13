@@ -2,7 +2,7 @@
 import os
 
 import numpy as np
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_backend
 
 from constant.gee_constant import LISTE_BANDE
 from constant.processing_constant import FACT_STD_S2, S1_BANDS, S2_BANDS, FACT_STD_S1
@@ -109,7 +109,8 @@ def load_from_dir(path_dir: str, image_shape: tuple, lim=None):
         path_tile = path_tile[:lim]  # list of all
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     # data_array = np.zeros(batch_x_shape)
-    data_array = np.array(Parallel(n_jobs=1)(delayed(load_one_tile)(tile) for tile in path_tile))
+    with parallel_backend("loky", inner_max_num_threads=2):
+        data_array = np.array(Parallel(n_jobs=2)(delayed(load_one_tile)(tile) for tile in path_tile))
     # for i, tile in enumerate(path_tile):
     #  assert os.path.isfile(tile), "Wrong path to tile {}".format(tile)
     #  data_array[i, :, :, :] = np.load(tile)
