@@ -7,7 +7,6 @@ conda activate training_env
 
 
 
-cp /srv/osirim/idumeur/data/dataset6/prepro1/input_large_dataset.zip  /tmp
-unzip tmp/input_large_dataset.zip
+cp /srv/osirim/idumeur/data/dataset6/prepro1/input_large_dataset/ -R  /tmp
 
-python train.py --model_path GAN_confs/model_0.yaml --train_path  GAN_confs/train_28.yaml 
+python train.py --model_path GAN_confs/model_1.yaml --train_path  GAN_confs/train_2.yaml 
