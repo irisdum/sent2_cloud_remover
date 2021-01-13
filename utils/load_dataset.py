@@ -109,7 +109,7 @@ def load_from_dir(path_dir: str, image_shape: tuple, lim=None):
         path_tile = path_tile[:lim]  # list of all
     batch_x_shape = (len(path_tile), image_shape[0], image_shape[1], image_shape[-1])
     # data_array = np.zeros(batch_x_shape)
-    data_array = np.array(Parallel(n_jobs=-1)(delayed(load_one_tile)(tile) for tile in path_tile))
+    data_array = np.array(Parallel(n_jobs=1)(delayed(load_one_tile)(tile) for tile in path_tile))
     # for i, tile in enumerate(path_tile):
     #  assert os.path.isfile(tile), "Wrong path to tile {}".format(tile)
     #  data_array[i, :, :, :] = np.load(tile)
