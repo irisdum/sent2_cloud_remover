@@ -9,6 +9,7 @@ import argparse
 
 from utils.load_dataset import load_data
 
+os.system("taskset -p 0xff %d" % os.getpid())
 
 def main(path_train, path_model,mgpu,h5):
     train_yaml=open_yaml(path_train)
