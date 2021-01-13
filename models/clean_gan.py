@@ -107,7 +107,7 @@ class GAN():
         print("Loading the data done dataX {} dataY {}".format(self.data_X.shape, self.data_y.shape))
         self.mgpu = train_yaml["multi_gpu"]
 
-        self.num_batches = self.data_X.shape[0] // self.global_batch_size
+
         self.model_yaml = model_yaml
         self.im_saving_epoch = train_yaml["im_saving_step"]
         self.w_saving_epoch = train_yaml["weights_saving_step"]
@@ -136,7 +136,7 @@ class GAN():
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
             self.build_model()
-
+        self.num_batches = self.data_X.shape[0] // self.global_batch_size
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
 
 
