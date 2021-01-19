@@ -384,7 +384,7 @@ class GAN():
         self.combined.save("{}model_combined_i{}".format(self.checkpoint_dir, step))
 
     def load_from_checkpoint(self, step):
-        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir, step)), "No file at {}".format(
+        assert os.path.isfile("{}model_discri_i{}".format(self.checkpoint_dir, step)), "No file at {}".format(
             "{}model_discri_i{}".format(self.checkpoint_dir, step))
         # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
