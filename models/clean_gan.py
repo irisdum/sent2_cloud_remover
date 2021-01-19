@@ -1,31 +1,29 @@
 # Keras Implementation of GAN
 import os
 import random
-import time
 import tensorflow as tf
-from tensorflow.compat.v2.keras.utils import multi_gpu_model
-from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Add
-from tensorflow.python.keras.layers import BatchNormalization, Activation, ZeroPadding2D, ReLU, GaussianNoise
+from tensorflow.python.keras.layers import Input, Dropout, Add
+from tensorflow.python.keras.layers import BatchNormalization, ReLU, GaussianNoise
 
 from tensorflow.python.keras.layers.convolutional import Conv2D
-from tensorflow.python.keras.models import Sequential, Model, model_from_yaml
+from tensorflow.python.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
-from constant.gee_constant import DICT_RESCALE_REVERSE
-from constant.storing_constant import XDIR, LABEL_DIR, DICT_SHAPE
-from models.callbacks import write_log, write_log_tf2
+from constant.storing_constant import XDIR
+from models.callbacks import write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
-from utils.load_dataset import load_data, save_images, load_from_dir, csv_2_dictstat
-from utils.normalize import rescale_on_batch, rescale_array
-from utils.open_yaml import open_yaml, saving_yaml
-from utils.metrics import batch_psnr, ssim_batch, compute_metric
+from utils.load_dataset import load_data, save_images, load_from_dir
+from utils.normalize import save_all_scaler
+from utils.open_yaml import open_yaml
+from utils.metrics import compute_metric
 
 import numpy as np
 import time
 
 import h5py
+
 
 class GAN():
     def __init__(self, model_yaml, train_yaml, data_h5py=None):
@@ -60,6 +58,7 @@ class GAN():
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
+        self.scaler_dir = self.this_training_dir + "scaler/"
         self.previous_checkpoint = train_yaml["load_model"]
         # TRAIN PARAMETER
         self.normalization = train_yaml["normalization"]
@@ -74,39 +73,39 @@ class GAN():
         self.fact_s1 = train_yaml["s1_scale"]
 
         if data_h5py is not None:
-            train_data=h5py.File(data_h5py["train/"], 'r')
-            val_data=h5py.File(data_h5py["val/"], 'r')
-            self.data_X=train_data.get("data_X")
-            self.data_y=train_data.get("data_y")
+            train_data = h5py.File(data_h5py["train/"], 'r')
+            val_data = h5py.File(data_h5py["val/"], 'r')
+            self.data_X = train_data.get("data_X")
+            self.data_y = train_data.get("data_y")
             self.val_X = val_data.get("data_X")
             self.val_Y = val_data.get("data_y")
             train_data.close()
             val_data.close()
             ##reshape
-            print(self.data_X.shape,self.val_X.shape)
+            print(self.data_X.shape, self.val_X.shape)
         else:
             self.data_X, self.data_y, self.scale_dict_train = load_data(train_yaml["train_directory"],
-                                                                    x_shape=model_yaml["input_shape"],
-                                                                    label_shape=model_yaml["dim_gt_image"],
-                                                                    normalization=self.normalization,
-                                                                    dict_band_X=self.dict_band_X,
-                                                                    dict_band_label=self.dict_band_label,
-                                                                    dict_rescale_type=self.dict_rescale_type,
-                                                                    fact_s2=self.fact_s2, fact_s1=self.fact_s1,
-                                                                    s2_bands=self.s2bands, s1_bands=self.s1bands,
-                                                                    lim=train_yaml["lim_train_tile"])
+                                                                        x_shape=model_yaml["input_shape"],
+                                                                        label_shape=model_yaml["dim_gt_image"],
+                                                                        normalization=self.normalization,
+                                                                        dict_band_X=self.dict_band_X,
+                                                                        dict_band_label=self.dict_band_label,
+                                                                        dict_rescale_type=self.dict_rescale_type,
+                                                                        fact_s2=self.fact_s2, fact_s1=self.fact_s1,
+                                                                        s2_bands=self.s2bands, s1_bands=self.s1bands,
+                                                                        lim=train_yaml["lim_train_tile"])
             self.val_X, self.val_Y, scale_dict_val = load_data(self.val_directory, x_shape=model_yaml["input_shape"],
-                                                           label_shape=model_yaml["dim_gt_image"],
-                                                           normalization=self.normalization,
-                                                           dict_band_X=self.dict_band_X,
-                                                           dict_band_label=self.dict_band_label,
-                                                           dict_rescale_type=self.dict_rescale_type,
-                                                           dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
-                                                           fact_s1=self.fact_s1, s2_bands=self.s2bands,
-                                                           s1_bands=self.s1bands, lim=train_yaml["lim_val_tile"])
+                                                               label_shape=model_yaml["dim_gt_image"],
+                                                               normalization=self.normalization,
+                                                               dict_band_X=self.dict_band_X,
+                                                               dict_band_label=self.dict_band_label,
+                                                               dict_rescale_type=self.dict_rescale_type,
+                                                               dict_scale=self.scale_dict_train, fact_s2=self.fact_s2,
+                                                               fact_s1=self.fact_s1, s2_bands=self.s2bands,
+                                                               s1_bands=self.s1bands, lim=train_yaml["lim_val_tile"])
+
         print("Loading the data done dataX {} dataY {}".format(self.data_X.shape, self.data_y.shape))
         self.mgpu = train_yaml["multi_gpu"]
-
 
         self.model_yaml = model_yaml
         self.im_saving_epoch = train_yaml["im_saving_step"]
@@ -121,8 +120,8 @@ class GAN():
         self.sigma_decay = train_yaml["sigma_decay"]
         self.max_im = 10
         self.buffer_size = self.data_X.shape[0]
-        self.steps_per_execution=train_yaml["steps_per_execution"]
-        if self.mgpu: # If training on multi_gpu
+        self.steps_per_execution = train_yaml["steps_per_execution"]
+        if self.mgpu:  # If training on multi_gpu
             self.strategy = tf.distribute.MirroredStrategy()
             print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
             self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
@@ -131,14 +130,13 @@ class GAN():
                 self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
 
                 self.build_model()
-        else: #Training on single GPU
-            self.global_batch_size=self.batch_size
+        else:  # Training on single GPU
+            self.global_batch_size = self.batch_size
             self.d_optimizer = Adam(self.learning_rate, self.beta1)
             self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
             self.build_model()
         self.num_batches = self.data_X.shape[0] // self.global_batch_size
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
-
 
     def build_model(self):
 
@@ -250,7 +248,6 @@ class GAN():
                 x = BatchNormalization(momentum=model_yaml["bn_momentum"], trainable=is_training,
                                        name="d_bn{}".format(layer_index))(x)
 
-
         if model_yaml["d_last_activ"] == "sigmoid":
             x_final = tf.keras.layers.Activation('sigmoid', name="d_last_activ")(x)
         else:
@@ -275,10 +272,13 @@ class GAN():
         # Define Tensorboard callbacks
         self.g_tensorboard_callback = TensorBoard(log_dir=self.saving_logs_path, histogram_freq=0,
                                                   batch_size=self.batch_size,
-                                                  write_graph=True, write_grads=True,profile_batch=2)
+                                                  write_graph=True, write_grads=True, profile_batch=2)
         self.g_tensorboard_callback.set_model(self.combined)
 
     def train(self):
+        # First the scaler model used :
+        save_all_scaler(scaler_dict=self.scale_dict_train, path_dir=self.scaler_dir)
+
         # Adversarial ground truths
         valid = np.ones((self.global_batch_size, 30, 30, 1))  # because of the shape of the discri
         fake = np.zeros((self.global_batch_size, 30, 30, 1))
@@ -296,10 +296,10 @@ class GAN():
             self.global_batch_size)
         sigma_val = self.sigma_init
 
-        start_time=time.time()
+        start_time = time.time()
         for epoch in range(start_epoch, self.epoch):
             # print("starting epoch {}".format(epoch))
-            for idx,(batch_input,batch_gt) in enumerate(train_dataset):
+            for idx, (batch_input, batch_gt) in enumerate(train_dataset):
 
                 ##  TRAIN THE DISCRIMINATOR
 
@@ -309,7 +309,7 @@ class GAN():
                                               self.fake_label_smoothing[1])  # Add noise on the loss
 
                 # Create a noisy gt images
-                batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val) #if add_discri_noise set to true
+                batch_new_gt = self.produce_noisy_input(batch_gt, sigma_val)  # if add_discri_noise set to true
                 # Generate a batch of new images
                 gen_imgs = self.generator.predict(batch_input)  # .astype(np.float32)
                 D_input_real = tf.concat([batch_new_gt, batch_input], axis=-1)
@@ -323,14 +323,16 @@ class GAN():
                 g_loss = self.combined.train_on_batch(batch_input, [valid, batch_gt])
 
                 # Plot the progress
-                print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (epoch,  epoch*self.num_batches + idx*self.global_batch_size ,
-                                                                                 d_loss[0], 100 * d_loss[1], g_loss[0],
-                                                                                 g_loss[1]))
+                print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (
+                epoch, epoch * self.num_batches + idx * self.global_batch_size,
+                d_loss[0], 100 * d_loss[1], g_loss[0],
+                g_loss[1]))
 
                 if epoch % self.im_saving_epoch == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
 
-                    save_images(gen_imgs, self.saving_image_path, ite=epoch*self.num_batches + idx*self.global_batch_size)
+                    save_images(gen_imgs, self.saving_image_path,
+                                ite=epoch * self.num_batches + idx * self.global_batch_size)
                 # LOGS to print in Tensorboard
                 if idx % self.val_metric_epoch == 0:
                     l_val_name_metrics, l_val_value_metrics = self.val_metric()
@@ -344,9 +346,9 @@ class GAN():
                     assert len(val_logs) == len(
                         name_logs), "The name and value list of logs does not have the same lenght {} vs {}".format(
                         name_logs, val_logs)
-                    write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric+["time_in_sec"],
-                                  val_logs + l_value_metrics + l_val_value_metrics+[time.time()-start_time],epoch*self.num_batches + idx*self.global_batch_size)
-
+                    write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric + ["time_in_sec"],
+                                  val_logs + l_value_metrics + l_val_value_metrics + [time.time() - start_time],
+                                  epoch * self.num_batches + idx * self.global_batch_size)
 
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
@@ -382,24 +384,13 @@ class GAN():
         self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
 
-    def load_generator(self, path_yaml, path_weight):
-        # load YAML and create model
-        yaml_file = open(path_yaml, 'r')
-        loaded_model_yaml = yaml_file.read()
-        yaml_file.close()
-        loaded_model = model_from_yaml(loaded_model_yaml)
-        # load weights into new model
-        loaded_model.load_weights(path_weight)
-        print("Loaded model from disk")
-        return loaded_model
-
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
-        for x,label in test_dataset:
+        for x, label in test_dataset:
             val_pred = self.generator.predict(x)
         return compute_metric(label.numpy(), val_pred)
 
-    def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True):
+    def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True,generator=None):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
         :param dataset:
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
@@ -426,7 +417,9 @@ class GAN():
             return data_array
         else:
             create_safe_directory(path_save)
-            batch_res = self.generator.predict(batch)
+            if generator is None:
+                generator=self.generator
+            batch_res = generator.predict(batch)
             # if un_rescale:  # remove the normalization made on the data
 
             # _, batch_res, _ = rescale_array(batch, batch_res, dict_group_band_X=self.dict_band_X,
