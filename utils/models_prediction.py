@@ -1,5 +1,6 @@
 import os
 
+import tensorflow as tf
 
 def load_from_checkpoint(checkpoint_dir, step):
     assert os.path.isfile("{}model_discri_i{}.h5".format(checkpoint_dir, step)), "No file at {}".format(
