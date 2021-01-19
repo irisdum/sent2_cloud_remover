@@ -1,4 +1,5 @@
 import tensorflow as tf
+
 def tanh(x):
     return tf.keras.activations.tanh(x)
 
