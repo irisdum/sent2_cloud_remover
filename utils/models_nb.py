@@ -5,7 +5,6 @@ import glob
 import os
 
 from utils.image_find_tbx import find_image_indir
-from utils.models_prediction import load_from_checkpoint
 from utils.open_yaml import open_yaml
 
 
