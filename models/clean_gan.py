@@ -224,7 +224,7 @@ class GAN():
     def build_discriminator(self, model_yaml, is_training=True):
         discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
         if model_yaml["d_activation"] == "lrelu":
-            get_custom_objects().update({'lrelu': lrelu})
+            get_custom_objects().update({'lrelu': lambda x : lrelu(alpha=model_yaml["lrelu_alpha"],x=x)})
             d_activation='lrelu'
         else:
             d_activation = model_yaml["d_activation"]
