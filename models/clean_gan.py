@@ -276,6 +276,7 @@ class GAN():
 
     def train(self):
         # First the scaler model used :
+        create_safe_directory(self.scaler_dir)
         save_all_scaler(scaler_dict=self.scale_dict_train, path_dir=self.scaler_dir)
 
         # Adversarial ground truths
