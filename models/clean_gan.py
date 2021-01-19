@@ -128,7 +128,6 @@ class GAN():
             with self.strategy.scope():
                 self.d_optimizer = Adam(self.learning_rate, self.beta1)
                 self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
-
                 self.build_model()
         else:  # Training on single GPU
             self.global_batch_size = self.batch_size
@@ -277,6 +276,7 @@ class GAN():
 
     def train(self):
         # First the scaler model used :
+        create_safe_directory(self.scaler_dir)
         save_all_scaler(scaler_dict=self.scale_dict_train, path_dir=self.scaler_dir)
 
         # Adversarial ground truths
@@ -285,7 +285,7 @@ class GAN():
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1
-            self.load_from_checkpoint(self.previous_checkpoint)
+            self.discriminator, self.generator, self.combined = self.load_from_checkpoint(self.previous_checkpoint)
         else:
             # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
@@ -324,9 +324,9 @@ class GAN():
 
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (
-                epoch, epoch * self.num_batches + idx * self.global_batch_size,
-                d_loss[0], 100 * d_loss[1], g_loss[0],
-                g_loss[1]))
+                    epoch, epoch * self.num_batches + idx * self.global_batch_size,
+                    d_loss[0], 100 * d_loss[1], g_loss[0],
+                    g_loss[1]))
 
                 if epoch % self.im_saving_epoch == 0 and idx < self.max_im:  # to save some generated_images
                     gen_imgs = self.generator.predict(batch_input)
@@ -353,7 +353,7 @@ class GAN():
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
             # save the models
-            if epoch % self.w_saving_epoch == 0:
+            if epoch % self.w_saving_epoch == 0:  # TODO save only the best model
                 self.save_model(epoch)
 
     def save_model(self, step):
@@ -373,16 +373,20 @@ class GAN():
             discri_yaml = self.discriminator.to_yaml()
             with open("{}model_discri.yaml".format(self.checkpoint_dir), "w") as yaml_file:
                 yaml_file.write(discri_yaml)
-        self.generator.save_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        self.discriminator.save_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        self.combined.save_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+        self.generator.save("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        self.discriminator.save("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        self.combined.save("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
 
     def load_from_checkpoint(self, step):
         assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir, step)), "No file at {}".format(
             "{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+        # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+        discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+        return discriminator, generator, combined
 
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
@@ -390,7 +394,7 @@ class GAN():
             val_pred = self.generator.predict(x)
         return compute_metric(label.numpy(), val_pred)
 
-    def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True,generator=None):
+    def predict_on_iter(self, batch, path_save, l_image_id=None, un_rescale=True, generator=None):
         """given an iter load the model at this iteration, returns the a predicted_batch but check if image have been saved at this directory
         :param dataset:
         :param batch could be a string : path to the dataset  or an array corresponding to the batch we are going to predict on
@@ -418,7 +422,7 @@ class GAN():
         else:
             create_safe_directory(path_save)
             if generator is None:
-                generator=self.generator
+                generator = self.generator
             batch_res = generator.predict(batch)
             # if un_rescale:  # remove the normalization made on the data
 
