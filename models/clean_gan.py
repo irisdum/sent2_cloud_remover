@@ -390,12 +390,12 @@ class GAN():
         # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
-        if self.model_yaml["d_activation"] == "lrelu":
-            d_activation = lambda x: tf.nn.leaky_relu(x, alpha=self.model_yaml["lrelu_alpha"])
-            discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step),
-                                                   custom_objects={"lrelu": d_activation})
-        else:
-            discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        # if self.model_yaml["d_activation"] == "lrelu":
+        #     d_activation = lambda x: tf.nn.leaky_relu(x, alpha=self.model_yaml["lrelu_alpha"])
+        #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step),
+        #                                            custom_objects={"lrelu": d_activation})
+        # else:
+        #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
         return discriminator, generator, combined
