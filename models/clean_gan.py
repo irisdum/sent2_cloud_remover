@@ -12,6 +12,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 
 from constant.storing_constant import XDIR
+from models.activations import tanh, lrelu
 from models.callbacks import write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
@@ -190,8 +191,6 @@ class GAN():
 
         if model_yaml["last_activation"] == "tanh":
             print("use tanh keras")
-            def tanh(x):
-                return tf.keras.activations.tanh(x)
             get_custom_objects().update({'tanh': tanh})
             last_activ='tanh'
         else:
@@ -225,8 +224,6 @@ class GAN():
     def build_discriminator(self, model_yaml, is_training=True):
         discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
         if model_yaml["d_activation"] == "lrelu":
-            def lrelu(x):
-                return tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
             get_custom_objects().update({'lrelu': lrelu})
             d_activation='lrelu'
         else:
@@ -398,7 +395,11 @@ class GAN():
         #                                            custom_objects={"lrelu": d_activation})
         # else:
         #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+        if self.model_yaml["last_activation"] == "tanh":
+            generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step),
+                                                   custom_objects={"tanh": tanh})
+        else:
+            generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
         return self.discriminator, generator, combined
 
