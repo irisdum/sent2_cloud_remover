@@ -9,6 +9,7 @@ from tensorflow.keras.utils import get_custom_objects
 from tensorflow.python.keras.layers.convolutional import Conv2D
 from tensorflow.python.keras.models import Model
 from tensorflow.keras.optimizers import Adam
+import keras
 from tensorflow.keras.callbacks import TensorBoard
 
 from constant.storing_constant import XDIR
@@ -130,13 +131,13 @@ class GAN():
             print('Number of devices: {}'.format(self.strategy.num_replicas_in_sync))
             self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
             with self.strategy.scope():
-                self.d_optimizer = Adam(self.learning_rate, self.beta1)
-                self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+                self.d_optimizer = keras.Adam(self.learning_rate, self.beta1)
+                self.g_optimizer = keras.Adam(self.learning_rate * self.fact_g_lr, self.beta1)
                 self.build_model()
         else:  # Training on single GPU
             self.global_batch_size = self.batch_size
-            self.d_optimizer = Adam(self.learning_rate, self.beta1)
-            self.g_optimizer = Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+            self.d_optimizer = keras.Adam(self.learning_rate, self.beta1)
+            self.g_optimizer = keras.Adam(self.learning_rate * self.fact_g_lr, self.beta1)
             self.build_model()
         self.num_batches = self.data_X.shape[0] // self.global_batch_size
         self.model_writer = tf.summary.create_file_writer(self.saving_logs_path)
