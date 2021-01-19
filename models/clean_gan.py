@@ -379,13 +379,13 @@ class GAN():
             discri_yaml = self.discriminator.to_yaml()
             with open("{}model_discri.yaml".format(self.checkpoint_dir), "w") as yaml_file:
                 yaml_file.write(discri_yaml)
-        self.generator.save("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        self.discriminator.save("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        self.combined.save("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+        self.generator.save("{}model_gene_i{}".format(self.checkpoint_dir, step))
+        self.discriminator.save("{}model_discri_i{}".format(self.checkpoint_dir, step))
+        self.combined.save("{}model_combined_i{}".format(self.checkpoint_dir, step))
 
     def load_from_checkpoint(self, step):
-        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir, step)), "No file at {}".format(
-            "{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+        assert os.path.isfile("{}model_discri_i{}".format(self.checkpoint_dir, step)), "No file at {}".format(
+            "{}model_discri_i{}".format(self.checkpoint_dir, step))
         # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
@@ -396,11 +396,11 @@ class GAN():
         # else:
         #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         if self.model_yaml["last_activation"] == "tanh":
-            generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step),
+            generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step),
                                                    custom_objects={"tanh": tanh})
         else:
-            generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+            generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step))
+        combined = tf.keras.models.load_model("{}model_combined_i{}".format(self.checkpoint_dir, step))
         return self.discriminator, generator, combined
 
     def val_metric(self):
