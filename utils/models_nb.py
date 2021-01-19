@@ -4,11 +4,11 @@ from models import clean_gan
 import glob
 import os
 
-from utils.display_image import plot_all_compar
 from utils.image_find_tbx import find_image_indir
+from utils.load_dataset import load_data
 from utils.open_yaml import open_yaml
 
-def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val",path_csv=None):
+def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val",path_csv=None,generator=None):
     """Run a prediction of the model and save the images if required and plot them too
     :param dataset: 
     """
@@ -28,15 +28,18 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
     path_weight,founded=find_weight_path(l_weight,select_weight)
     assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
-    gan_gen = gan.generator.load_weights(path_weight)
+    #gan_gen = gan.generator.load_weights(path_weight)
     if save:
         path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
         print("saving image at {}".format(path_save))
     else:
         path_save=None
-    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name, un_rescale=True)
+    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name, un_rescale=True,generator=generator)
 
     return bath_res,gan
+
+
+
 
 
 def get_important_path(path_model,training_nber):
@@ -58,3 +61,5 @@ def find_weight_path(l_w,nb_w):
             return path_w,True
     else:
         return None,False
+
+

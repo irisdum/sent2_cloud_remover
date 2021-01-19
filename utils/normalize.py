@@ -15,7 +15,9 @@ from utils.image_find_tbx import extract_tile_id, find_csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from joblib import Parallel, delayed,parallel_backend
+from joblib import Parallel, delayed, parallel_backend
+from pickle import dump, load
+import glob
 
 
 def plot_one_band(raster_array, fig, ax, title="", cmap="bone"):
@@ -227,7 +229,8 @@ def conv1D_dim(tuple_dim):
 
 def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_group_band_label=None,
                   dict_rescale_type=None, s1_log=True, dict_scale=None, invert=False, s2_bands=S2_BANDS,
-                  s1_bands=S1_BANDS, fact_scale2=FACT_STD_S2, fact_scale1=FACT_STD_S1, clip_s2=True) -> Tuple[np.array, np.array, dict]:
+                  s1_bands=S1_BANDS, fact_scale2=FACT_STD_S2, fact_scale1=FACT_STD_S1, clip_s2=True) -> Tuple[
+    np.array, np.array, dict]:
     """
 
     Args:
@@ -269,19 +272,20 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
     for group_bands in s1_bands:
         # all s1 band are in dict_band_X
         data_sar_band = batch_X[:, :, :, dict_group_band_X[group_bands]]
-        nbands=len(dict_group_band_X[group_bands])
+        nbands = len(dict_group_band_X[group_bands])
         if s1_log:
             data_nan_sar = np.copy(data_sar_band)
             data_nan_sar[data_nan_sar < 0] = float("nan")
-            print("Remove the negative values in order to have no error in the log : negative value will be replaced using"
-                  "knn algorithm")
-            data_sar_band = replace_batch_nan_knn(data_nan_sar,[i for i in range(nbands)])
+            print(
+                "Remove the negative values in order to have no error in the log : negative value will be replaced using"
+                "knn algorithm")
+            data_sar_band = replace_batch_nan_knn(data_nan_sar, [i for i in range(nbands)])
             data_sar_band = 10 * np.log10(data_sar_band)
         init_shape = data_sar_band.shape
         data_flatten_sar_band = data_sar_band.reshape(
             conv1D_dim(data_sar_band.shape))  # Modify into 2D array as required for sklearn
         output_data, sar_scale = sklearn_scale(dict_rescale_type[group_bands], data_flatten_sar_band,
-                                               scaler=dict_scale[group_bands], fact_scale=fact_scale1,invert=invert)
+                                               scaler=dict_scale[group_bands], fact_scale=fact_scale1, invert=invert)
         rescaled_batch_X[:, :, :, dict_group_band_X[group_bands]] = output_data.reshape(init_shape)  # reshape it
         dict_scaler.update({group_bands: sar_scale})
     for group_bands in s2_bands:
@@ -294,8 +298,8 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         flat_rescale_data, scale_s2 = sklearn_scale(dict_rescale_type[group_bands], data_flatten,
                                                     scaler=dict_scale[group_bands], invert=invert,
                                                     fact_scale=fact_scale2)
-        if clip_s2: #we clip between -1 and 1
-            flat_rescale_data=np.clip(flat_rescale_data,DATA_RANGE[0],DATA_RANGE[1])
+        if clip_s2:  # we clip between -1 and 1
+            flat_rescale_data = np.clip(flat_rescale_data, DATA_RANGE[0], DATA_RANGE[1])
 
         rescale_global_data = flat_rescale_data.reshape(global_shape)
         # print("rescale_global_shape {} sub {} fit in {} & label {}".format(rescale_global_data.shape,
@@ -332,8 +336,10 @@ def sklearn_scale(scaling_method, data, scaler=None, invert=False, fact_scale=1)
     else:
         return data, None
 
-def save_sklearn_model(scaler,path):
+
+def save_sklearn_model(scaler, path):
     pass
+
 
 def rescale_on_batch(batch_X, batch_label, dict_band_X=None, dict_band_label=None, dict_rescale_type=None,
                      l_s2_stat=None, dict_method=None):
@@ -508,14 +514,77 @@ def get_ndvi_minmax_fromcsv(tile_id, path_csv, vi):  # TODO make one isnge funct
 
 
 def knn_model(data):
-    knn=KNNImputer(n_neighbors=5)
+    knn = KNNImputer(n_neighbors=5)
     return knn.fit_transform(data)
 
-def replace_batch_nan_knn(batch,lband_index):
+
+def replace_batch_nan_knn(batch, lband_index):
     print("Important the index of the bands in lband_index should be index that follow each other")
-    knn_batch=np.copy(batch)
+    knn_batch = np.copy(batch)
     for b in lband_index:
         with parallel_backend("loky", inner_max_num_threads=2):
-            list_arr_band=Parallel(n_jobs=2)(delayed(knn_model)(data) for data in batch[:,:,:,b])
-        knn_batch[:,:,:,b]=np.array(list_arr_band)
+            list_arr_band = Parallel(n_jobs=2)(delayed(knn_model)(data) for data in batch[:, :, :, b])
+        knn_batch[:, :, :, b] = np.array(list_arr_band)
     return knn_batch
+
+
+def save_all_scaler(scaler_dict: dict, path_dir: str):
+    """
+
+    Args:
+        scaler_dict: dict where keys corresponds to a group of band,
+        path_dir: d
+
+    Returns:
+
+    """
+    for bands in scaler_dict:
+        save_model(scaler_dict[bands], path_dir + bands + "_scaler.pkl")
+
+
+def save_model(scaler: StandardScaler, path: str):
+    """
+
+    Args:
+        scaler:
+        scaler_name: name used to save the model
+
+    Returns:
+
+    """
+    dump(scaler, open(path, 'wb'))
+
+
+def load_scaler(input_dir, bands) -> dict:
+    """
+
+    Args:
+        input_dir: path to directory where pkl scaler model are saved
+        bands: string group bands name (used to save the model)
+
+    Returns:
+
+    """
+    l = glob.glob("{}*{}*.pkl".format(input_dir, bands))
+    assert len(l) == 1, "Found more or less pkl model for group {} we found {}".format(
+        "{}*{}*.pkl".format(input_dir, bands), l)
+    path_scaler = l[0]
+    # load the scaler
+    scaler = load(open(path_scaler, 'rb'))
+    return {bands: scaler}
+
+
+def load_dict_scaler(input_dir: str, l_band_group: list) -> dict:
+    """
+
+    Args:
+        input_dir:
+        l_band_group:
+
+    Returns:
+
+    """
+    dict_scaler = {}
+    for bands in l_band_group:
+        dict_scaler.update(load_scaler(input_dir, bands))
+    return dict_scaler
