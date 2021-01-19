@@ -168,6 +168,7 @@ class GAN():
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
                               optimizer=self.g_optimizer)
+        #get_custom_objects().update({"L1_Loss": L1_loss.computeloss})
         print("[INFO] combined model loss are : ".format(self.combined.metrics_names))
 
     def build_generator(self, model_yaml, is_training=True):
@@ -398,10 +399,10 @@ class GAN():
         #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         if self.model_yaml["last_activation"] == "tanh":
             generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step),
-                                                   custom_objects={"tanh": tanh})
+                                                   custom_objects={"tanh": tanh,'L1_loss':L1_loss})
         else:
-            generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step))
-        combined = tf.keras.models.load_model("{}model_combined_i{}".format(self.checkpoint_dir, step))
+            generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step),custom_objects={'L1_loss':L1_loss})
+        combined = tf.keras.models.load_model("{}model_combined_i{}".format(self.checkpoint_dir, step),custom_objects={'L1_loss':L1_loss})
         return self.discriminator, generator, combined
 
     def val_metric(self):
