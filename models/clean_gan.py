@@ -190,7 +190,10 @@ class GAN():
 
         if model_yaml["last_activation"] == "tanh":
             print("use tanh keras")
-            last_activ = lambda x: tf.keras.activations.tanh(x)
+            def tanh(x):
+                return tf.keras.activations.tanh(x)
+            get_custom_objects().update({'tanh': tanh})
+            last_activ='tanh'
         else:
             last_activ = model_yaml["last_activation"]
         x = img_input
@@ -222,7 +225,6 @@ class GAN():
     def build_discriminator(self, model_yaml, is_training=True):
         discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
         if model_yaml["d_activation"] == "lrelu":
-            d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
             def lrelu(x):
                 return tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
             get_custom_objects().update({'lrelu': lrelu})
