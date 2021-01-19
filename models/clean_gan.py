@@ -291,7 +291,7 @@ class GAN():
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1
-            self.discriminator, self.generator, self.combined = load_from_checkpoint(self.checkpoint_dir,self.previous_checkpoint)
+            self.discriminator, self.generator, self.combined = self.load_from_checkpoint(self.previous_checkpoint)
         else:
             # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
@@ -384,8 +384,8 @@ class GAN():
         self.combined.save("{}model_combined_i{}".format(self.checkpoint_dir, step))
 
     def load_from_checkpoint(self, step):
-        assert os.path.isfile("{}model_discri_i{}".format(self.checkpoint_dir, step)), "No file at {}".format(
-            "{}model_discri_i{}".format(self.checkpoint_dir, step))
+       # assert os.path.isfile("{}model_discri_i{}".format(self.checkpoint_dir, step)), "No file at {}".format(
+        #    "{}model_discri_i{}".format(self.checkpoint_dir, step))
         # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
