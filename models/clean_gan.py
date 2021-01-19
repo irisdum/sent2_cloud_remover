@@ -15,7 +15,7 @@ from models.callbacks import write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
 from utils.load_dataset import load_data, save_images, load_from_dir
-from utils.models_nb import load_from_checkpoint
+from utils.models_prediction import load_from_checkpoint
 from utils.normalize import save_all_scaler
 from utils.open_yaml import open_yaml
 from utils.metrics import compute_metric
