@@ -5,20 +5,8 @@ import glob
 import os
 
 from utils.image_find_tbx import find_image_indir
-from utils.load_dataset import load_data
+from utils.models_prediction import load_from_checkpoint
 from utils.open_yaml import open_yaml
-import tensorflow as tf
-
-def load_from_checkpoint(checkpoint_dir, step):
-    assert os.path.isfile("{}model_discri_i{}.h5".format(checkpoint_dir, step)), "No file at {}".format(
-        "{}model_discri_i{}.h5".format(checkpoint_dir, step))
-    # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-    # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-    # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
-    discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(checkpoint_dir, step))
-    generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(checkpoint_dir, step))
-    combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(checkpoint_dir, step))
-    return discriminator, generator, combined
 
 
 def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val",path_csv=None,generator=None):
