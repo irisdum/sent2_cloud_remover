@@ -35,9 +35,9 @@ def main(path_model,training_nber,l_weight,dataset=None,pref="val",path_csv=None
     assert len(l) == 1, "Wrong nber file found {} at {}".format(l, "{}*model_generator.yaml".format(path_checkpoints))
 
     for w in l_weight:
-        lw = glob.glob("{}*h5".format(path_checkpoints))
-        path_weight, founded = find_weight_path(lw,w)
-        assert founded is True, "No path weight nb {} founded in {}".format(w, lw)
+        #lw = glob.glob("{}*gene*".format(path_checkpoints))
+        #path_weight, founded = find_weight_path(lw,w)
+        #assert founded is True, "No path weight nb {} founded in {}".format(w, lw)
         #generator=load_generator(l[0], path_weight) # laod the weight
         predict_iter_on_val(path_model, training_nber, select_weight=w, save=True,dataset=dataset,prefix_save=pref,
                             path_csv=path_csv,generator=None)
