@@ -4,6 +4,7 @@ import random
 import tensorflow as tf
 from tensorflow.python.keras.layers import Input, Dropout, Add
 from tensorflow.python.keras.layers import BatchNormalization, ReLU, GaussianNoise
+from tensorflow.keras.utils import get_custom_objects
 
 from tensorflow.python.keras.layers.convolutional import Conv2D
 from tensorflow.python.keras.models import Model
@@ -222,6 +223,10 @@ class GAN():
         discri_input = Input(shape=tuple([256, 256, 12]), name="d_input")
         if model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
+            def lrelu(x):
+                return tf.nn.leaky_relu(x, alpha=model_yaml["lrelu_alpha"])
+            get_custom_objects().update({'lrelu': lrelu})
+            d_activation='lrelu'
         else:
             d_activation = model_yaml["d_activation"]
 
