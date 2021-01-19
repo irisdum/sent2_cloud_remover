@@ -131,7 +131,7 @@ class GAN():
             self.global_batch_size = self.batch_size * self.strategy.num_replicas_in_sync
             with self.strategy.scope():
                 self.d_optimizer = keras.optimizers.Adam(self.learning_rate, self.beta1)
-                self.g_optimizer = keras.Adam(self.learning_rate * self.fact_g_lr, self.beta1)
+                self.g_optimizer = keras.optimizers.Adam(self.learning_rate * self.fact_g_lr, self.beta1)
                 self.build_model()
         else:  # Training on single GPU
             self.global_batch_size = self.batch_size
@@ -162,7 +162,6 @@ class GAN():
         D_output_fake = self.discriminator(D_input)
 
         # The combined model  (stacked generator and discriminator)
-        # TO TRAIN WITH MULTIPLE GPU
 
         self.combined = Model(g_input, [D_output_fake, G], name="Combined_model")
         self.combined.compile(loss=['binary_crossentropy', L1_loss], loss_weights=[1, self.val_lambda],
