@@ -398,7 +398,7 @@ class GAN():
         #     discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
         combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
-        return discriminator, generator, combined
+        return self.discriminator, generator, combined
 
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])
