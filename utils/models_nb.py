@@ -7,14 +7,31 @@ import os
 from utils.image_find_tbx import find_image_indir
 from utils.load_dataset import load_data
 from utils.open_yaml import open_yaml
+import tensorflow as tf
+
+def load_from_checkpoint(checkpoint_dir, step):
+    assert os.path.isfile("{}model_discri_i{}.h5".format(checkpoint_dir, step)), "No file at {}".format(
+        "{}model_discri_i{}.h5".format(checkpoint_dir, step))
+    # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
+    # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
+    # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
+    discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(checkpoint_dir, step))
+    generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(checkpoint_dir, step))
+    combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(checkpoint_dir, step))
+    return discriminator, generator, combined
+
 
 def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True, dataset=None,prefix_save="val",path_csv=None,generator=None):
     """Run a prediction of the model and save the images if required and plot them too
     :param dataset: 
     """
     path_model_yaml, path_train_yaml=get_important_path(path_model,training_nber)
-    gan = clean_gan.GAN(open_yaml(path_model_yaml), open_yaml(path_train_yaml))
-    l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
+    train_yaml = open_yaml(path_train_yaml)
+    model_yaml = open_yaml(path_model_yaml)
+    gan = clean_gan.GAN(model_yaml, train_yaml)
+    path_checkpoints=gan.checkpoint_dir
+    #gan.load_from_checkpoint(select_weight)
+    #l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
     if dataset is None:
         path_val=gan.val_directory
         val_dataX, val_dataY = gan.val_X, gan.val_Y
@@ -26,16 +43,17 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     l_image_name=find_image_indir(path_val+XDIR, "npy")
     print("The val image founded are {}".format(l_image_name))
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
-    path_weight,founded=find_weight_path(l_weight,select_weight)
-    assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
-    gan_gen = gan.generator.load_weights(path_weight)
+    #path_weight,founded=find_weight_path(l_weight,select_weight)
+    #assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
+    gan.generator = load_from_checkpoint(path_checkpoints, select_weight)
     if save:
         path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
         print("saving image at {}".format(path_save))
     else:
         path_save=None
-    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name, un_rescale=True,generator=generator)
-
+    bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name, un_rescale=True,generator=gan.generator)
+    #TODO Modify the code so we do not have to load each time all the data. For instance create like a another class of GAN model
+    #with all the necessary attributes for prediction and nothing more.
     return bath_res,gan
 
 
