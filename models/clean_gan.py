@@ -15,6 +15,7 @@ from models.callbacks import write_log_tf2
 from models.losses import L1_loss
 from utils.image_find_tbx import create_safe_directory, find_image_indir
 from utils.load_dataset import load_data, save_images, load_from_dir
+from utils.models_nb import load_from_checkpoint
 from utils.normalize import save_all_scaler
 from utils.open_yaml import open_yaml
 from utils.metrics import compute_metric
@@ -58,6 +59,7 @@ class GAN():
         self.saving_image_path = self.this_training_dir + "saved_training_images/"
         self.saving_logs_path = self.this_training_dir + "logs/"
         self.checkpoint_dir = self.this_training_dir + "checkpoints/"
+        #TODO add the possibility to load a scaler and use to Standardize the dat
         self.scaler_dir = self.this_training_dir + "scaler/"
         self.previous_checkpoint = train_yaml["load_model"]
         # TRAIN PARAMETER
@@ -285,7 +287,7 @@ class GAN():
         if self.previous_checkpoint is not None:
             print("LOADING the model from step {}".format(self.previous_checkpoint))
             start_epoch = int(self.previous_checkpoint) + 1
-            self.discriminator, self.generator, self.combined = self.load_from_checkpoint(self.previous_checkpoint)
+            self.discriminator, self.generator, self.combined = load_from_checkpoint(self.checkpoint_dir,self.previous_checkpoint)
         else:
             # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
@@ -377,16 +379,7 @@ class GAN():
         self.discriminator.save("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
         self.combined.save("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
 
-    def load_from_checkpoint(self, step):
-        assert os.path.isfile("{}model_discri_i{}.h5".format(self.checkpoint_dir, step)), "No file at {}".format(
-            "{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        # self.discriminator.load_weights("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        # self.generator.load_weights("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
-        discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step))
-        generator = tf.keras.models.load_model("{}model_gene_i{}.h5".format(self.checkpoint_dir, step))
-        combined = tf.keras.models.load_model("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
-        return discriminator, generator, combined
+
 
     def val_metric(self):
         test_dataset = tf.data.Dataset.from_tensor_slices((self.val_X, self.val_Y)).batch(self.val_X.shape[0])

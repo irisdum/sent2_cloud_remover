@@ -243,7 +243,7 @@ def rescale_array(batch_X: np.array, batch_label, dict_group_band_X=None, dict_g
         dict_group_band_label: a dictionnary, gives indication on the index localisation of the band in the batch_label
         dict_rescale_type: a dictionnary, for each group band defined in the input dictionnaires, gives the string
         method to use, the string should be associated in the method define in sklearn_scale
-        s1_log : boolean, if set to True the sar bands are going to pe passed through log10(x+10) function
+        s1_log : boolean, if set to True the sar bands are going to pe passed through 10*log10(x) function
     Returns:
         rescaled_batch_X : a numpy array, the rescaled batch_X
         ,rescaled_batch_label : a numpy array the rescaled batch_label
