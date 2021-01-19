@@ -392,10 +392,10 @@ class GAN():
         # self.combined.load_weights("{}model_combined_i{}.h5".format(self.checkpoint_dir, step))
         if self.model_yaml["d_activation"] == "lrelu":
             d_activation = lambda x: tf.nn.leaky_relu(x, alpha=self.model_yaml["lrelu_alpha"])
-            discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step),
+            discriminator = tf.keras.models.load_model("{}model_discri_i{}".format(self.checkpoint_dir, step),
                                                    custom_objects={"lrelu": d_activation,'L1_loss':L1_loss})
         else:
-            discriminator = tf.keras.models.load_model("{}model_discri_i{}.h5".format(self.checkpoint_dir, step),
+            discriminator = tf.keras.models.load_model("{}model_discri_i{}".format(self.checkpoint_dir, step),
                                                        custom_objects={'L1_loss':L1_loss})
         if self.model_yaml["last_activation"] == "tanh":
             generator = tf.keras.models.load_model("{}model_gene_i{}".format(self.checkpoint_dir, step),
