@@ -28,7 +28,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
     path_weight,founded=find_weight_path(l_weight,select_weight)
     assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
-    #gan_gen = gan.generator.load_weights(path_weight)
+    gan_gen = gan.generator.load_weights(path_weight)
     if save:
         path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
         print("saving image at {}".format(path_save))
