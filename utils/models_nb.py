@@ -17,7 +17,6 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     train_yaml = open_yaml(path_train_yaml)
     model_yaml = open_yaml(path_model_yaml)
     gan = clean_gan.GAN(model_yaml, train_yaml)
-    path_checkpoints=gan.checkpoint_dir
     #gan.load_from_checkpoint(select_weight)
     #l_weight = glob.glob("{}*h5".format(gan.checkpoint_dir))
     if dataset is None:
@@ -33,7 +32,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
     assert len(l_image_name)>0, "No image found in val dir {}".format(path_val)
     #path_weight,founded=find_weight_path(l_weight,select_weight)
     #assert founded is True,"No path weight nb {} founded in {}".format(select_weight,l_weight)
-    gan.generator = load_from_checkpoint(path_checkpoints, select_weight)
+    gan.generator = gan.load_from_checkpoint(select_weight)
     if save:
         path_save=path_model + "training_{}/image_{}_iter_{}/".format(training_nber,prefix_save,select_weight)
         print("saving image at {}".format(path_save))
