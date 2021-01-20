@@ -76,7 +76,9 @@ def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
         i = i + 1
     #print("count", count)
     #print(len(feature_vector_set))
-    #print(np.array(feature_vector_set).shape)
+    print("before multiply shape feature vector {}".format(np.array(feature_vector_set).shape))
+    print(EVS.shape)
+    print(np.array(feature_vector_set).shape)
     #print(EVS.shape)
     FVS = np.dot(feature_vector_set, EVS)
     FVS = FVS - mean_vec
@@ -106,7 +108,9 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     # RUN ACP
     pca = PCA(n_components=n_components)
     pca.fit(vector_set)
-    EVS = pca.components_
+    print(pca.components_.shape)
+    EVS = np.transpose(pca.components_) #shape will be (features,n_components)
+    #TODO try if works better with transpose
     #print("compo", EVS.shape)
     print("The amount of variance explained by the componants of ACP", pca.explained_variance_)
     print("We are using a symetric padding to add the missing dimension ")
