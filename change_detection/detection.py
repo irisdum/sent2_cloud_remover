@@ -125,3 +125,52 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     cleanChangeMap = cv2.erode(change_map, kernel)
 
     return diff_image, change_map, cleanChangeMap
+
+def ACP_on_batch(batch1,batch2, kernel_dim=4, n_components="full", k=2, padding="symmetric",save=False):
+    list_vector_set=[]
+
+    for i in range(batch1.shape[0]): #TODO parallelize to improve the computation time if too slow
+        image1=batch1[i,:,:,:]
+        image2=batch2[i,:,:,:]
+        diff_image = abs(image1 - image2)
+        input_dim = (diff_image.shape[1], diff_image.shape[2])
+        vector_set, mean_vec = find_vector_set(diff_image, n_channel=diff_image.shape[0], kernel_dim=kernel_dim)
+        list_vector_set+=[vector_set]
+
+    batch_vect_set=np.array(list_vector_set)
+    vector_set_dim=(list_vector_set[0].shape[0],list_vector_set[1].shape[0])
+    batch_vect_set=batch_vect_set.reshape((len(list_vector_set)*vector_set_dim[0],vector_set_dim[1])) # a way to concatenate all the data
+    batch_mean_vect=mean_vec = np.mean(vector_set, axis=0)
+    #batch_vect_set has the features built for the whole input batches
+    pca = PCA(n_components=n_components)
+    pca.fit(batch_vect_set)
+    EVS = pca.components_
+    list_FVS=[]
+    for i in range(batch1.shape[0]):
+        image1 = batch1[i, :, :, :]
+        image2 = batch2[i, :, :, :]
+        diff_image = abs(image1 - image2)
+        input_dim = (diff_image.shape[1], diff_image.shape[2])
+        FVS = find_FVS(EVS, diff_image, batch_mean_vect, kernel_dim, padding)
+        list_FVS+=[FVS]
+    batch_FVS=np.array(list_FVS)
+    input_fvs_dim=batch_FVS.shape
+    dim=list_FVS[0].shape
+    batch_FVS.reshape(len(list_FVS)*dim[0],dim[1])
+    least_index, change_map = clustering(batch_FVS, k, input_dim) #TODO think of clustering on the whole batch. Concatenate and then reshape into the different array
+    change_map[change_map == least_index] = 255
+    change_map[change_map != 255] = 0
+    change_map.reshape(input_fvs_dim)
+    kernel = np.asarray(((0, 0, 1, 0, 0),
+                         (0, 1, 1, 1, 0),
+                         (1, 1, 1, 1, 1),
+                         (0, 1, 1, 1, 0),
+                         (0, 0, 1, 0, 0)), dtype=np.uint8)
+    batch_clean_change_map=np.zeros(change_map.shape)
+    for i in range(change_map.shape[0]):
+        change_map[i,:,:,:] = change_map[i,:,:,:].astype(np.uint8)
+
+        batch_clean_change_map[i,:,:,:] = cv2.erode(change_map, kernel)
+    if save:
+        pass #add saving ACP model
+        #save the K-means model
