@@ -354,7 +354,7 @@ class GAN():
                         name_logs, val_logs)
                     write_log_tf2(self.model_writer, name_logs + l_name_metrics + name_val_metric + ["time_in_sec"],
                                   val_logs + l_value_metrics + l_val_value_metrics + [time.time() - start_time],
-                                  epoch * self.num_batches + idx * self.global_batch_size)
+                                  epoch * self.num_batches * self.global_batch_size + idx * self.global_batch_size)
 
             if epoch % self.sigma_step == 0:  # update simga
                 sigma_val = sigma_val * self.sigma_decay
