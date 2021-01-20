@@ -330,7 +330,7 @@ class GAN():
 
                 # Plot the progress
                 print("%d iter %d [D loss: %f, acc.: %.2f%%] [G loss: %f %f]" % (
-                    epoch, epoch * self.num_batches + idx * self.global_batch_size,
+                    epoch, epoch * self.num_batches * self.global_batch_size + idx * self.global_batch_size,
                     d_loss[0], 100 * d_loss[1], g_loss[0],
                     g_loss[1]))
 
@@ -338,7 +338,7 @@ class GAN():
                     gen_imgs = self.generator.predict(batch_input)
 
                     save_images(gen_imgs, self.saving_image_path,
-                                ite=epoch * self.num_batches + idx * self.global_batch_size)
+                                ite=epoch * self.num_batches * self.global_batch_size + idx * self.global_batch_size)
                 # LOGS to print in Tensorboard
                 if idx % self.val_metric_epoch == 0:
                     l_val_name_metrics, l_val_value_metrics = self.val_metric()
