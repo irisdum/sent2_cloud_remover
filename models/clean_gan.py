@@ -282,8 +282,7 @@ class GAN():
 
     def train(self):
         # First the scaler model used :
-        create_safe_directory(self.scaler_dir)
-        save_all_scaler(scaler_dict=self.scale_dict_train, path_dir=self.scaler_dir)
+
 
         # Adversarial ground truths
         valid = np.ones((self.global_batch_size, 30, 30, 1))  # because of the shape of the discri
@@ -293,6 +292,8 @@ class GAN():
             start_epoch = int(self.previous_checkpoint) + 1
             self.discriminator, self.generator, self.combined = self.load_from_checkpoint(self.previous_checkpoint)
         else:
+            create_safe_directory(self.scaler_dir)
+            save_all_scaler(scaler_dict=self.scale_dict_train, path_dir=self.scaler_dir)
             # create_safe_directory(self.saving_logs_path)
             create_safe_directory(self.saving_image_path)
             start_epoch = 0
