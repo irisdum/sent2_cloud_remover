@@ -40,11 +40,25 @@ def find_vector_set(diff_image: np.array, n_channel=1, kernel_dim=5):
         j = j + kernel_dim
 
     mean_vec = np.mean(vector_set, axis=0)
+    print("vec_set",vector_set.shape)
+    print("mean set",np.mean(vector_set, axis=1).shape)
     vector_set = vector_set - mean_vec
     return vector_set, mean_vec
 
 
 def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
+    """
+
+    Args:
+        EVS: Eigen Vector space
+        diff_image:
+        mean_vec: mean vector
+        kernel_dim:
+        padding:
+
+    Returns:
+
+    """
     if kernel_dim % 2 == 0:
         i_before = int(kernel_dim / 2)
         i_after = int(i_before)
@@ -74,12 +88,11 @@ def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
             j = j + 1
             count += 1
         i = i + 1
-    #print("count", count)
-    #print(len(feature_vector_set))
-    #print(np.array(feature_vector_set).shape)
+    print("before multiply shape feature vector {}".format(np.array(feature_vector_set).shape))
     #print(EVS.shape)
-    FVS = np.dot(feature_vector_set, EVS)
-    FVS = FVS - mean_vec
+    FVS = np.dot(np.array(feature_vector_set)-mean_vec, EVS) # Feature_vector_space (Npixels,h*h*nchannel) EVS dim (h*h*nchannel,S number PCA components)
+    #FVS dim will be (Npixel, S, number of PCA components)
+    #FVS = FVS - mean_vec
     print("\nfeature vector space size", FVS.shape)
     assert FVS.shape[0] == input_dim[1] * input_dim[2], "Dimension problem FVS shape is {} and should be {}".format(
         FVS.shape[0], input_dim[1] * input_dim[2])
@@ -87,6 +100,16 @@ def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
 
 
 def clustering(FVS, components, input_shape):
+    """
+
+    Args:
+        FVS: Feature vector space
+        components: nber of cluster K in Kmeans
+        input_shape: (N*N)
+
+    Returns:
+
+    """
     kmeans = KMeans(components, verbose=0)
     kmeans.fit(FVS)
     output = kmeans.predict(FVS)
@@ -97,6 +120,19 @@ def clustering(FVS, components, input_shape):
 
 
 def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, padding="symmetric"):
+    """
+
+    Args:
+        image1: a numpy array of dimension (n_channel, N,N)
+        image2:  a numpy array of dimension (n_channel, N,N)
+        kernel_dim: size of the non-overlapping block, h in the article
+        n_components: number of components for PCA, S in the article
+        k: nber of cluster in the K means
+        padding: type of padding applied with tf.pad
+
+    Returns:
+
+    """
     assert image1.shape[1] % kernel_dim == 0, "To not loose any information please use a kernel_dim {} that divides the" \
                                               " image dimension {}".format(kernel_dim, image1.shape[1])
 
@@ -106,8 +142,10 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     # RUN ACP
     pca = PCA(n_components=n_components)
     pca.fit(vector_set)
-    EVS = pca.components_
-    #print("compo", EVS.shape)
+    print(pca.components_.shape)
+    EVS = np.transpose(pca.components_) #shape will be (features,n_components)
+    #TODO try if works better with transpose
+    print("compo", EVS.shape)
     print("The amount of variance explained by the componants of ACP", pca.explained_variance_)
     print("We are using a symetric padding to add the missing dimension ")
 
@@ -127,6 +165,20 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     return diff_image, change_map, cleanChangeMap
 
 def ACP_on_batch(batch1,batch2, kernel_dim=4, n_components="full", k=2, padding="symmetric",save=False):
+    """
+    NOT FINISEHD DO NOT LOOK !
+    Args:
+        batch1:
+        batch2:
+        kernel_dim:
+        n_components:
+        k:
+        padding:
+        save:
+
+    Returns:
+
+    """
     list_vector_set=[]
 
     for i in range(batch1.shape[0]): #TODO parallelize to improve the computation time if too slow
@@ -140,7 +192,7 @@ def ACP_on_batch(batch1,batch2, kernel_dim=4, n_components="full", k=2, padding=
     batch_vect_set=np.array(list_vector_set)
     vector_set_dim=(list_vector_set[0].shape[0],list_vector_set[1].shape[0])
     batch_vect_set=batch_vect_set.reshape((len(list_vector_set)*vector_set_dim[0],vector_set_dim[1])) # a way to concatenate all the data
-    batch_mean_vect=mean_vec = np.mean(vector_set, axis=0)
+    #batch_mean_vect=mean_vec = np.mean(vector_set, axis=0)
     #batch_vect_set has the features built for the whole input batches
     pca = PCA(n_components=n_components)
     pca.fit(batch_vect_set)
