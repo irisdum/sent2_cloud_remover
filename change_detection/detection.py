@@ -214,13 +214,12 @@ def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="sym
         pca = PCA(n_components=n_components)
         pca.fit(batch_vect_set)
         EVS = np.transpose(pca.components_)
-
         batch_mean_vect = np.mean(batch_vect_set, axis=0)
         kmeans=None
     else:
-        EVS=np.load(load_dir+"EVS.npy")
-        batch_mean_vect=np.load(load_dir+"mean_vect.npy")
-        kmeans=pickle.load(open("{}kmeans.pkl".format(load_dir), "rb"))
+        EVS=np.load(load_dir+"EVS_band{}".format(band_name))
+        batch_mean_vect=np.load(load_dir+"mean_vect{}.npy".format(band_name))
+        kmeans=pickle.load(open("{}kmeans{}.pkl".format(path_save,band_name), "rb"))
     list_FVS = []
 
     for i in range(batch1.shape[0]):
