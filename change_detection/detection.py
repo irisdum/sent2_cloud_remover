@@ -169,7 +169,7 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     return diff_image, change_map, cleanChangeMap
 
 
-def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="symmetric",band=None, path_save=None,load_dir=None):
+def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="symmetric",band=None, path_save=None,load_dir=None,band_name="red"):
     """
     NOT FINISEHD DO NOT LOOK !
     Args:
@@ -252,8 +252,8 @@ def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="sym
     if path_save is not None: #TO SAVE THE MODEL
         assert path_save[-1]=="/".format("Wrong path_save name should be a directory path {}".format(path_save))
         create_safe_directory(path_save)
-        np.save(path_save+"EVS",EVS)
-        np.save(path_save+"mean_vect",batch_mean_vect)
-        pickle.dump(kmeans, open("{}kmeans.pkl".format(path_save), "wb"))
+        np.save(path_save+"EVS_band{}".format(band_name),EVS)
+        np.save(path_save+"mean_vect{}".format(band_name),batch_mean_vect)
+        pickle.dump(kmeans, open("{}kmeans{}.pkl".format(path_save,band_name), "wb"))
 
     return None, change_map, batch_clean_change_map
