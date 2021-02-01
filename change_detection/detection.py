@@ -91,7 +91,7 @@ def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
     print("before multiply shape feature vector {}".format(np.array(feature_vector_set).shape))
     #print(EVS.shape)
     FVS = np.dot(np.array(feature_vector_set)-mean_vec, EVS) # Feature_vector_space (Npixels,h*h*nchannel) EVS dim (h*h*nchannel,S number PCA components)
-    #FVS dim will be (Npixel, S, number of PCA components)
+    #FVS dim will be (Npixel, S)
     #FVS = FVS - mean_vec
     print("\nfeature vector space size", FVS.shape)
     assert FVS.shape[0] == input_dim[1] * input_dim[2], "Dimension problem FVS shape is {} and should be {}".format(
@@ -192,7 +192,8 @@ def ACP_on_batch(batch1,batch2, kernel_dim=4, n_components="full", k=2, padding=
     batch_vect_set=np.array(list_vector_set)
     vector_set_dim=(list_vector_set[0].shape[0],list_vector_set[1].shape[0])
     batch_vect_set=batch_vect_set.reshape((len(list_vector_set)*vector_set_dim[0],vector_set_dim[1])) # a way to concatenate all the data
-    #batch_mean_vect=mean_vec = np.mean(vector_set, axis=0)
+    batch_mean_vect=np.mean(batch_vect_set, axis=0)
+
     #batch_vect_set has the features built for the whole input batches
     pca = PCA(n_components=n_components)
     pca.fit(batch_vect_set)
@@ -226,3 +227,5 @@ def ACP_on_batch(batch1,batch2, kernel_dim=4, n_components="full", k=2, padding=
     if save:
         pass #add saving ACP model
         #save the K-means model
+
+    return None, change_map, batch_clean_change_map
