@@ -220,7 +220,7 @@ def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="sym
     else:
         EVS=np.load(load_dir+"EVS.npy")
         batch_mean_vect=np.load(load_dir+"mean_vect.npy")
-        kmeans=pickle.load(open("{}kmeans.pkl".format(path_save), "rb"))
+        kmeans=pickle.load(open("{}kmeans.pkl".format(load_dir), "rb"))
     list_FVS = []
 
     for i in range(batch1.shape[0]):
