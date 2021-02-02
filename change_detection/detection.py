@@ -42,8 +42,8 @@ def find_vector_set(diff_image: np.array, n_channel=1, kernel_dim=5):
         j = j + kernel_dim
 
     mean_vec = np.mean(vector_set, axis=0)
-    print("vec_set",vector_set.shape)
-    print("mean set",np.mean(vector_set, axis=1).shape)
+    #print("vec_set",vector_set.shape)
+    #print("mean set",np.mean(vector_set, axis=1).shape)
     vector_set = vector_set - mean_vec
     return vector_set, mean_vec
 
@@ -146,12 +146,12 @@ def map_detection(image1, image2, kernel_dim=4, n_components="full", k=2, paddin
     # RUN ACP
     pca = PCA(n_components=n_components)
     pca.fit(vector_set)
-    print(pca.components_.shape)
+    #print(pca.components_.shape)
     EVS = np.transpose(pca.components_) #shape will be (features,n_components)
     #TODO try if works better with transpose
-    print("compo", EVS.shape)
-    print("The amount of variance explained by the componants of ACP", pca.explained_variance_)
-    print("We are using a symetric padding to add the missing dimension ")
+    #print("compo", EVS.shape)
+    #print("The amount of variance explained by the componants of ACP", pca.explained_variance_)
+    #print("We are using a symetric padding to add the missing dimension ")
 
     FVS = find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding)
     least_index, change_map,kmeans = clustering(FVS, k, input_dim)
@@ -203,12 +203,12 @@ def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="sym
             list_vector_set += [vector_set]
 
         batch_vect_set = np.array(list_vector_set)
-        print("batch vect set {}".format(batch_vect_set.shape))
+        #print("batch vect set {}".format(batch_vect_set.shape))
         vector_set_dim = (list_vector_set[0].shape[0], list_vector_set[0].shape[1])
-        print(vector_set_dim)
+        #print(vector_set_dim)
         batch_vect_set = batch_vect_set.reshape(
             (len(list_vector_set) * vector_set_dim[0], vector_set_dim[1]))  # a way to concatenate all the data
-        print("after reshape {}".format(batch_vect_set.shape))
+        #print("after reshape {}".format(batch_vect_set.shape))
 
      # batch_vect_set has the features built for the whole input batches
         pca = PCA(n_components=n_components)
@@ -232,7 +232,7 @@ def ACP_on_batch(batch1, batch2, kernel_dim=4, n_components=3, k=2, padding="sym
     batch_FVS = np.array(list_FVS)
     dim = list_FVS[0].shape
     batch_FVS = batch_FVS.reshape(len(list_FVS) * dim[0], dim[1])
-    print("FVS shape{}".format(batch_FVS.shape))
+    #print("FVS shape{}".format(batch_FVS.shape))
     shape_change_map = (batch1.shape[0], batch1.shape[1], batch1.shape[2])
     least_index, change_map,kmeans = clustering(batch_FVS, k,
                                                 shape_change_map,kmeans=kmeans)
