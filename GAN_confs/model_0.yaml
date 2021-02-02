@@ -1,0 +1,74 @@
+
+model_name: new_model_corr
+
+# DIMENSION DATA
+input_shape: [256,256,8] #represent the dimension of one image (one tile) as the input of the generator
+dim_gt_image: [256,256,4] #represents the dimensions of the image to simulate (ground truth image)
+
+######################################
+#### THE GENERATOR PARAM #############
+######################################
+
+param_before_resnet: [[64,7],[128,3],[256,3]] # [dim,k] for the layers before the resnet blocks
+nb_resnet_blocs: 9 # Number of Resnet Block
+k_resnet: 3 #size of the kernel during the resent blocks
+dim_resnet: 256  #the nber of filter used in the resnet blocks
+param_after_resnet: [[128,3],[64,3]]
+stride: [1,1]
+padding: same
+
+last_layer: [4,3]
+last_activation: tanh
+#batch norm momentum
+bn_momentum: 0.99
+#dropout rate
+do_rate: 0.5
+
+######################################
+#### THE DISCRIMINATOR PARAM #############
+######################################
+#describe the whole discriminator architecture
+discri_opt_padding: SYMMETRIC #"CONSTANT" for ZeroPadding, REFLECT or SYMMETRIC
+
+layer_key: ["padding","stride","kernel","nfilter"] #corresponds to the parameter name to be modified in the following dict
+dict_discri_archi:
+  1:
+    - 1
+    - 2
+    - 4
+    - 64
+  2:
+    - 1
+    - 2
+    - 4
+    - 256
+  3:
+    - 1
+    - 2
+    - 4
+    - 256
+  4:
+    - 1
+    - 1
+    - 4
+    - 512
+  5:
+    - 1
+    - 1
+    - 4
+    - 1
+discri_dense_archi:
+  1:
+    - 1
+  #the values will be zipped with layer key
+## last layer activation leaky relu alpha_param
+lrelu_alpha: 0.2 #useful only if lrelu
+d_activation: "lrelu" #could also be lrelu or relu, corresponds to the activation of the discriminator
+d_last_activ: sigmoid
+
+
+
+add_discri_white_noise: false #boolean if True white noise is added to the input data
+add_relu_after_noise: true
+
+add_discri_noise: false #if set to true add_discri_white_noise should be set to false !!!!
