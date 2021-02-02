@@ -84,7 +84,8 @@ def compute_metric(gt, gen_img,compute_sam=False):
     _, ssim = ssim_batch(gt, gen_img)
     if compute_sam:
         _,bsam=batch_sam(gt,gen_img)
-    _, bsam = 2,1
+    else:
+        _, bsam = 2,1
     l_name = ["psnr", "ssim", "sam"]
     l_val = [psnr, ssim, bsam]
     return l_name, l_val
