@@ -79,9 +79,11 @@ def pixels_sam(pixel1, pixel2):
     return alpha
 
 
-def compute_metric(gt, gen_img):
+def compute_metric(gt, gen_img,compute_sam=False):
     _, psnr = batch_psnr(gt, gen_img)
     _, ssim = ssim_batch(gt, gen_img)
+    if compute_sam:
+        _,bsam=batch_sam(gt,gen_img)
     _, bsam = 2,1
     l_name = ["psnr", "ssim", "sam"]
     l_val = [psnr, ssim, bsam]
