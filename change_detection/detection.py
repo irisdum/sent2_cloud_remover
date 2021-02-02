@@ -90,12 +90,12 @@ def find_FVS(EVS, diff_image, mean_vec, kernel_dim, padding="symmetric"):
             j = j + 1
             count += 1
         i = i + 1
-    print("before multiply shape feature vector {}".format(np.array(feature_vector_set).shape))
+    #print("before multiply shape feature vector {}".format(np.array(feature_vector_set).shape))
     #print(EVS.shape)
     FVS = np.dot(np.array(feature_vector_set)-mean_vec, EVS) # Feature_vector_space (Npixels,h*h*nchannel) EVS dim (h*h*nchannel,S number PCA components)
     #FVS dim will be (Npixel, S)
     #FVS = FVS - mean_vec
-    print("\nfeature vector space size", FVS.shape)
+    #print("\nfeature vector space size", FVS.shape)
     assert FVS.shape[0] == input_dim[1] * input_dim[2], "Dimension problem FVS shape is {} and should be {}".format(
         FVS.shape[0], input_dim[1] * input_dim[2])
     return FVS
