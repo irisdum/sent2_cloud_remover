@@ -420,7 +420,7 @@ class GAN():
             print("We load our data from {}".format(batch))
 
             l_image_id = find_image_indir(batch + XDIR, "npy")
-            batch, _ = load_data(batch, x_shape=self.model_yaml["input_shape"],
+            batch, _ ,_= load_data(batch, x_shape=self.model_yaml["input_shape"],
                                  label_shape=self.model_yaml["dim_gt_image"], normalization=self.normalization,
                                  dict_band_X=self.dict_band_X, dict_band_label=self.dict_band_label,
                                  dict_rescale_type=self.dict_rescale_type, dict_scale=self.scale_dict_train,
