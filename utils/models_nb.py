@@ -37,7 +37,7 @@ def predict_iter_on_val(path_model, training_nber, select_weight=100, save=True,
         print("saving image at {}".format(path_save))
     else:
         path_save=None
-    print("We have to predict on {} tiles".format(val_dataX.shape[0]))
+    print("We have to predict on {} tiles".format(len(l_image_name)))
     bath_res= gan.predict_on_iter(val_dataX, path_save, l_image_id=l_image_name, un_rescale=True,generator=gan.generator)
     #TODO Modify the code so we do not have to load each time all the data. For instance create like a another class of GAN model
     #with all the necessary attributes for prediction and nothing more.
