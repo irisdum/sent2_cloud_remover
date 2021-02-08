@@ -4,7 +4,7 @@ import numpy as np
 from skimage.measure import compare_ssim as ssim
 
 
-def calculate_psnr(img1, img2, max_value=255):
+def calculate_psnr(img1, img2, max_value=4095):
     """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
     mse = np.mean((np.array(img1, dtype=np.float32) - np.array(img2, dtype=np.float32)) ** 2)
     if mse == 0:
@@ -23,7 +23,7 @@ def psnr_by_band(im1, im2, max_value):
     return l, np.mean(l)
 
 
-def batch_psnr(batch1, batch2, max_value=1):
+def batch_psnr(batch1, batch2, max_value=4095):
     """Compute the psnr value on a batch of images"""
     assert batch1.shape == batch2.shape, "Batch 1 {} does not have the same dim as batch 2 {}".format(batch1.shape,
                                                                                                       batch2.shape)
@@ -79,8 +79,8 @@ def pixels_sam(pixel1, pixel2):
     return alpha
 
 
-def compute_metric(gt, gen_img,compute_sam=False):
-    _, psnr = batch_psnr(gt, gen_img)
+def compute_metric(gt, gen_img,max_value=4095,compute_sam=False):
+    _, psnr = batch_psnr(gt, gen_img,max_value=max_value)
     _, ssim = ssim_batch(gt, gen_img)
     if compute_sam:
         _,bsam=batch_sam(gt,gen_img)
