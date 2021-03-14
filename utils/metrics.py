@@ -4,7 +4,7 @@ import numpy as np
 from skimage.measure import compare_ssim as ssim
 
 
-def calculate_psnr(img1, img2, max_value=4095):
+def calculate_psnr(img1, img2, max_value=1.27):
     """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
     mse = np.mean((np.array(img1, dtype=np.float32) - np.array(img2, dtype=np.float32)) ** 2)
     if mse == 0:
