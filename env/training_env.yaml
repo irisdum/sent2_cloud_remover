@@ -30,4 +30,5 @@ dependencies:
       - jupyter-tensorboard
       - joblib
       - tensorboard_plugin_profile
+      - runai
 
