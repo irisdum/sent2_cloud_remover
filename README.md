@@ -1,3 +1,6 @@
+The clean verson of this code is available at : https://github.com/irisdum/cGAN_sent2_sim
+
+
 # sent2-cloud-remover
 IN PROGRESS, this code is not finished and change regularly !!!!!
 This project aim at first using the method of conditional Generative adversial Network on Sentinel 1 and Sentinel 2 
